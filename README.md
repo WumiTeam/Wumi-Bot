@@ -109,8 +109,8 @@ Right-click a member › **Sanction**, warnings with automatic steps, automod, a
 **You need:** Node.js **22.5 or newer** (24 recommended) and a Discord application from the [Developer Portal](https://discord.com/developers/applications).
 
 ```bash
-git clone https://github.com/Zhaak63/Wumi-bot.git
-cd Wumi-bot
+git clone https://github.com/WumiTeam/Wumi-Bot.git
+cd Wumi-Bot
 npm install
 cp .env.example .env      # then fill in DISCORD_TOKEN, CLIENT_ID, OWNER_IDS...
 npm run deploy            # registers the slash commands
