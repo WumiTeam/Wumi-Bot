@@ -109,8 +109,8 @@ Clic droit sur un membre › **Sanctionner**, avertissements avec paliers automa
 **Il te faut :** Node.js **22.5 ou plus** (24 conseillé) et une application Discord créée sur le [Developer Portal](https://discord.com/developers/applications).
 
 ```bash
-git clone https://github.com/Zhaak63/Wumi-bot.git
-cd Wumi-bot
+git clone https://github.com/WumiTeam/Wumi-Bot.git
+cd Wumi-Bot
 npm install
 cp .env.example .env      # puis remplis DISCORD_TOKEN, CLIENT_ID, OWNER_IDS...
 npm run deploy            # enregistre les commandes slash
