@@ -1,0 +1,43 @@
+{
+  "antiphishing": {
+    "motif": "Lien de phishing",
+    "detail": "Ce lien pointe vers un site de phishing connu ({domaine}).",
+    "raison_sanction": "Lien de phishing détecté : {domaine}",
+    "log_titre": "Anti-phishing",
+    "log_membre": "Membre",
+    "log_domaine": "Domaine",
+    "log_action": "Action",
+    "log_lien": "Lien",
+    "log_total": "Blocages anti-phishing (bot) : {n}",
+    "action": {
+      "supprimer": "Message supprimé",
+      "avertir": "Message supprimé, membre averti",
+      "exclure": "Membre exclu",
+      "bannir": "Membre banni"
+    }
+  },
+  "config": {
+    "r": {
+      "antiphishing_actif": {
+        "nom": "Anti-phishing",
+        "aide": "Bloque les liens vers des sites de phishing connus (liste communautaire, mise à jour automatiquement toutes les heures)."
+      },
+      "antiphishing_action": {
+        "nom": "Action sur un lien signalé",
+        "aide": "Ce qui arrive en plus de la suppression du message."
+      },
+      "antiphishing_liste_blanche": {
+        "nom": "Liste blanche anti-phishing",
+        "aide": "Domaines toujours autorisés sur ce serveur, séparés par des virgules."
+      }
+    },
+    "valeur": {
+      "antiphishing_action": {
+        "supprimer": "Supprimer le message",
+        "avertir": "Supprimer et avertir",
+        "exclure": "Exclure le membre",
+        "bannir": "Bannir le membre"
+      }
+    }
+  }
+}

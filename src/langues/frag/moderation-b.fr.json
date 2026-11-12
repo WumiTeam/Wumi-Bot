@@ -1,0 +1,83 @@
+{
+  "sanctions": {
+    "description_commande": "Consulte et gère l'historique des sanctions",
+    "sous_liste": "Affiche l'historique d'un membre",
+    "sous_retirer": "Supprime une sanction par son identifiant",
+    "sous_vider": "Annule tous les avertissements actifs d'un membre",
+    "opt_membre": "Le membre",
+    "opt_id": "Numéro de la sanction",
+    "introuvable": "Aucune sanction #{n} sur ce serveur.",
+    "retiree": "Sanction **#{n}** ({type}) supprimée de l'historique.",
+    "videes": "**{n}** avertissement annulé pour {membre}. || **{n}** avertissements annulés pour {membre}.",
+    "vide": "**{membre}** n'a aucune sanction : casier vierge.",
+    "titre": "Sanctions de {pseudo}",
+    "resume": "Résumé",
+    "total": "**{n}** sanction au total || **{n}** sanctions au total",
+    "actifs": "**{n}** avertissement actif || **{n}** avertissements actifs",
+    "par": "par {moderateur}",
+    "duree": "durée {duree}",
+    "plus_recentes": "**{max}** sanctions les plus récentes sur **{total}**.",
+    "id_compte": "ID : {id}",
+    "type": {
+      "warn": "Avertissement",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "kick": "Expulsion",
+      "ban": "Bannissement",
+      "unban": "Débannissement",
+      "automod": "Automod",
+      "clear": "Purge",
+      "lockdown": "Verrouillage"
+    }
+  },
+  "signaler": {
+    "pas_configure": "Les signalements ne sont pas configurés sur ce serveur.\nUn responsable peut choisir le salon avec `/config` → **Communauté**.",
+    "pas_de_bot": "Inutile de signaler un message de bot.",
+    "pas_soi_meme": "Tu ne peux pas signaler ton propre message.",
+    "deja_signale": "Ce message a déjà été signalé : l'équipe l'a en attente de traitement.",
+    "trop_vite": "Tu as déjà signalé un message il y a peu. Réessaie {quand}.",
+    "fenetre_titre": "Signaler ce message",
+    "champ_label": "Pourquoi signales-tu ce message ?",
+    "champ_exemple": "Insultes, spam, lien suspect, hors-sujet répété…"
+  },
+  "slowmode": {
+    "description_commande": "Définit le mode lent d'un salon",
+    "opt_duree": "Ex : 5s, 30s, 2m, 1h — « 0 » pour désactiver",
+    "opt_salon": "Salon visé (par défaut : celui-ci)",
+    "duree_invalide": "Durée invalide. Exemples : `5s`, `30s`, `2m`, `1h`, `0`.",
+    "maximum": "Le mode lent est limité à **6 heures**.",
+    "desactive": "Mode lent désactivé dans {salon}.",
+    "regle": "Mode lent réglé sur **{duree}** dans {salon}.",
+    "audit": "Mode lent modifié par {moderateur}"
+  },
+  "unban": {
+    "description_commande": "Débannit un membre",
+    "opt_utilisateur": "Identifiant de l'utilisateur à débannir",
+    "opt_raison": "Raison du débannissement",
+    "id_invalide": "Identifiant invalide.",
+    "pas_banni": "Cet utilisateur n'est pas banni.",
+    "fait": "**{membre}** a été débanni.",
+    "audit": "{raison} — par {moderateur}"
+  },
+  "unmute": {
+    "description_commande": "Retire le mute d'un membre",
+    "opt_membre": "Le membre",
+    "opt_raison": "Raison du retrait",
+    "pas_sur_serveur": "Ce membre n'est pas sur le serveur.",
+    "pas_muet": "Ce membre n'est pas muet.",
+    "fait": "**{membre}** peut de nouveau parler.",
+    "audit": "{raison} — par {moderateur}"
+  },
+  "warn": {
+    "description_commande": "Avertit un membre",
+    "opt_membre": "Le membre à avertir",
+    "opt_raison": "Raison de l'avertissement",
+    "pas_sur_serveur": "Ce membre n'est pas sur le serveur.",
+    "fait": "**{membre}** a reçu un avertissement (**{n}** au total).",
+    "escalade_mute": "Escalade automatique : **mute de {duree}**.",
+    "escalade_kick": "Escalade automatique : **expulsion**.",
+    "escalade_ban": "Escalade automatique : **bannissement**.",
+    "escalade_impossible": "Escalade automatique impossible (permissions ou hiérarchie).",
+    "escalade_raison": "Escalade automatique — {n} avertissements"
+  }
+}

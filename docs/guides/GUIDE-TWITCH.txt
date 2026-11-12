@@ -1,0 +1,99 @@
+ANNONCER LES DIRECTS TWITCH
+===========================
+
+Le bot regarde toutes les 2 minutes si la chaine est en direct, et poste une
+annonce des qu'elle demarre. Pour cela il lui faut une « application Twitch » :
+c'est gratuit, ca prend cinq minutes, et ca ne demande AUCUN acces au compte
+de la streameuse. L'application ne fait que consulter des informations
+publiques.
+
+
+ETAPE 1 — Creer l'application
+-----------------------------
+1. Va sur  https://dev.twitch.tv/console/apps
+2. Connecte-toi avec un compte Twitch (le tien suffit — ce n'est pas
+   forcement celui de la chaine surveillee).
+3. Twitch demande d'activer l'authentification a deux facteurs sur ce compte
+   avant de laisser creer une application. C'est obligatoire, fais-le.
+4. Clique sur « Enregistrer votre application ».
+   - Nom : ce que tu veux, il doit juste etre unique sur Twitch.
+   - URL de redirection OAuth : http://localhost
+     (elle ne sert pas ici, mais le champ est obligatoire)
+   - Categorie : Application Integration
+   - Type de client : Confidentiel
+5. Valide.
+
+
+ETAPE 2 — Recuperer les deux valeurs
+------------------------------------
+Sur la page de l'application, clique sur « Gerer ».
+
+  - ID client        : affiche directement, copie-le.
+  - Secret du client : clique sur « Nouveau secret ». Il ne s'affiche
+                       QU'UNE SEULE FOIS. Copie-le tout de suite.
+                       Si tu le perds, tu en generes un autre, ce n'est pas
+                       grave — mais l'ancien cesse alors de fonctionner.
+
+
+ETAPE 3 — Les mettre dans le .env
+---------------------------------
+Ouvre le fichier .env a la racine du bot et ajoute ces deux lignes :
+
+    TWITCH_CLIENT_ID=colle_ici_l_id_client
+    TWITCH_CLIENT_SECRET=colle_ici_le_secret
+
+Une ligne chacune, sans guillemets, sans espace autour du signe egal.
+Puis redemarre le bot.
+
+
+ETAPE 4 — Ajouter la chaine
+---------------------------
+Dans Discord :
+
+    /veille ajouter  type: 🔴 Twitch  salon: #annonces  source: mana__tw
+                     role: @Notif  message: Elle est en live !
+
+Le champ « source » accepte le pseudo seul, @pseudo, ou l'adresse complete de
+la chaine.
+
+Ou depuis le panneau, onglet « Annonces auto ».
+
+
+CE QU'IL FAUT SAVOIR
+--------------------
+Si la chaine est DEJA en direct au moment ou tu ajoutes la source, ce direct-la
+ne sera pas annonce : le bot part de maintenant. Le suivant le sera. C'est
+voulu — annoncer un stream commence il y a trois heures n'a pas d'interet.
+
+Une chaine hors ligne est acceptee sans probleme a l'ajout. C'est meme l'etat
+dans lequel elle se trouve la plupart du temps.
+
+Une annonce par direct. Tant que le stream continue, le bot se tait ; il
+reparle au direct suivant. Si elle coupe et relance dans la foulee, ca compte
+comme deux directs et ca fait deux annonces.
+
+Le delai peut aller jusqu'a 2 minutes : le bot demande a Twitch, Twitch ne le
+previent pas. Tu peux descendre a 1 minute dans config.js
+(veille.intervalleTwitchMinutes), l'API le supporte tres largement.
+
+Le jeton se renouvelle tout seul et n'expire jamais vraiment : contrairement a
+Instagram, il n'y a rien a surveiller ni a reconnecter. Si tu regeneres le
+secret cote Twitch, remplace-le dans le .env et redemarre.
+
+
+EN CAS DE PROBLEME
+------------------
+« identifiants Twitch absents »
+    Les deux lignes manquent dans le .env, ou le bot n'a pas ete redemarre
+    depuis que tu les as ajoutees.
+
+« 401 » ou « Invalid OAuth token »
+    Le secret est faux, ou il a ete regenere cote Twitch. Reprends l'etape 2.
+
+« chaine Twitch introuvable »
+    Le pseudo est mal orthographie. Attention aux blancs soulignes : la chaine
+    de Mana en a DEUX (mana__tw).
+
+« pseudo Twitch invalide »
+    Le pseudo contient un caractere impossible. Un pseudo Twitch ne contient
+    que des lettres, des chiffres et des blancs soulignes.

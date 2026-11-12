@@ -1,0 +1,73 @@
+=====================================================================
+  WUMI 2.0 — VERIFICATION PAR ACTIVITE DISCORD (serveur support)
+=====================================================================
+
+Le membre clique « Se vérifier » : une petite application s'ouvre DANS
+Discord (une « Activité »), il accepte le règlement, touche l'emoji demandé,
+et reçoit son rôle. Discord confirme son identité : impossible de tricher.
+
+Tant que l'Activité n'est pas branchée, le panneau propose automatiquement
+un code à recopier à la place. Tu peux donc publier le panneau tout de suite
+et brancher l'Activité plus tard.
+
+
+---------------------------------------------------------------------
+ 1. LE SERVEUR PUBLIC (la page de l'Activité)
+---------------------------------------------------------------------
+Toute la partie réseau (DNS OVH, Livebox, Caddy, .env) est dans
+GUIDE-WEB.txt. Quand https://verif.wumi.fr/sante répond {"ok":true,...},
+reviens ici.
+
+
+---------------------------------------------------------------------
+ 2. LE DEVELOPER PORTAL (https://discord.com/developers/applications)
+---------------------------------------------------------------------
+  a) OAuth2 > Client Secret > « Reset Secret » > copie-le dans le .env :
+       CLIENT_SECRET=...
+  b) OAuth2 > Redirects > ajoute : https://127.0.0.1
+     (Discord l'exige pour les Activités, même si on ne s'en sert pas.)
+  c) Activities > URL Mappings > Root Mapping :
+       PREFIX  /
+       TARGET  verif.wumi.fr               (sans https://, sans / final)
+  d) Activities > Settings > coche « Enable Activities ».
+     Discord crée alors une commande d'entrée (« Launch »).
+
+
+---------------------------------------------------------------------
+ 3. ACTIVER DANS LE BOT
+---------------------------------------------------------------------
+  a) Dans le .env :  ACTIVITE_ACTIVE=true
+  b) Redémarre le bot.
+  c) Redéploie les commandes :  npm run deploy
+     (le script reprend la commande d'entrée de l'Activité ; sans ça,
+     Discord refuserait le déploiement avec l'erreur 50240.)
+
+
+---------------------------------------------------------------------
+ 4. SUR LE SERVEUR SUPPORT (toi seul, avec /admin)
+---------------------------------------------------------------------
+  /admin verification role role:@Vérifié non-verifie:@Non vérifié
+  /admin verification age-minimum jours:3          (facultatif)
+  /admin verification panneau salon:#vérification
+  /admin verification voir                         (tout vérifier d'un coup)
+
+  Le rôle du bot doit être AU-DESSUS du rôle @Vérifié, avec la permission
+  « Gérer les rôles ». Configuration classique des salons : @everyone ne voit
+  que #vérification, @Vérifié voit le reste.
+
+
+---------------------------------------------------------------------
+ EN CAS DE SOUCI
+---------------------------------------------------------------------
+  « Impossible d'ouvrir l'Activité »
+     → Activities pas activées dans le portail, ou ACTIVITE_ACTIVE=true sans
+       que le portail suive. Le bouton de secours (code) reste disponible.
+  L'Activité s'ouvre mais reste sur « Connexion à Discord… »
+     → URL Mapping incorrect, ou le tunnel est coupé (teste /sante).
+  « code refusé par Discord »
+     → CLIENT_SECRET faux, ou redirect https://127.0.0.1 absent.
+  Lancée depuis un autre serveur
+     → refusé volontairement : la vérification ne marche que sur le support.
+
+Tout est tracé dans LOG_VERIFICATION (réussites ET refus : comptes trop
+récents, liste noire, trop d'essais) : pratique pour repérer un raid.

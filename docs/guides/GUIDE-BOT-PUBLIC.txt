@@ -1,0 +1,240 @@
+METTRE BLUEPRINT EN PUBLIC
+==========================
+
+Le code est pret. Ce qui reste est du cote de Discord, et ca se fait dans le
+Developer Portal (https://discord.com/developers/applications).
+
+Fais les etapes dans l'ordre : la 4 depend de la 3.
+
+
+------------------------------------------------------------------------------
+1. OUVRIR L'INVITATION A TOUT LE MONDE
+------------------------------------------------------------------------------
+
+Developer Portal > ton application > Bot
+
+  [x] PUBLIC BOT          <- a cocher. Tant que c'est decoche, toi seul peux
+                             ajouter le bot quelque part.
+  [ ] REQUIRES OAUTH2 CODE GRANT   <- a laisser DECOCHE. Coche, l'ajout echoue
+                             pour tout le monde avec une erreur incomprehensible.
+
+Puis Installation > Install Link : choisis « Discord Provided Link ».
+Dans Default Install Settings, scopes : bot + applications.commands.
+
+Le lien obtenu est celui que tu donnes. Garde-le : c'est lui qu'on partage.
+
+
+------------------------------------------------------------------------------
+2. DEPLOYER LES COMMANDES EN GLOBAL
+------------------------------------------------------------------------------
+
+Dans ton .env, GUILD_ID doit etre VIDE :
+
+    GUILD_ID=
+
+Puis, une seule fois :
+
+    node src/deploy-commands.js
+
+La premiere propagation prend jusqu'a une heure. Ensuite, tout serveur qui
+ajoute le bot a les commandes immediatement, sans rien relancer.
+
+SI TU AVAIS DEJA DEPLOYE SUR TES SERVEURS : les copies locales restent, et tes
+commandes apparaissent EN DOUBLE. Remets temporairement GUILD_ID avec les
+identifiants concernes et lance :
+
+    node src/deploy-commands.js --vider
+
+Puis revide GUILD_ID.
+
+
+------------------------------------------------------------------------------
+3. PUBLIER LES DEUX DOCUMENTS
+------------------------------------------------------------------------------
+
+Deux fichiers sont a la racine du projet :
+
+    CONFIDENTIALITE.md    ce que le bot enregistre et comment le faire effacer
+    CONDITIONS.md         les conditions d'utilisation
+
+AVANT DE LES PUBLIER, remplis les deux lignes de contact a la fin de chacun
+(ton e-mail, ton serveur de support). Discord exige une adresse valide.
+
+Il leur faut une adresse web. Le plus simple, gratuit :
+  - cree un depot public sur GitHub,
+  - depose les deux fichiers,
+  - l'adresse de chaque fichier est son lien « Raw » ou la page GitHub.
+
+Puis Developer Portal > General Information :
+    Terms of Service URL   -> le lien de CONDITIONS.md
+    Privacy Policy URL     -> le lien de CONFIDENTIALITE.md
+
+Ces deux champs sont OBLIGATOIRES pour la verification.
+
+
+------------------------------------------------------------------------------
+4. LA VERIFICATION (a partir de 75 serveurs)
+------------------------------------------------------------------------------
+
+Discord n'accorde les intents privilegies sans rien demander que sous
+100 serveurs. Au-dela, il faut faire verifier l'application.
+
+Les deux intents concernes, et ce qu'on perd sans eux :
+
+  SERVER MEMBERS INTENT      messages de bienvenue et d'au revoir, suivi des
+                             invitations, anti-raid, salons statistiques
+
+  MESSAGE CONTENT INTENT     automod (mots interdits, liens, majuscules, spam),
+                             reponses automatiques de la FAQ, texte des
+                             messages dans les logs
+
+Le reste — niveaux, economie, moderation manuelle, tickets, suggestions,
+veille, cartes — ne depend d'aucun des deux et continue de marcher.
+
+LE BOT NE PLANTE PAS SI DISCORD REFUSE. Il reessaie de se connecter sans
+l'intent refuse, ecrit dans la console ce qui est desactive, et sert les
+serveurs normalement pour tout le reste.
+
+Le dossier se depose dans Developer Portal > ton application > App Verification.
+Il demande une piece d'identite et une description de l'usage que tu fais de
+chaque intent. COMPTE PLUSIEURS SEMAINES DE REPONSE : depose-le vers
+75 serveurs, pas a 99.
+
+Ce que tu peux ecrire pour justifier les intents :
+
+  Message Content : « Le bot propose une moderation automatique configurable
+  (anti-spam, filtrage de liens et de mots) et un systeme de questions
+  frequentes qui repond automatiquement. Les deux analysent le texte des
+  messages au moment ou ils arrivent. Aucun contenu n'est stocke : l'analyse
+  est faite en memoire et le message est oublie immediatement. »
+
+  Server Members : « Le bot envoie des messages de bienvenue et d'au revoir,
+  suit quelle invitation a amene quel membre pour un systeme de recompenses,
+  et applique une protection anti-raid basee sur l'age des comptes et le
+  rythme des arrivees. »
+
+Le bot te previent tout seul dans la console quand il passe 75, puis 100
+serveurs.
+
+
+------------------------------------------------------------------------------
+5. INSCRIRE LE BOT SUR TOP.GG
+------------------------------------------------------------------------------
+
+top.gg est l'annuaire de bots Discord le plus frequente : c'est de la que
+viennent la plupart des ajouts pour un bot qui debute.
+
+  1. Va sur https://top.gg, connecte-toi, « Add bot ».
+  2. Remplis la fiche : description, prefixe (mets « / »), les liens de ta
+     politique de confidentialite et de tes conditions (ceux de l'etape 3).
+  3. Attends la validation, souvent quelques jours.
+  4. Une fois valide : ta page > onglet API > copie le jeton.
+  5. Colle-le dans ton .env :
+
+         TOPGG_TOKEN=le_jeton
+
+  6. Relance le bot.
+
+Le bot publie alors son nombre de serveurs toutes les 30 minutes — c'est ce
+chiffre qui pese dans le classement, et personne ne le met a jour a ta place.
+
+LES VOTES
+  `/voter` donne le lien et un bouton « J'ai vote ». Quand quelqu'un clique,
+  le bot DEMANDE a top.gg si la personne a vote. Il n'y a donc aucune adresse
+  publique a ouvrir sur ta box : c'est le bot qui appelle top.gg, jamais
+  l'inverse.
+
+  La recompense par defaut est un bonus d'XP double pendant 12 heures, reglable
+  par serveur avec `/config votes recompense`. Un vote = une recompense, meme
+  si la personne est sur dix serveurs : un vote vaut pour le bot, pas pour un
+  serveur.
+
+  top.gg sait aussi PREVENIR un bot a chaque vote, mais cela demande une
+  adresse publique en HTTPS (port ouvert, nom de domaine, certificat). Le jour
+  ou tu heberges le bot sur un serveur avec un domaine, ca vaudra le coup — la
+  recompense tomberait alors sans que personne ait a la reclamer.
+
+
+------------------------------------------------------------------------------
+6. LA BLOCKLIST COMMUNAUTAIRE
+------------------------------------------------------------------------------
+
+Une liste de membres signales, partagee entre tous les serveurs du bot.
+
+A REGLER UNE FOIS, sur ton serveur support :
+
+    /config blocklist salons examen:#salon-prive public:#salon-des-fiches
+
+  examen : le salon ou ton staff voit arriver les propositions. Prive.
+  public : le salon ou les fiches approuvees sont publiees.
+
+LE CHEMIN D'UNE FICHE
+  1. Un administrateur, sur n'importe quel serveur, fait
+     `/blocklist proposer identifiant:… raison:…`
+  2. La fiche arrive dans ton salon d'examen, avec deux boutons.
+  3. Ton staff approuve ou refuse. LUI SEUL : le bouton verifie que la
+     personne est bien sur le serveur support ET qu'elle a « Gerer le
+     serveur ».
+  4. Si c'est approuve, la fiche part dans le salon public : pseudo,
+     identifiant, raison. Le nom du PROPOSANT n'y figure pas — il est garde
+     dans la fiche d'examen, pas expose publiquement.
+  5. Les autres serveurs consultent avec `/blocklist verifier` ou
+     `/blocklist liste`.
+
+L'ALERTE A L'ARRIVEE
+  Un serveur qui le veut active `/config blocklist alerte actif:true`. Quand
+  une personne de la liste le rejoint, le staff est prevenu dans ses logs de
+  moderation.
+
+  LE BOT NE SANCTIONNE JAMAIS TOUT SEUL. Une seule fiche approuvee a tort
+  ferait sinon bannir quelqu'un sur des dizaines de serveurs d'un coup, sans
+  recours. Il previent, le staff decide.
+
+RETIRER UNE FICHE
+  `/blocklist retirer fiche:12`, reserve a ton staff. Le message public est
+  efface en meme temps : laisser l'accusation en ligne apres avoir retire la
+  fiche serait pire que de ne pas l'avoir retiree.
+
+CE QUI EST ENREGISTRE
+  Qui a propose, qui a approuve, quand. Une accusation publique doit pouvoir
+  se remonter jusqu'a son auteur.
+
+
+------------------------------------------------------------------------------
+7. A 2500 SERVEURS
+------------------------------------------------------------------------------
+
+Discord impose alors le « sharding » : le bot doit se decouper en plusieurs
+connexions. Ce n'est pas un ralentissement, c'est un refus de connexion.
+
+Ce n'est PAS fait dans le code actuel, et ca demande deux choses :
+  - un ShardingManager qui lance plusieurs processus,
+  - sortir la base de son fichier SQLite unique, qui se partage mal entre
+    plusieurs processus qui ecrivent en meme temps.
+
+Le bot te previent a 2000 serveurs. D'ici la, il y aura de quoi voir venir.
+
+
+------------------------------------------------------------------------------
+CE QUI A CHANGE DANS LE BOT
+------------------------------------------------------------------------------
+
+  - A l'arrivee sur un serveur, le bot poste un message de presentation dans
+    le premier salon ou il a vraiment le droit d'ecrire. Si aucun ne convient,
+    il ecrit au proprietaire en prive.
+
+  - /demarrer : la configuration guidee, en cinq menus. Chaque etape enregistre
+    tout de suite, donc s'arreter au milieu ne perd rien.
+
+  - /confidentialite voir et /confidentialite effacer : chaque membre peut voir
+    ce qui est enregistre sur lui et le faire effacer.
+
+  - Quand le bot est retire d'un serveur, toutes les donnees de ce serveur sont
+    effacees. Sauf pendant une panne Discord : le bot fait la difference.
+
+  - Les photographies de structure du serveur sont maintenant DESACTIVEES par
+    defaut. Utile sur son propre serveur, inutile sur des centaines d'autres.
+
+  - Maximum 10 sources de veille par serveur. Chaque source est une requete
+    reseau sur une minuterie : sans plafond, un seul serveur peut ralentir le
+    bot pour tous les autres.

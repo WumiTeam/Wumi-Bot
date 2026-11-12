@@ -1,0 +1,54 @@
+{
+  "config": {
+    "exporter": "Export",
+    "historique": "History",
+    "r": {
+      "statut_salon": {
+        "nom": "Status channel",
+        "aide": "Where the bot posts its state, refreshed every 5 minutes"
+      }
+    }
+  },
+  "configplus": {
+    "export": {
+      "titre": "Settings exported",
+      "texte": "{n} setting is in the file below. || {n} settings are in the file below.",
+      "rappel": "To put them on another server: `/config` with the `file` option. Channels and roles don't travel — they don't exist over there."
+    },
+    "import": {
+      "opt_fichier": "An exported settings file, to apply it here",
+      "titre": "Import settings",
+      "resume": "**{n}** setting will change. || **{n}** settings will change.",
+      "pourquoi_ignores": "Channels, roles and categories in the file are skipped: their IDs belong to the other server and point to nothing here.",
+      "rien": "Nothing to import. {ignores} pointed at channels or roles from the other server.",
+      "fait": "{n} setting imported. || {n} settings imported.",
+      "expire": "This import has expired, or isn't yours. Send the file again.",
+      "trop_gros": "This file is too big to be a settings file.",
+      "telechargement": "I couldn't read the file. Try again.",
+      "pas_json": "This isn't a settings file: it doesn't contain valid JSON.",
+      "version_inconnue": "This file comes from a version I don't know ({version}). Export it again from an up-to-date server.",
+      "format_invalide": "This file has the right shape but no settings inside.",
+      "valeur_invalide": "The value of setting `{nom}` doesn't match what it expects. Nothing was imported."
+    },
+    "audit": {
+      "titre": "Configuration changes",
+      "vide": "No change recorded yet.",
+      "inconnu": "unknown author",
+      "tout": "All settings",
+      "conserve": "kept for {n} days",
+      "source": {
+        "import": "via import",
+        "remise_a_zero": "reset"
+      }
+    }
+  },
+  "statut": {
+    "titre": "Bot status",
+    "serveurs": "Servers",
+    "membres": "Members",
+    "latence": "Latency",
+    "demarre": "Started",
+    "shards": "Shards",
+    "releve": "Updated"
+  }
+}

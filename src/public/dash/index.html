@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <script>(function(){try{var m=localStorage.getItem('wumi-theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=m}catch(e){}})();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tableau de bord · Wumi</title>
+  <meta name="theme-color" content="#0b0e1c">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="fond" aria-hidden="true"></div>
+
+  <header class="barre">
+    <a class="marque" href="/">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 120 80" width="28" height="19"><polyline points="14,14 26,56 44,32 62,56 74,14" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/><circle cx="100" cy="58" r="10" fill="#fff"/></svg>
+      </span>
+      <span>wumi<b>.</b></span>
+      <small id="t-dashboard">dashboard</small>
+    </a>
+    <div class="barre-droite">
+      <button class="theme" type="button" aria-label="Thème clair / sombre" title="Thème clair / sombre"><span class="lune">🌙</span><span class="soleil">☀️</span></button>
+      <div class="profil" id="profil" hidden>
+        <img id="profil-avatar" alt="">
+        <span id="profil-nom"></span>
+        <a href="/deconnexion" class="lien" id="t-deconnexion">Déconnexion</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" class="page" aria-live="polite">
+    <div class="roue" aria-hidden="true"></div>
+  </main>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="/app.js"></script>
+  <script>document.addEventListener('click',function(e){var b=e.target.closest('.theme');if(!b)return;var m=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=m;try{localStorage.setItem('wumi-theme',m)}catch(_){}});</script>
+</body>
+</html>

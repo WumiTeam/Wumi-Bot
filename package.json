@@ -1,0 +1,38 @@
+{
+  "name": "wumi",
+  "version": "2.17.0",
+  "description": "Wumi, the cutest all-in-one Discord bot: moderation, anti-nuke, levels, economy, music, tickets, and its own game, Wumi Run.",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy": "node src/deploy-commands.js",
+    "dev": "node --watch src/index.js",
+    "shards": "node src/shard.js",
+    "bannieres": "node outils/generer-bannieres.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.8",
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.0.0",
+    "gifenc": "^1.0.3"
+  },
+  "license": "MIT",
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "discord.js",
+    "moderation",
+    "economy",
+    "levels",
+    "music",
+    "tickets",
+    "discord-activity"
+  ],
+  "homepage": "https://wumi.fr",
+  "author": "Zhaak"
+}

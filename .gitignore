@@ -1,0 +1,21 @@
+# Dependances
+node_modules/
+
+# Secrets : ne jamais publier
+.env
+.env.*
+!.env.example
+
+# Donnees du bot (base SQLite, sauvegardes)
+data/
+src/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Divers
+npm-debug.log*
+logs/
+*.log
+.DS_Store
+Thumbs.db

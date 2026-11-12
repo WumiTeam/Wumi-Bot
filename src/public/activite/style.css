@@ -1,0 +1,137 @@
+:root {
+  --nuit: #0b0e1c;
+  --carte: rgba(20, 25, 46, 0.78);
+  --bord: rgba(255, 255, 255, 0.08);
+  --texte: #eef0fb;
+  --discret: #9aa3c4;
+  --bleu: #58a6ff;
+  --bleu-fonce: #2f6fd1;
+  --vert: #3ddc97;
+  --rouge: #ff5c7a;
+  font-family: "gg sans", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  min-height: 100%;
+  background: var(--nuit);
+}
+
+/* Pas de fond sur body : il masquerait le decor (.fond, z-index -1). */
+body {
+  margin: 0;
+  color: var(--texte);
+}
+
+body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 16px;
+  overflow-x: hidden;
+}
+
+.fond {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(600px 420px at 12% 55%, rgba(58, 120, 182, 0.55), transparent 70%),
+    radial-gradient(700px 500px at 100% 100%, rgba(88, 86, 140, 0.45), transparent 70%),
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px) 0 0 / 48px 48px,
+    var(--nuit);
+}
+
+.carte {
+  width: min(520px, 100%);
+  background: var(--carte);
+  border: 1px solid var(--bord);
+  border-radius: 22px;
+  padding: 28px 26px 18px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.entete { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+.logo {
+  width: 72px; height: 72px; border-radius: 20px;
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 40% 45%, #3a78b6, #1b2c52 75%);
+  box-shadow: 0 0 40px rgba(88, 166, 255, 0.35);
+  flex: none;
+}
+.etiquette { margin: 0; letter-spacing: 0.22em; font-size: 12px; font-weight: 700; color: var(--bleu); }
+h1 { margin: 2px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+h2 { margin: 0 0 12px; font-size: 20px; font-weight: 800; }
+p { line-height: 1.5; }
+.discret { color: var(--discret); }
+
+.etape { animation: entrer 0.35s ease both; }
+.cachee { display: none; }
+@keyframes entrer { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.roue {
+  width: 38px; height: 38px; margin: 18px auto 8px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.12);
+  border-top-color: var(--bleu);
+  animation: tourner 0.9s linear infinite;
+}
+#etape-chargement { text-align: center; }
+@keyframes tourner { to { transform: rotate(360deg); } }
+
+.membre { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,0.04); }
+.membre img { width: 40px; height: 40px; border-radius: 50%; }
+.membre strong { display: block; }
+.membre small { color: var(--discret); }
+
+.regles { margin: 0 0 16px; padding-left: 22px; }
+.regles li { margin: 6px 0; line-height: 1.45; }
+.regles li::marker { color: var(--bleu); font-weight: 800; }
+
+.case { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 18px; cursor: pointer; line-height: 1.4; }
+.case input { width: 20px; height: 20px; margin-top: 1px; accent-color: var(--bleu); flex: none; }
+
+.bouton {
+  width: 100%; border: 0; border-radius: 12px; padding: 13px 16px;
+  font: inherit; font-weight: 700; font-size: 15px; color: white;
+  background: linear-gradient(180deg, var(--bleu), var(--bleu-fonce));
+  cursor: pointer; transition: transform 0.12s ease, opacity 0.2s;
+}
+.bouton:hover:not(:disabled) { transform: translateY(-1px); }
+.bouton:disabled { opacity: 0.4; cursor: not-allowed; }
+.bouton.secondaire { background: rgba(255,255,255,0.08); }
+
+.consigne { font-size: 17px; margin: 0 0 16px; }
+.consigne b { font-size: 26px; vertical-align: middle; }
+
+.grille { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.grille button {
+  aspect-ratio: 1 / 1; border-radius: 16px; border: 1px solid var(--bord);
+  background: rgba(255,255,255,0.05); font-size: clamp(30px, 9vw, 44px);
+  cursor: pointer; transition: transform 0.12s ease, background 0.2s, border-color 0.2s;
+}
+.grille button:hover:not(:disabled) { transform: scale(1.04); background: rgba(88,166,255,0.14); border-color: rgba(88,166,255,0.5); }
+.grille button:disabled { opacity: 0.5; cursor: wait; }
+
+.message { min-height: 1.5em; margin: 14px 0 0; color: var(--rouge); text-align: center; }
+
+#etape-reussi { text-align: center; }
+.coche svg { width: 84px; height: 84px; margin: 6px auto 10px; display: block; }
+.coche circle { fill: none; stroke: var(--vert); stroke-width: 3; stroke-dasharray: 160; stroke-dashoffset: 160; animation: tracer 0.6s ease forwards; }
+.coche path { fill: none; stroke: var(--vert); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; animation: tracer 0.4s 0.5s ease forwards; }
+@keyframes tracer { to { stroke-dashoffset: 0; } }
+
+#etape-erreur h2 { color: var(--rouge); }
+
+.pied { margin-top: 22px; text-align: right; font-weight: 800; color: #9a9db3; font-size: 15px; }
+.pied span { color: var(--bleu); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .coche circle, .coche path { stroke-dashoffset: 0; }
+}
+

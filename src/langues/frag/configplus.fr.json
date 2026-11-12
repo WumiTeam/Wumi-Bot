@@ -1,0 +1,54 @@
+{
+  "config": {
+    "exporter": "Exporter",
+    "historique": "Historique",
+    "r": {
+      "statut_salon": {
+        "nom": "Salon du statut",
+        "aide": "Où le bot publie son état, mis à jour toutes les 5 minutes"
+      }
+    }
+  },
+  "configplus": {
+    "export": {
+      "titre": "Réglages exportés",
+      "texte": "{n} réglage est dans le fichier ci-dessous. || {n} réglages sont dans le fichier ci-dessous.",
+      "rappel": "Pour les remettre sur un autre serveur : `/config` avec l'option `fichier`. Les salons et les rôles ne traversent pas — ils n'existent pas là-bas."
+    },
+    "import": {
+      "opt_fichier": "Un fichier de réglages exporté, pour le réappliquer ici",
+      "titre": "Importer des réglages",
+      "resume": "**{n}** réglage va changer. || **{n}** réglages vont changer.",
+      "pourquoi_ignores": "Les salons, rôles et catégories du fichier sont ignorés : leurs identifiants appartiennent à l'autre serveur et ne désignent rien ici.",
+      "rien": "Aucun réglage à importer. {ignores} désignaient des salons ou des rôles de l'autre serveur.",
+      "fait": "{n} réglage importé. || {n} réglages importés.",
+      "expire": "Cet import a expiré, ou n'est pas le tien. Renvoie le fichier.",
+      "trop_gros": "Ce fichier est trop gros pour être un fichier de réglages.",
+      "telechargement": "Impossible de lire le fichier. Réessaie.",
+      "pas_json": "Ce fichier n'est pas un fichier de réglages : il ne contient pas de JSON valide.",
+      "version_inconnue": "Ce fichier vient d'une version que je ne connais pas ({version}). Réexporte-le depuis un serveur à jour.",
+      "format_invalide": "Ce fichier a la bonne forme mais pas de réglages dedans.",
+      "valeur_invalide": "La valeur du réglage `{nom}` ne correspond pas à ce qu'il attend. Rien n'a été importé."
+    },
+    "audit": {
+      "titre": "Changements de configuration",
+      "vide": "Aucun changement enregistré pour l'instant.",
+      "inconnu": "auteur inconnu",
+      "tout": "Tous les réglages",
+      "conserve": "conservé {n} jours",
+      "source": {
+        "import": "par import",
+        "remise_a_zero": "remise à zéro"
+      }
+    }
+  },
+  "statut": {
+    "titre": "État du bot",
+    "serveurs": "Serveurs",
+    "membres": "Membres",
+    "latence": "Latence",
+    "demarre": "Démarré",
+    "shards": "Shards",
+    "releve": "Relevé"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "antiphishing": {
+    "motif": "Phishing link",
+    "detail": "This link points to a known phishing site ({domaine}).",
+    "raison_sanction": "Phishing link detected: {domaine}",
+    "log_titre": "Anti-phishing",
+    "log_membre": "Member",
+    "log_domaine": "Domain",
+    "log_action": "Action",
+    "log_lien": "Link",
+    "log_total": "Anti-phishing blocks (bot): {n}",
+    "action": {
+      "supprimer": "Message deleted",
+      "avertir": "Message deleted, member warned",
+      "exclure": "Member kicked",
+      "bannir": "Member banned"
+    }
+  },
+  "config": {
+    "r": {
+      "antiphishing_actif": {
+        "nom": "Anti-phishing",
+        "aide": "Blocks links to known phishing sites (community list, refreshed automatically every hour)."
+      },
+      "antiphishing_action": {
+        "nom": "Action on a flagged link",
+        "aide": "What happens on top of deleting the message."
+      },
+      "antiphishing_liste_blanche": {
+        "nom": "Anti-phishing whitelist",
+        "aide": "Domains always allowed on this server, separated by commas."
+      }
+    },
+    "valeur": {
+      "antiphishing_action": {
+        "supprimer": "Delete the message",
+        "avertir": "Delete and warn",
+        "exclure": "Kick the member",
+        "bannir": "Ban the member"
+      }
+    }
+  }
+}

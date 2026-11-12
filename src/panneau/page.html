@@ -1,0 +1,2012 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panneau du bot</title>
+<!-- La marque du panneau : un chevron et un curseur.
+     Elle est volontairement DIFFERENTE de la mascotte du bot. Le bot vit sur
+     Discord, ou les gens le croisent cent fois par jour ; le panneau est
+     l'outil, et il merite son propre signe. Deux marques qui ne se disputent
+     jamais la meme place valent mieux qu'un compromis entre les deux.
+     La tuile est violette et non sombre : mesure faite sur les fonds reels de
+     Discord, une tuile presque noire n'y donne que 1.45 de contraste et
+     l'avatar devient un trou. Meme signe partout, donc meme couleur ici.
+     Verifiee jusqu'a 16 px, la taille d'un onglet de navigateur. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='f' x1='0' y1='0' x2='32' y2='32' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%236a4fc0'/%3E%3Cstop offset='1' stop-color='%23221546'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='7' fill='url(%23f)'/%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1.9' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M16 7.79 L23.36 11.84 L23.36 20.16 L16 24.21 L8.64 20.16 L8.64 11.84 Z'/%3E%3Cpath d='M8.64 11.84 L16 15.89 L23.36 11.84'/%3E%3Cpath d='M16 15.89 L16 24.21'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  /* ==================================================================
+     PANNEAU DE CONTROLE — feuille de style
+     Un seul jeu de variables commande toute la page : couleurs, espaces,
+     arrondis, ombres. Changer le bloc ci-dessous suffit a rehabiller le
+     panneau sans toucher a une seule regle plus bas.
+     ================================================================== */
+
+  :root {
+    /* ---- palette ---- */
+    --p0:  #ffffff;   /* surface la plus haute (cartes, champs) */
+    --p1:  #fbfbfa;   /* fond de page */
+    --p2:  #f4f4f2;   /* survol, zones creuses */
+    --p3:  #e9e9e6;   /* bordures */
+    --p4:  #d6d6d1;   /* bordures marquees */
+    --t1:  #17181a;   /* texte principal */
+    --t2:  #5b5f66;   /* texte secondaire */
+    --t3:  #8b9099;   /* texte discret, libelles */
+
+    --accent:      #6244b8;
+    --accent-fort: #503597;
+    --accent-doux: #f2effb;
+    --accent-bord: #dcd3f2;
+    --sur-accent:  #ffffff;
+
+    --danger:      #b4342a;
+    --danger-doux: #fdf0ee;
+    --ok:          #2f7a4e;
+
+    /* ---- rythme ---- */
+    --e1: 4px;  --e2: 8px;  --e3: 12px; --e4: 16px;
+    --e5: 24px; --e6: 32px; --e7: 48px;
+
+    --r1: 6px;  --r2: 10px; --r3: 14px; --r4: 999px;
+
+    /* Des ombres tres basses : sur une interface dense, une ombre marquee
+       fait "boite qui flotte" et fatigue l'oeil. La bordure porte la
+       separation, l'ombre ne fait que la souligner. */
+    --ombre1: 0 1px 2px rgba(16, 18, 20, .04);
+    --ombre2: 0 1px 3px rgba(16, 18, 20, .06), 0 8px 24px -12px rgba(16, 18, 20, .12);
+    --ombre3: 0 2px 6px rgba(16, 18, 20, .08), 0 16px 40px -16px rgba(16, 18, 20, .22);
+
+    --barre-laterale: 244px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --p0: #17191b;  --p1: #101113;  --p2: #1e2124;  --p3: #292d31;  --p4: #3a3f45;
+      --t1: #eceef0;  --t2: #a2a8b0;  --t3: #767d86;
+
+      --accent: #a48ce8;  --accent-fort: #b9a6f0;  --accent-doux: #1d1830;
+      --accent-bord: #3b3163; --sur-accent: #14102a;
+
+      --danger: #e8746a;  --danger-doux: #2a1917;  --ok: #62b98a;
+
+      --ombre1: 0 1px 2px rgba(0, 0, 0, .4);
+      --ombre2: 0 1px 3px rgba(0, 0, 0, .5), 0 8px 24px -12px rgba(0, 0, 0, .6);
+      --ombre3: 0 2px 6px rgba(0, 0, 0, .5), 0 16px 40px -16px rgba(0, 0, 0, .7);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  /* L'attribut hidden ne vaut, dans la feuille du navigateur, qu'un
+     « display: none » de specificite nulle : n'importe quelle regle de classe
+     qui pose un display le neutralise sans bruit. C'est ce qui faisait
+     apparaitre l'avatar du bot ET sa pastille de repli cote a cote dans la
+     barre laterale. Cette ligne rend l'attribut fiable partout. */
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    background: var(--p1);
+    color: var(--t1);
+    font: 400 14.5px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.011em; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  button { font: inherit; cursor: pointer; }
+  /* Un anneau de focus unique, visible partout, jamais supprime : c'est ce
+     qui rend la page utilisable au clavier. */
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r1); }
+
+  /* ------------------------------------------------------------ CHAMPS */
+  input, select, textarea {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px 11px;
+    border: 1px solid var(--p3);
+    border-radius: var(--r2);
+    background: var(--p0);
+    color: var(--t1);
+    font: inherit;
+    transition: border-color .12s, box-shadow .12s;
+  }
+  input:hover, select:hover, textarea:hover { border-color: var(--p4); }
+  input:focus, select:focus, textarea:focus {
+    outline: 0;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-doux);
+  }
+  input::placeholder, textarea::placeholder { color: var(--t3); }
+  textarea { resize: vertical; min-height: 84px; line-height: 1.5; padding-top: 9px; }
+  select {
+    appearance: none;
+    padding-right: 32px;
+    /* Le chevron est dessine en fond : pas d'image a charger, et il suit la
+       couleur du texte discret dans les deux themes. */
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 16px) 51%, calc(100% - 11px) 51%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
+
+  /* ----------------------------------------------------------- BOUTONS */
+  .bouton {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 36px; padding: 0 15px;
+    border: 1px solid transparent; border-radius: var(--r2);
+    background: var(--accent); color: var(--sur-accent);
+    font-weight: 550; font-size: 14px; letter-spacing: -.006em;
+    box-shadow: var(--ombre1);
+    transition: background .12s, border-color .12s, color .12s, transform .06s;
+  }
+  .bouton:hover { background: var(--accent-fort); }
+  .bouton:active { transform: translateY(1px); }
+  .bouton:disabled { opacity: .45; cursor: default; transform: none; }
+  .bouton.secondaire {
+    background: var(--p0); color: var(--t1); border-color: var(--p3);
+  }
+  .bouton.secondaire:hover { background: var(--p2); border-color: var(--p4); }
+  .bouton.danger { background: var(--p0); color: var(--danger); border-color: var(--p3); }
+  .bouton.danger:hover { background: var(--danger-doux); border-color: var(--danger); }
+
+  /* -------------------------------------------------------- CONNEXION */
+  #connexion { display: grid; place-items: center; min-height: 100vh; padding: var(--e5); }
+  #connexion form {
+    background: var(--p0); border: 1px solid var(--p3); border-radius: var(--r3);
+    box-shadow: var(--ombre3); padding: var(--e6); width: 100%; max-width: 380px;
+  }
+  /* La marque, la meme que le favicon et que l'avatar du bot. Ses couleurs
+     sont fixes dans les deux themes : c'est un signe, pas un element
+     d'interface, et un signe qui change de couleur selon le fond n'en est
+     plus un. */
+  #connexion .marque {
+    width: 38px; height: 38px; border-radius: var(--r2);
+    display: block; margin-bottom: var(--e4);
+  }
+  #connexion h1 { font-size: 19px; margin-bottom: var(--e1); }
+  #connexion p { color: var(--t2); margin: 0 0 var(--e5); font-size: 13.5px; }
+
+  /* ------------------------------------------------------------- CADRE */
+  #app {
+    display: none; grid-template-columns: var(--barre-laterale) 1fr; min-height: 100vh;
+    /* La colonne laterale est collante et s'arrete donc a 100vh. Ce degre
+       prolonge son fond jusqu'en bas des pages longues. */
+    background: linear-gradient(to right, var(--p0) var(--barre-laterale), var(--p1) var(--barre-laterale));
+  }
+  #app.visible { display: grid; }
+
+  aside {
+    background: var(--p0); border-right: 1px solid var(--p3);
+    padding: var(--e4) var(--e3) var(--e4);
+    display: flex; flex-direction: column; gap: var(--e5);
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+
+  .entete-bot { display: flex; gap: 10px; align-items: center; padding: 0 var(--e2); }
+  .entete-bot img { width: 34px; height: 34px; border-radius: var(--r2); }
+  .entete-bot .jeton {
+    width: 34px; height: 34px; border-radius: var(--r2); flex: none;
+    background: var(--accent); color: var(--sur-accent);
+    display: grid; place-items: center; font-weight: 700; font-size: 15px;
+  }
+  .entete-bot strong { display: block; font-size: 14px; line-height: 1.3; }
+  .entete-bot span { font-size: 12px; color: var(--t3); }
+
+  .bloc-lateral > label {
+    display: block; padding: 0 var(--e2) 6px;
+    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--t3);
+  }
+
+  nav { display: flex; flex-direction: column; gap: 1px; }
+  nav button {
+    display: flex; align-items: center; gap: 10px;
+    text-align: left; padding: 8px var(--e2); border: 0; border-radius: var(--r2);
+    background: transparent; color: var(--t2); font-weight: 500; font-size: 14px;
+    transition: background .1s, color .1s;
+  }
+  nav button .ic { width: 18px; text-align: center; font-size: 14px; opacity: .85; flex: none; }
+  nav button:hover { background: var(--p2); color: var(--t1); }
+  nav button.actif { background: var(--accent-doux); color: var(--accent); font-weight: 600; }
+  nav button.actif .ic { opacity: 1; }
+
+  main { padding: var(--e6) var(--e7) 132px; max-width: 1120px; }
+  .titre-page { font-size: 24px; margin-bottom: 5px; letter-spacing: -.02em; }
+  .sous-titre { color: var(--t2); margin: 0 0 var(--e5); font-size: 14.5px; max-width: 68ch; }
+
+  /* ------------------------------------------------------------ CARTES */
+  .carte {
+    background: var(--p0); border: 1px solid var(--p3); border-radius: var(--r3);
+    box-shadow: var(--ombre1); padding: var(--e5); margin-bottom: var(--e4);
+  }
+  .carte > h3 { font-size: 15px; margin-bottom: 2px; }
+  .carte > .aide-bloc { color: var(--t2); font-size: 13px; margin: 0 0 var(--e4); max-width: 78ch; }
+  .carte > h3 + .champ, .carte > .aide-bloc + .champ { border-top: 0; }
+
+  .champ {
+    display: grid; grid-template-columns: 1fr 320px; gap: var(--e4);
+    align-items: center; padding: 13px 0; border-top: 1px solid var(--p3);
+  }
+  .champ:first-of-type { border-top: 0; padding-top: var(--e2); }
+  .champ:last-of-type { padding-bottom: 0; }
+  .champ label { font-weight: 500; }
+  .aide { display: block; font-weight: 400; color: var(--t3); font-size: 13px; margin-top: 2px; }
+  .champ.large { grid-template-columns: 1fr; gap: var(--e2); }
+  .champ.large > div:last-child { max-width: none; }
+
+  /* ------------------------------------------------------- INTERRUPTEUR */
+  .bascule {
+    width: 40px; height: 23px; border-radius: var(--r4); border: 0; padding: 0;
+    background: var(--p4); position: relative; justify-self: start;
+    transition: background .15s;
+  }
+  .bascule::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 19px; height: 19px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.3);
+    transition: transform .15s;
+  }
+  .bascule[aria-checked="true"] { background: var(--accent); }
+  .bascule[aria-checked="true"]::after { transform: translateX(17px); }
+
+  /* ------------------------------------------------------------- STATS */
+  .grille-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); gap: var(--e3); }
+  .stat {
+    background: var(--p0); border: 1px solid var(--p3); border-radius: var(--r3);
+    padding: var(--e4) var(--e4) 15px; box-shadow: var(--ombre1);
+  }
+  .stat span {
+    display: block; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--t3); margin-bottom: 6px;
+  }
+  .stat b { display: block; font-size: 25px; line-height: 1.15; letter-spacing: -.02em; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .stat em { display: block; font-style: normal; font-size: 13px; color: var(--t2); margin-top: 3px; }
+
+  /* ---------------------------------------------------------- TABLEAUX */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left; padding: 0 10px 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--t3); border-bottom: 1px solid var(--p3);
+  }
+  td { padding: 11px 10px; border-bottom: 1px solid var(--p3); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr { transition: background .1s; }
+  tbody tr:hover { background: var(--p2); }
+  td.droite, th.droite { text-align: right; }
+  td.droite { font-variant-numeric: tabular-nums; }
+  td.droite { white-space: nowrap; }
+  td .bouton { min-height: 30px; padding: 0 11px; font-size: 13px; }
+
+  .ligne-form {
+    display: flex; gap: var(--e2); flex-wrap: wrap; align-items: flex-end;
+    margin-top: var(--e4); padding-top: var(--e4); border-top: 1px solid var(--p3);
+  }
+  .carte > .ligne-form:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+  .ligne-form > div { flex: 1 1 150px; }
+  .ligne-form label { display: block; font-size: 12.5px; color: var(--t2); margin-bottom: 5px; }
+
+  img.apercu { width: 100%; border-radius: var(--r3); border: 1px solid var(--p3); display: block; }
+
+  /* ------------------------------------------------------ ENREGISTREMENT */
+  /* Une pastille flottante plutot qu'un bandeau : elle attire l'oeil sans
+     manger une bande de la page, et reste centree quel que soit l'ecran. */
+  #barre {
+    position: fixed; left: calc(var(--barre-laterale) / 2 + 50%); bottom: var(--e5);
+    transform: translateX(-50%) translateY(14px);
+    padding: 10px 10px 10px var(--e5);
+    background: var(--p0); border: 1px solid var(--p3); border-radius: var(--r4);
+    box-shadow: var(--ombre3);
+    display: flex; align-items: center; gap: var(--e4);
+    opacity: 0; pointer-events: none;
+    transition: opacity .16s, transform .16s;
+    z-index: 15;
+  }
+  #barre.visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  #barre span { color: var(--t2); font-size: 13.5px; white-space: nowrap; }
+  #barre .bouton { min-height: 34px; }
+
+  #toast {
+    position: fixed; bottom: 96px; left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--t1); color: var(--p0);
+    padding: 9px 17px; border-radius: var(--r4);
+    font-size: 13.5px; font-weight: 500; box-shadow: var(--ombre3);
+    opacity: 0; transition: opacity .18s, transform .18s;
+    pointer-events: none; z-index: 20;
+  }
+  #toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.erreur { background: var(--danger); color: #fff; }
+
+  /* ------------------------------------------------------- GRAPHIQUES */
+  .viz-filtres { display: flex; gap: var(--e2); flex-wrap: wrap; justify-content: space-between; margin-bottom: var(--e4); }
+  .viz-plages { display: flex; gap: var(--e2); }
+  .viz-hote { position: relative; margin-top: var(--e2); }
+  .viz-cadre { position: relative; }
+  .viz-cadre svg { display: block; touch-action: none; }
+  .viz-bulle {
+    position: absolute; top: 8px; pointer-events: none;
+    background: var(--p0); border: 1px solid var(--p3); border-radius: var(--r2);
+    box-shadow: var(--ombre2); padding: 7px 11px; min-width: 118px;
+  }
+  /* La valeur d'abord, la date ensuite : c'est la valeur qu'on vient lire. */
+  .viz-bulle b { display: block; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .viz-bulle span { display: block; font-size: 12px; color: var(--t3); margin-top: 1px; }
+  .viz-legende { display: flex; gap: var(--e4); margin: 0 0 var(--e2); font-size: 13px; color: var(--t2); }
+  .viz-legende span { display: inline-flex; align-items: center; gap: 7px; }
+  .viz-legende i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* ------------------------------------------------------------ CONSOLE */
+  /* Un pave sombre dans les deux themes : une console se lit comme une
+     console, et le contraste des niveaux ne tient qu'a ce fond-la. */
+  .console-barre { display: flex; gap: var(--e2); flex-wrap: wrap; margin-bottom: var(--e3); }
+  .console-barre select { flex: 0 0 180px; }
+  .console-barre input { flex: 1 1 200px; }
+
+  .console {
+    --c-fond: #12131a;
+    background: var(--c-fond);
+    border: 1px solid var(--p3); border-radius: var(--r2);
+    height: min(62vh, 620px); overflow-y: auto; overscroll-behavior: contain;
+    padding: var(--e3) 0;
+    font: 12.5px/1.65 ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-variant-ligatures: none;
+    scrollbar-width: thin; scrollbar-color: #3b3e4d var(--c-fond);
+  }
+  .console:focus-visible { outline-offset: -2px; }
+  .console::-webkit-scrollbar { width: 10px; }
+  .console::-webkit-scrollbar-thumb { background: #3b3e4d; border-radius: 99px; border: 3px solid var(--c-fond); }
+
+  .lc {
+    display: grid; grid-template-columns: 62px 58px 1fr; gap: 10px;
+    padding: 1px var(--e4); color: #c9cdda;
+  }
+  .lc:hover { background: rgba(255, 255, 255, .04); }
+  .lc-h { color: #666c80; }
+  .lc-n { font-weight: 600; letter-spacing: .02em; }
+  /* Le texte garde ses retours a la ligne : une trace d'erreur reste lisible. */
+  .lc-t { white-space: pre-wrap; word-break: break-word; }
+
+  .lc-action  .lc-n { color: #8b95f2; }
+  .lc-info    .lc-n { color: #56b6c2; }
+  .lc-succes  .lc-n { color: #7bc47f; }
+  .lc-debug   .lc-n { color: #6b7185; }
+  .lc-debug   .lc-t { color: #8a90a3; }
+  .lc-avertissement .lc-n { color: #e2b341; }
+  .lc-avertissement .lc-t { color: #f0d9a0; }
+  .lc-erreur  { background: rgba(224, 92, 80, .10); }
+  .lc-erreur  .lc-n, .lc-erreur .lc-t { color: #f0938a; }
+
+  .console-etat {
+    display: block; margin-top: var(--e2);
+    font-size: 12.5px; color: var(--t3); font-variant-numeric: tabular-nums;
+  }
+
+  /* ------------------------------------------------------------- DIVERS */
+  .vide { color: var(--t3); font-size: 13.5px; padding: var(--e3) 0; }
+  .diff { margin: var(--e3) 0 0; padding-left: 18px; font-size: 13px; color: var(--t2); }
+  .diff li { margin: 4px 0; }
+  .diff strong { color: var(--t1); font-weight: 550; }
+  .puce {
+    display: inline-block; padding: 2px 9px; border-radius: var(--r4);
+    font-size: 12px; font-weight: 600;
+    background: var(--accent-doux); color: var(--accent);
+    border: 1px solid var(--accent-bord);
+  }
+
+  @media (max-width: 900px) {
+    #app { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--p3); }
+    nav { flex-direction: row; flex-wrap: wrap; }
+    main { padding: var(--e5) var(--e4) 132px; }
+    #barre { left: 50%; right: auto; width: calc(100% - var(--e6)); justify-content: flex-end; }
+    #barre span { flex: 1; white-space: normal; }
+    .champ { grid-template-columns: 1fr; gap: var(--e2); }
+  }
+</style>
+</head>
+<body>
+
+<div id="connexion">
+  <form id="form-connexion">
+    <svg class="marque" viewBox="0 0 32 32" aria-hidden="true">
+      <defs><linearGradient id="marque-fond" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#6a4fc0"/><stop offset="1" stop-color="#221546"/>
+      </linearGradient></defs>
+      <rect width="32" height="32" rx="7" fill="url(#marque-fond)"/>
+      <g fill="none" stroke="#ffffff" stroke-width="1.76" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M16 7.79 L23.36 11.84 L23.36 20.16 L16 24.21 L8.64 20.16 L8.64 11.84 Z"/>
+        <path d="M8.64 11.84 L16 15.89 L23.36 11.84"/>
+        <path d="M16 15.89 L16 24.21"/>
+      </g>
+      <g fill="none" stroke="#ffffff" stroke-width="0.9" stroke-opacity="0.55" stroke-dasharray="1.6 1.4" stroke-linecap="round">
+        <path d="M16 7.79 L16 16.11"/>
+        <path d="M16 16.11 L8.64 20.16"/>
+        <path d="M16 16.11 L23.36 20.16"/>
+      </g>
+    </svg>
+    <h1>Panneau du bot</h1>
+    <p>Cette page ne fonctionne que sur l'ordinateur qui fait tourner le bot.</p>
+    <input type="password" id="motdepasse" placeholder="Mot de passe" autocomplete="current-password" autofocus>
+    <p id="erreur-connexion" style="color:var(--danger);min-height:20px;margin:10px 0 0"></p>
+    <button class="bouton" style="width:100%;margin-top:8px">Se connecter</button>
+  </form>
+</div>
+
+<div id="app">
+  <aside>
+    <div class="entete-bot">
+      <img id="bot-avatar" alt="" hidden>
+      <div class="jeton" id="bot-jeton">Z</div>
+      <div>
+        <strong id="bot-nom">…</strong>
+        <span id="bot-etat"></span>
+      </div>
+    </div>
+
+    <div class="bloc-lateral">
+      <label for="choix-serveur">Serveur</label>
+      <select id="choix-serveur"></select>
+    </div>
+
+    <nav id="onglets"></nav>
+
+    <button class="bouton secondaire" id="deconnexion" style="margin-top:auto">Se déconnecter</button>
+  </aside>
+
+  <main>
+    <h1 class="titre-page" id="titre-page"></h1>
+    <p class="sous-titre" id="sous-titre"></p>
+    <div id="contenu"></div>
+  </main>
+</div>
+
+<div id="barre">
+  <span id="barre-texte"></span>
+  <button class="bouton secondaire" id="annuler">Annuler</button>
+  <button class="bouton" id="enregistrer">Enregistrer</button>
+</div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+
+// ============================================================ DESCRIPTION
+// Chaque onglet decrit ses champs : la page se construit toute seule a partir
+// de cette liste, il n'y a pas de formulaire ecrit a la main.
+const ONGLETS = [
+  { cle: 'resume', icone: '◈', nom: 'Résumé', titre: 'Résumé', soustitre: "Ce que le bot voit de ton serveur en ce moment." },
+
+  { cle: 'bienvenue', icone: '✦', nom: 'Bienvenue', titre: 'Arrivées et départs', soustitre: "Messages d'accueil, image de bienvenue et rôle automatique.",
+    blocs: [
+      { titre: 'Arrivée', aide: 'Variables utilisables : {mention} {pseudo} {tag} {serveur} {membres} {id}', champs: [
+        { c: 'salon_bienvenue', l: 'Salon de bienvenue', t: 'salon' },
+        { c: 'message_bienvenue', l: 'Message', t: 'zone', a: 'Laisse vide pour le texte par défaut.' },
+        { c: 'carte_bienvenue', l: "Image de bienvenue", t: 'bool', a: "Joint la carte en image sous le message." },
+        { c: 'role_auto', l: 'Rôle donné à l\'arrivée', t: 'role' },
+        { c: 'mp_bienvenue', l: 'Message privé à l\'arrivée', t: 'zone', a: 'Vide = aucun message privé.' },
+      ]},
+      { titre: 'Départ', champs: [
+        { c: 'salon_aurevoir', l: 'Salon des départs', t: 'salon' },
+        { c: 'message_aurevoir', l: 'Message', t: 'zone' },
+      ]},
+      { titre: 'Premier message', aide: "Le silence après le premier message est ce qui fait repartir la plupart des nouveaux. Une réaction et un mot suffisent souvent à lancer la suite. Les membres déjà présents ne sont jamais accueillis rétroactivement.", champs: [
+        { c: 'premier_actif', l: 'Accueillir le premier message', t: 'bool' },
+        { c: 'premier_reaction', l: 'Réaction posée', t: 'texte', a: 'Un emoji. Vide = aucune réaction.' },
+        { c: 'premier_message', l: 'Réponse', t: 'zone', a: 'Vide = aucune réponse. Variables : {mention} {pseudo} {serveur}' },
+      ]},
+    ]},
+
+  { cle: 'logs', icone: '≡', nom: 'Logs', titre: 'Journalisation', soustitre: 'Chaque catégorie peut aller dans un salon différent, ou tous dans le même.',
+    blocs: [
+      { titre: 'Salons de logs', champs: [
+        { c: 'log_messages', l: 'Messages', t: 'salon', a: 'Suppressions, éditions, purges.' },
+        { c: 'log_membres', l: 'Membres', t: 'salon', a: 'Arrivées, départs, rôles, pseudos.' },
+        { c: 'log_moderation', l: 'Modération', t: 'salon', a: 'Sanctions, automod, signalements, appels.' },
+        { c: 'log_serveur', l: 'Serveur', t: 'salon', a: 'Salons et rôles créés ou supprimés.' },
+        { c: 'log_vocal', l: 'Vocal', t: 'salon', a: 'Connexions, déplacements, partages d\'écran.' },
+      ]},
+      { titre: 'Pannes du bot', aide: "Le bot signale ses propres erreurs dans ce salon. Les erreurs identiques sont regroupées et espacées de deux minutes : une panne qui se répète cent fois ne donne pas cent messages.", champs: [
+        { c: 'alerte_salon', l: 'Salon des erreurs', t: 'salon', a: "Un salon privé de l'équipe. Vide = ne rien signaler." },
+      ]},
+    ]},
+
+  { cle: 'xp', icone: '▲', nom: 'XP et niveaux', titre: 'Expérience', soustitre: "Gains, annonces de niveau et rôles débloqués.",
+    blocs: [
+      { titre: 'Réglages', champs: [
+        { c: 'xp_actif', l: "Système d'XP", t: 'bool' },
+        { c: 'xp_vocal_actif', l: 'XP en vocal', t: 'bool', a: "Désactivé si le membre est seul ou en sourdine." },
+        { c: 'salon_levelup', l: 'Annonces de niveau', t: 'levelup' },
+      ]},
+      { titre: 'Progression', aide: "Le prestige remet l'XP à zéro contre une étoile permanente et un bonus d'XP. Les badges se débloquent tout seuls ; leur liste se règle dans config.js.", champs: [
+        { c: 'prestige_actif', l: 'Prestige', t: 'bool' },
+        { c: 'badges_actif', l: 'Badges automatiques', t: 'bool' },
+      ]},
+      { titre: 'Cartes de rank', aide: "L'image envoyée par un membre est recadrée et gardée en local. Le thème équipé décide toujours des couleurs.", champs: [
+        { c: 'fond_perso_actif', l: 'Fond personnel (/carte fond)', t: 'bool' },
+        { c: 'carte_animee_actif', l: 'Carte animée en GIF', t: 'bool', a: '/rank animee:true — environ deux secondes de calcul.' },
+      ]},
+    ],
+    apres: 'recompenses' },
+
+  { cle: 'moderation', icone: '⛨', nom: 'Modération', titre: 'Modération automatique', soustitre: 'Automod, anti-raid, signalements et appels de sanction.',
+    blocs: [
+      { titre: 'Automod', aide: 'Les modérateurs sont toujours exemptés. Les seuils précis se règlent dans config.js.', champs: [
+        { c: 'automod_actif', l: 'Automod', t: 'bool' },
+        { c: 'automod_spam', l: 'Anti-spam', t: 'bool' },
+        { c: 'automod_invitations', l: 'Anti-invitations Discord', t: 'bool' },
+        { c: 'automod_liens', l: 'Anti-liens', t: 'bool' },
+        { c: 'automod_mots', l: 'Mots interdits', t: 'bool' },
+        { c: 'automod_mentions', l: 'Anti-mentions massives', t: 'bool' },
+        { c: 'automod_majuscules', l: 'Anti-majuscules', t: 'bool' },
+      ]},
+      { titre: 'Anti-raid', champs: [
+        { c: 'antiraid_actif', l: 'Anti-raid', t: 'bool' },
+        { c: 'antiraid_age_min', l: 'Âge minimum du compte', t: 'nombre', min: 0, max: 365, a: 'En jours. 0 = aucune limite.' },
+      ]},
+      { titre: 'Signalements', aide: 'Les membres signalent par clic droit sur un message → Applications.', champs: [
+        { c: 'signalement_salon', l: "Salon de l'équipe", t: 'salon' },
+        { c: 'signalement_delai', l: 'Délai entre deux signalements', t: 'nombre', min: 0, max: 3600, a: 'En secondes.' },
+      ]},
+      { titre: 'Appels de sanction', champs: [
+        { c: 'appel_actif', l: 'Appels ouverts', t: 'bool' },
+        { c: 'appel_salon', l: "Salon de l'équipe", t: 'salon' },
+        { c: 'appel_delai_jours', l: 'Délai pour contester', t: 'nombre', min: 0, max: 365, a: 'En jours. 0 = illimité.' },
+      ]},
+    ]},
+
+  { cle: 'systemes', icone: '⬡', nom: 'Systèmes', titre: 'Systèmes du serveur', soustitre: 'Tickets, suggestions, candidatures, vérification, FAQ, boosts, missions.',
+    blocs: [
+      { titre: 'Tickets', champs: [
+        { c: 'ticket_categorie', l: 'Catégorie des tickets', t: 'categorie' },
+        { c: 'ticket_role_staff', l: 'Rôle du support', t: 'role' },
+        { c: 'ticket_logs', l: 'Salon des transcriptions', t: 'salon' },
+        { c: 'ticket_formulaire', l: 'Formulaire à l\'ouverture', t: 'bool', a: 'Demande sujet et description avant de créer le salon.' },
+        { c: 'ticket_max', l: 'Tickets ouverts par membre', t: 'nombre', min: 1, max: 10 },
+      ]},
+      { titre: 'Suggestions', champs: [
+        { c: 'suggestion_salon', l: 'Salon des suggestions', t: 'salon' },
+        { c: 'suggestion_role_staff', l: 'Rôle qui répond', t: 'role' },
+        { c: 'suggestion_fil', l: 'Ouvrir un fil de discussion', t: 'bool' },
+        { c: 'suggestion_niveau_min', l: 'Niveau minimum', t: 'nombre', min: 0, max: 200 },
+        { c: 'suggestion_cooldown', l: 'Délai entre deux suggestions', t: 'nombre', min: 0, max: 1440, a: 'En minutes.' },
+      ]},
+      { titre: 'Candidatures', champs: [
+        { c: 'cand_salon', l: 'Salon des candidatures', t: 'salon' },
+        { c: 'cand_role_staff', l: 'Rôle qui décide', t: 'role' },
+      ]},
+      { titre: 'Vérification', champs: [
+        { c: 'verif_actif', l: 'Vérification à l\'entrée', t: 'bool' },
+        { c: 'verif_role', l: 'Rôle donné après vérification', t: 'role' },
+        { c: 'verif_captcha', l: 'Petit calcul à résoudre', t: 'bool' },
+        { c: 'verif_titre', l: 'Titre du panneau', t: 'texte' },
+        { c: 'verif_message', l: 'Message du panneau', t: 'zone' },
+        { c: 'verif_bouton', l: 'Texte du bouton', t: 'texte' },
+      ]},
+      { titre: 'FAQ automatique', champs: [
+        { c: 'faq_actif', l: 'Réponses automatiques', t: 'bool' },
+        { c: 'faq_seuil', l: 'Seuil de confiance', t: 'nombre', min: 20, max: 100, a: 'Plus haut = le bot répond moins souvent, mais plus juste.' },
+      ]},
+      { titre: 'Boosts', champs: [
+        { c: 'boost_salon', l: 'Salon des remerciements', t: 'salon' },
+        { c: 'boost_message', l: 'Message', t: 'zone' },
+        { c: 'boost_role', l: 'Rôle offert aux boosteurs', t: 'role' },
+        { c: 'boost_monnaie', l: 'Monnaie offerte par boost', t: 'nombre', min: 0, max: 1000000 },
+      ]},
+      { titre: 'Invitations', champs: [
+        { c: 'invitations_actif', l: 'Suivi des invitations', t: 'bool' },
+        { c: 'invitations_salon', l: 'Salon des annonces', t: 'salon' },
+        { c: 'invitations_age_min', l: 'Âge minimum du compte', t: 'nombre', min: 0, max: 365, a: 'En jours. En dessous, l\'invitation est comptée comme fausse.' },
+      ]},
+      { titre: 'Missions', champs: [
+        { c: 'missions_actif', l: 'Défis quotidiens', t: 'bool', a: 'La liste des missions se règle dans config.js.' },
+      ]},
+    ]},
+
+  { cle: 'economie', icone: '◎', nom: 'Économie', titre: 'Monnaie et boutique', soustitre: 'Gains, récompense quotidienne, travail et articles en vente.',
+    blocs: [
+      { titre: 'Monnaie', champs: [
+        { c: 'eco_actif', l: 'Économie', t: 'bool' },
+        { c: 'eco_nom', l: 'Nom de la monnaie', t: 'texte' },
+        { c: 'eco_emoji', l: 'Emoji', t: 'texte' },
+        { c: 'eco_gain_message', l: 'Gain par message', t: 'nombre', min: 0, max: 1000 },
+        { c: 'eco_daily', l: 'Récompense quotidienne', t: 'nombre', min: 0, max: 1000000 },
+        { c: 'eco_travail_min', l: 'Travail : gain minimum', t: 'nombre', min: 0, max: 1000000 },
+        { c: 'eco_travail_max', l: 'Travail : gain maximum', t: 'nombre', min: 0, max: 1000000 },
+        { c: 'eco_travail_delai', l: 'Travail : délai', t: 'nombre', min: 1, max: 1440, a: 'En minutes.' },
+      ]},
+      { titre: 'Banque, transferts et braquages', aide: "L'argent déposé à la banque rapporte des intérêts chaque jour et ne peut pas être braqué. Taux, taxe et chances de réussite se règlent dans config.js (section economie).", champs: [
+        { c: 'banque_actif', l: 'Banque (/banque)', t: 'bool' },
+        { c: 'paye_actif', l: 'Transferts entre membres (/payer)', t: 'bool' },
+        { c: 'braquage_actif', l: 'Braquages (/braquer)', t: 'bool' },
+        { c: 'objets_actif', l: 'Objets et inventaire (/objet)', t: 'bool', a: 'Potions d\'XP, couleur de pseudo, coupe-file, coffre-fort.' },
+      ]},
+    ],
+    apres: 'boutique' },
+
+  { cle: 'veille', icone: '➤', nom: 'Annonces auto', titre: 'Annonces automatiques', soustitre: "Instagram, YouTube et flux RSS annoncés dans un salon dès qu'il y a du nouveau." },
+  { cle: 'stats', icone: '◱', nom: 'Statistiques', titre: 'Évolution du serveur', soustitre: 'Messages, arrivées, départs et vocal au fil des jours.' },
+  { cle: 'apercus', icone: '▣', nom: 'Aperçus', titre: 'Images et statistiques', soustitre: "Les cartes telles qu'elles apparaîtront sur Discord." },
+  { cle: 'outils', icone: '⛁', nom: 'Sauvegardes', titre: 'Sauvegardes', soustitre: 'Copies de la base de données et photos de la structure du serveur.' },
+  { cle: 'console', icone: '⌘', nom: 'Console', titre: 'Console du bot', soustitre: "Ce que le bot écrit dans sa fenêtre, en direct." },
+];
+
+// =============================================================== ETAT
+let etat = null;      // /api/etat
+let serveurId = null;
+let donnees = null;   // /api/serveur/:id
+let ongletActif = 'resume';
+const modifs = new Map();
+
+// ============================================================== OUTILS
+const $ = (s) => document.querySelector(s);
+const el = (balise, proprietes = {}, enfants = []) => {
+  const n = document.createElement(balise);
+  for (const [k, v] of Object.entries(proprietes)) {
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (v !== null && v !== undefined) n.setAttribute(k, v);
+  }
+  for (const e of [].concat(enfants)) if (e) n.append(e);
+  return n;
+};
+
+let minuteurToast;
+function toast(message, erreur = false) {
+  const t = $('#toast');
+  t.textContent = message;
+  t.classList.toggle('erreur', erreur);
+  t.classList.add('visible');
+  clearTimeout(minuteurToast);
+  minuteurToast = setTimeout(() => t.classList.remove('visible'), 2600);
+}
+
+async function api(chemin, options = {}) {
+  const reponse = await fetch(chemin, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+  });
+  if (reponse.status === 401 && chemin !== '/api/connexion') {
+    $('#app').classList.remove('visible');
+    $('#connexion').style.display = 'grid';
+    throw new Error('Session expirée');
+  }
+  const corps = await reponse.json().catch(() => ({}));
+  if (!reponse.ok) throw new Error(corps.erreur || 'Erreur ' + reponse.status);
+  return corps;
+}
+
+const nb = (n) => Number(n || 0).toLocaleString('fr-FR');
+const octets = (n) => (n > 1048576 ? (n / 1048576).toFixed(1) + ' Mo' : Math.round(n / 1024) + ' Ko');
+
+// ========================================================== CONNEXION
+$('#form-connexion').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('#erreur-connexion').textContent = '';
+  try {
+    await api('/api/connexion', { method: 'POST', body: JSON.stringify({ motdepasse: $('#motdepasse').value }) });
+    $('#motdepasse').value = '';
+    await demarrer();
+  } catch (erreur) {
+    $('#erreur-connexion').textContent = erreur.message;
+  }
+});
+
+$('#deconnexion').addEventListener('click', async () => {
+  await api('/api/deconnexion', { method: 'POST' }).catch(() => {});
+  location.reload();
+});
+
+// =========================================================== CHARGEMENT
+async function demarrer() {
+  etat = await api('/api/etat');
+  $('#connexion').style.display = 'none';
+  $('#app').classList.add('visible');
+
+  // Avatar du bot, avec une pastille a son initiale en repli : sans elle, la
+  // barre laterale s'ouvrirait sur un trou quand l'image ne charge pas.
+  const avatar = $('#bot-avatar');
+  const jeton = $('#bot-jeton');
+  jeton.textContent = (etat.bot.nom || '?').charAt(0).toUpperCase();
+  const sansAvatar = () => { avatar.hidden = true; jeton.hidden = false; };
+  if (etat.bot.avatar) {
+    avatar.hidden = false;
+    jeton.hidden = true;
+    avatar.src = etat.bot.avatar;
+    avatar.onerror = sansAvatar;
+  } else sansAvatar();
+  $('#bot-nom').textContent = etat.bot.nom;
+  $('#bot-etat').textContent = etat.bot.ping + ' ms · ' + etat.bot.commandes + ' commandes';
+
+  const choix = $('#choix-serveur');
+  choix.replaceChildren(...etat.serveurs.map((s) => el('option', { value: s.id, text: s.nom })));
+  choix.addEventListener('change', () => charger(choix.value));
+
+  $('#onglets').replaceChildren(
+    ...ONGLETS.map((o) =>
+      el('button', {
+        class: o.cle === ongletActif ? 'actif' : '',
+        onclick: () => {
+          if (modifs.size && !confirm('Des modifications ne sont pas enregistrées. Changer d\'onglet quand même ?')) return;
+          modifs.clear();
+          majBarre();
+          ongletActif = o.cle;
+          [...$('#onglets').children].forEach((b, i) => b.classList.toggle('actif', ONGLETS[i].cle === o.cle));
+          dessiner();
+        },
+      }, [
+        // L'icone est purement decorative : elle aide a retrouver un onglet
+        // d'un coup d'oeil, le nom reste ce qui est lu.
+        el('span', { class: 'ic', 'aria-hidden': 'true', text: o.icone ?? '•' }),
+        document.createTextNode(o.nom),
+      ])
+    )
+  );
+
+  if (!etat.serveurs.length) {
+    $('#contenu').replaceChildren(el('p', { class: 'vide', text: "Le bot n'est sur aucun serveur." }));
+    return;
+  }
+  await charger(etat.serveurs[0].id);
+}
+
+let serveurModifiable = false;
+
+async function charger(id) {
+  serveurId = id;
+  serveurModifiable = (etat.serveurs.find((s) => s.id === id) ?? {}).modifiable === true;
+  modifs.clear();
+  majBarre();
+  donnees = await api('/api/serveur/' + id);
+  dessiner();
+}
+
+// ============================================================== CHAMPS
+function valeurCourante(colonne) {
+  return modifs.has(colonne) ? modifs.get(colonne) : donnees.config[colonne];
+}
+
+function noter(colonne, valeur) {
+  if (String(donnees.config[colonne] ?? '') === String(valeur ?? '')) modifs.delete(colonne);
+  else modifs.set(colonne, valeur);
+  majBarre();
+}
+
+function majBarre() {
+  const barre = $('#barre');
+  barre.classList.toggle('visible', modifs.size > 0 && serveurModifiable);
+  $('#barre-texte').textContent =
+    modifs.size === 1 ? '1 modification non enregistrée' : modifs.size + ' modifications non enregistrées';
+}
+
+function selecteur(colonne, liste, videTexte) {
+  const valeur = valeurCourante(colonne);
+  const s = el('select', { onchange: (e) => noter(colonne, e.target.value || null) }, [
+    el('option', { value: '', text: videTexte }),
+    ...liste.map((o) => el('option', { value: o.id, text: o.nom + (o.attribuable === false ? ' (trop haut pour le bot)' : '') })),
+  ]);
+  s.value = valeur ?? '';
+  // La valeur enregistree peut pointer un salon supprime : on le signale.
+  if (valeur && s.value !== String(valeur)) {
+    s.prepend(el('option', { value: valeur, text: 'introuvable (' + valeur + ')' }));
+    s.value = valeur;
+  }
+  return s;
+}
+
+function construireChamp(champ) {
+  let controle;
+  switch (champ.t) {
+    case 'bool': {
+      const actif = Number(valeurCourante(champ.c)) === 1;
+      controle = el('button', {
+        class: 'bascule', type: 'button', role: 'switch', 'aria-checked': String(actif),
+        'aria-label': champ.l,
+        onclick: (e) => {
+          const nouveau = e.currentTarget.getAttribute('aria-checked') !== 'true';
+          e.currentTarget.setAttribute('aria-checked', String(nouveau));
+          noter(champ.c, nouveau ? 1 : 0);
+        },
+      });
+      break;
+    }
+    case 'salon': controle = selecteur(champ.c, donnees.salons, '— aucun —'); break;
+    case 'categorie': controle = selecteur(champ.c, donnees.categories, '— aucune —'); break;
+    case 'role': controle = selecteur(champ.c, donnees.roles, '— aucun —'); break;
+    case 'levelup': {
+      const valeur = valeurCourante(champ.c) ?? 'actuel';
+      const options = [
+        { id: 'actuel', nom: 'Dans le salon du message' },
+        { id: 'mp', nom: 'En message privé' },
+        { id: 'off', nom: 'Ne rien annoncer' },
+        ...donnees.salons.map((s) => ({ id: s.id, nom: '# ' + s.nom })),
+      ];
+      controle = el('select', { onchange: (e) => noter(champ.c, e.target.value) },
+        options.map((o) => el('option', { value: o.id, text: o.nom })));
+      controle.value = valeur;
+      break;
+    }
+    case 'nombre':
+      controle = el('input', {
+        type: 'number', min: champ.min ?? 0, max: champ.max ?? 1000000,
+        value: valeurCourante(champ.c) ?? 0,
+        oninput: (e) => noter(champ.c, e.target.value === '' ? 0 : Number(e.target.value)),
+      });
+      break;
+    case 'zone':
+      controle = el('textarea', {
+        rows: 3, oninput: (e) => noter(champ.c, e.target.value),
+      });
+      controle.value = valeurCourante(champ.c) ?? '';
+      break;
+    default:
+      controle = el('input', { type: 'text', oninput: (e) => noter(champ.c, e.target.value) });
+      controle.value = valeurCourante(champ.c) ?? '';
+  }
+
+  const grand = champ.t === 'zone';
+  return el('div', { class: 'champ' + (grand ? ' large' : '') }, [
+    el('label', {}, [document.createTextNode(champ.l), champ.a ? el('span', { class: 'aide', text: champ.a }) : null]),
+    el('div', {}, controle),
+  ]);
+}
+
+// ============================================================== ONGLETS
+function vueResume() {
+  const r = donnees.resume;
+  const stats = [
+    ['Membres', nb(r.membres), nb(r.membresXp) + ' avec de l\'XP'],
+    ['Messages (7 j)', nb(r.messages7j), '+' + nb(r.arrivees7j) + ' / −' + nb(r.departs7j) + ' membres'],
+    ['Tickets', nb(r.tickets?.ouverts ?? 0) + ' ouverts', nb(r.tickets?.total ?? 0) + ' au total'],
+    ['Signalements', nb(r.signalements), 'en attente'],
+    ['Appels', nb(r.appels), 'en attente'],
+  ];
+
+  const bloc = el('div', { class: 'carte' }, [
+    el('h3', { text: 'Classement du serveur' }),
+    el('p', { class: 'aide-bloc', text: 'Les dix premiers membres par expérience.' }),
+    donnees.classement.length
+      ? el('table', {}, [
+          el('thead', {}, el('tr', {}, [
+            el('th', { text: '#' }), el('th', { text: 'Membre' }),
+            el('th', { class: 'droite', text: 'Niveau' }), el('th', { class: 'droite', text: 'XP' }),
+            el('th', { class: 'droite', text: 'Messages' }), el('th', { class: 'droite', text: 'Solde' }),
+          ])),
+          el('tbody', {}, donnees.classement.map((m) => el('tr', {}, [
+            el('td', { text: m.position }), el('td', { text: m.nom }),
+            el('td', { class: 'droite', text: m.niveau }), el('td', { class: 'droite', text: nb(m.xp) }),
+            el('td', { class: 'droite', text: nb(m.messages) }), el('td', { class: 'droite', text: nb(m.solde) }),
+          ]))),
+        ])
+      : el('p', { class: 'vide', text: 'Personne n\'a encore gagné d\'XP.' }),
+  ]);
+
+  const missions = donnees.missions.length
+    ? el('div', { class: 'carte' }, [
+        el('h3', { text: 'Missions en cours' }),
+        el('p', { class: 'aide-bloc', text: 'Tirées automatiquement dans la réserve de config.js.' }),
+        ...donnees.missions.map((p) =>
+          el('div', {}, [
+            el('p', { style: 'font-weight:600;margin:12px 0 6px', text: p.titre }),
+            el('table', {}, el('tbody', {}, p.liste.map((m) => el('tr', {}, [
+              el('td', { text: m.nom }),
+              el('td', { style: 'color:var(--texte2)', text: m.description }),
+              el('td', { class: 'droite', text: m.xp + ' XP · ' + nb(m.monnaie) }),
+            ])))),
+          ])
+        ),
+      ])
+    : null;
+
+  return [
+    el('div', { class: 'grille-stats', style: 'margin-bottom:18px' },
+      stats.map(([titre, valeur, sous]) => el('div', { class: 'stat' }, [
+        el('span', { text: titre }), el('b', { text: valeur }), el('em', { text: sous }),
+      ]))),
+    bloc,
+    missions,
+  ];
+}
+
+function vueRecompenses() {
+  const nomRole = (id) => donnees.roles.find((r) => r.id === id)?.nom ?? 'rôle supprimé';
+  const champNiveau = el('input', { type: 'number', min: 1, max: 1000, value: 5 });
+  const champRole = el('select', {}, donnees.roles.map((r) => el('option', { value: r.id, text: r.nom })));
+
+  return el('div', { class: 'carte' }, [
+    el('h3', { text: 'Rôles débloqués par niveau' }),
+    el('p', { class: 'aide-bloc', text: 'Le rôle est donné automatiquement quand le membre atteint le niveau.' }),
+    donnees.recompenses.length
+      ? el('table', {}, el('tbody', {}, donnees.recompenses.map((r) => el('tr', {}, [
+          el('td', {}, el('span', { class: 'puce', text: 'niveau ' + r.niveau })),
+          el('td', { text: nomRole(r.role_id) }),
+          el('td', { class: 'droite' }, el('button', {
+            class: 'bouton danger', text: 'Retirer',
+            onclick: async () => {
+              try {
+                const res = await api('/api/serveur/' + serveurId + '/recompense', {
+                  method: 'POST', body: JSON.stringify({ niveau: r.niveau, supprimer: true }),
+                });
+                donnees.recompenses = res.recompenses;
+                dessiner();
+                toast('Récompense retirée.');
+              } catch (e) { toast(e.message, true); }
+            },
+          })),
+        ]))))
+      : el('p', { class: 'vide', text: 'Aucune récompense pour le moment.' }),
+    el('div', { class: 'ligne-form' }, [
+      el('div', {}, [el('label', { text: 'Niveau' }), champNiveau]),
+      el('div', { style: 'flex:2 1 200px' }, [el('label', { text: 'Rôle' }), champRole]),
+      el('button', {
+        class: 'bouton', text: 'Ajouter',
+        onclick: async () => {
+          try {
+            const res = await api('/api/serveur/' + serveurId + '/recompense', {
+              method: 'POST', body: JSON.stringify({ niveau: champNiveau.value, roleId: champRole.value }),
+            });
+            donnees.recompenses = res.recompenses;
+            dessiner();
+            toast('Récompense ajoutée.');
+          } catch (e) { toast(e.message, true); }
+        },
+      }),
+    ]),
+  ]);
+}
+
+function vueBoutique() {
+  const nom = el('input', { type: 'text', placeholder: 'Rôle VIP' });
+  const prix = el('input', { type: 'number', min: 1, value: 1000 });
+  const stock = el('input', { type: 'number', min: 0, placeholder: 'illimité' });
+  const role = el('select', {}, [el('option', { value: '', text: '— aucun —' }),
+    ...donnees.roles.map((r) => el('option', { value: r.id, text: r.nom }))]);
+  const description = el('input', { type: 'text', placeholder: 'Courte description' });
+
+  return el('div', { class: 'carte' }, [
+    el('h3', { text: 'Boutique' }),
+    el('p', { class: 'aide-bloc', text: 'Articles achetables avec /boutique acheter.' }),
+    donnees.boutique.length
+      ? el('table', {}, [
+          el('thead', {}, el('tr', {}, [
+            el('th', { text: '#' }), el('th', { text: 'Article' }),
+            el('th', { class: 'droite', text: 'Prix' }), el('th', { class: 'droite', text: 'Stock' }), el('th', {}),
+          ])),
+          el('tbody', {}, donnees.boutique.map((a) => el('tr', {}, [
+            el('td', { text: a.id }),
+            el('td', {}, [
+              document.createTextNode(a.nom),
+              a.role_id ? el('span', { class: 'aide', text: donnees.roles.find((r) => r.id === a.role_id)?.nom ?? 'rôle supprimé' }) : null,
+            ]),
+            el('td', { class: 'droite', text: nb(a.prix) }),
+            el('td', { class: 'droite', text: a.stock < 0 ? '∞' : a.stock }),
+            el('td', { class: 'droite' }, el('button', {
+              class: 'bouton danger', text: 'Retirer',
+              onclick: async () => {
+                try {
+                  const res = await api('/api/serveur/' + serveurId + '/boutique', {
+                    method: 'POST', body: JSON.stringify({ supprimer: a.id }),
+                  });
+                  donnees.boutique = res.boutique;
+                  dessiner();
+                  toast('Article retiré.');
+                } catch (e) { toast(e.message, true); }
+              },
+            })),
+          ]))),
+        ])
+      : el('p', { class: 'vide', text: 'La boutique est vide.' }),
+    el('div', { class: 'ligne-form' }, [
+      el('div', { style: 'flex:2 1 180px' }, [el('label', { text: 'Nom' }), nom]),
+      el('div', {}, [el('label', { text: 'Prix' }), prix]),
+      el('div', {}, [el('label', { text: 'Stock' }), stock]),
+      el('div', { style: 'flex:2 1 180px' }, [el('label', { text: 'Rôle offert' }), role]),
+      el('div', { style: 'flex:3 1 240px' }, [el('label', { text: 'Description' }), description]),
+      el('button', {
+        class: 'bouton', text: 'Ajouter',
+        onclick: async () => {
+          try {
+            const res = await api('/api/serveur/' + serveurId + '/boutique', {
+              method: 'POST',
+              body: JSON.stringify({
+                nom: nom.value, prix: prix.value, stock: stock.value || 0,
+                roleId: role.value || null, description: description.value || null,
+              }),
+            });
+            donnees.boutique = res.boutique;
+            dessiner();
+            toast('Article ajouté.');
+          } catch (e) { toast(e.message, true); }
+        },
+      }),
+    ]),
+  ]);
+}
+
+function vueVeille() {
+  const j = donnees.jetonInstagram || {};
+  const type = el('select', {}, [
+    el('option', { value: 'twitch', text: '🔴 Twitch' }),
+    el('option', { value: 'tiktok', text: '🎵 TikTok' }),
+    el('option', { value: 'instagram', text: '📸 Instagram' }),
+    el('option', { value: 'youtube', text: '▶️ YouTube' }),
+    el('option', { value: 'rss', text: '📰 Flux RSS' }),
+  ]);
+  const source = el('input', { type: 'text', placeholder: '@pseudo, UC…, ou adresse du flux' });
+  const salonChoix = el('select', {}, donnees.salons.map((s) => el('option', { value: s.id, text: '# ' + s.nom })));
+  const roleChoix = el('select', {}, [el('option', { value: '', text: '— aucune mention —' }),
+    ...donnees.roles.map((r) => el('option', { value: r.id, text: '@ ' + r.nom }))]);
+  const nom = el('input', { type: 'text', placeholder: 'Nom affiché' });
+  const message = el('input', { type: 'text', placeholder: 'Texte au-dessus (facultatif)' });
+
+  const majSource = () => {
+    source.disabled = type.value === 'instagram';
+    source.placeholder = type.value === 'instagram'
+      ? 'inutile : le compte est celui du jeton'
+      : type.value === 'twitch' ? 'pseudo de la chaîne, ou son adresse twitch.tv'
+      : type.value === 'tiktok' ? 'pseudo du compte, sans le @'
+      : type.value === 'youtube' ? '@pseudo, adresse, ou identifiant UC…' : 'https://exemple.fr/flux.xml';
+    if (type.value === 'instagram') source.value = '';
+  };
+  type.addEventListener('change', majSource);
+  majSource();
+
+  const recharger = (liste) => { donnees.veille = liste; dessiner(); };
+  const agir = async (corps, succes) => {
+    try {
+      const res = await api('/api/serveur/' + serveurId + '/veille', { method: 'POST', body: JSON.stringify(corps) });
+      if (res.veille) recharger(res.veille);
+      if (res.jetonInstagram) { donnees.jetonInstagram = res.jetonInstagram; dessiner(); }
+      toast(typeof succes === 'function' ? succes(res) : succes);
+    } catch (e) { toast(e.message, true); }
+  };
+
+  const tableau = donnees.veille?.length
+    ? el('table', {}, [
+        el('thead', {}, el('tr', {}, [
+          el('th', { text: '#' }), el('th', { text: 'Source' }), el('th', { text: 'Salon' }),
+          el('th', { text: 'Dernière publication vue' }), el('th', {}),
+        ])),
+        el('tbody', {}, donnees.veille.map((v) => el('tr', {}, [
+          el('td', { text: v.id }),
+          el('td', {}, [
+            document.createTextNode(({ twitch: '🔴 ', tiktok: '🎵 ', instagram: '📸 ', youtube: '▶️ ' }[v.type] ?? '📰 ') + v.nom),
+            el('span', { class: 'aide', text: v.type === 'instagram' ? 'compte lié au jeton' : v.source }),
+            v.erreurs ? el('span', { class: 'aide', style: 'color:var(--danger)', text: '⚠️ ' + v.erreurs + ' erreur(s) — ' + (v.derniere_erreur || '') }) : null,
+          ]),
+          el('td', {}, [
+            document.createTextNode('#' + (donnees.salons.find((s) => s.id === v.salon_id)?.nom ?? 'salon supprimé')),
+            v.role_id ? el('span', { class: 'aide', text: 'mentionne @' + (donnees.roles.find((r) => r.id === v.role_id)?.nom ?? '?') }) : null,
+          ]),
+          el('td', { text: v.derniere_date ? new Date(v.derniere_date).toLocaleString('fr-FR') : 'jamais' }),
+          el('td', { class: 'droite' }, [
+            el('button', {
+              class: 'bouton secondaire', text: 'Tester', style: 'margin-right:6px',
+              onclick: (e) => { e.target.disabled = true; agir({ tester: v.id }, (r) => r.resultat?.annonces ? 'Annonce envoyée dans le salon.' : r.resultat?.erreur ? 'Erreur : ' + r.resultat.erreur : 'Rien à annoncer.'); },
+            }),
+            el('button', { class: 'bouton danger', text: 'Retirer', onclick: () => agir({ supprimer: v.id }, 'Source retirée.') }),
+          ]),
+        ]))),
+      ])
+    : el('p', { class: 'vide', text: 'Aucune source surveillée pour le moment.' });
+
+  const blocJeton = el('div', { class: 'carte' }, [
+    el('h3', { text: 'Jeton Instagram' }),
+    el('p', { class: 'aide-bloc', text: "Nécessaire uniquement pour Instagram. YouTube et les flux RSS n'ont besoin de rien." }),
+    el('p', {
+      text: j.present
+        ? (j.joursRestants !== null
+            ? 'Jeton en place, valable encore ' + j.joursRestants + ' jours. Le bot le renouvelle tout seul tous les 40 jours.'
+            : "Jeton en place (celui du .env). Il sera renouvelé et enregistré au premier passage.")
+        : "Aucun jeton. Ajoute INSTAGRAM_TOKEN dans le fichier .env, puis relance le bot. Les étapes sont dans GUIDE-INSTAGRAM.txt.",
+      style: 'margin:0;color:var(--texte2)',
+    }),
+    j.present
+      ? el('div', { class: 'ligne-form' }, [
+          el('button', {
+            class: 'bouton secondaire', text: 'Renouveler maintenant',
+            onclick: (e) => { e.target.disabled = true; agir({ renouveler: true }, 'Jeton renouvelé pour 60 jours.'); },
+          }),
+        ])
+      : null,
+  ]);
+
+  return [
+    el('div', { class: 'carte' }, [
+      el('h3', { text: 'Sources surveillées' }),
+      el('p', { class: 'aide-bloc', text: 'Le bot vérifie régulièrement et annonce chaque nouveauté. En ajoutant une source, la publication déjà en ligne n\'est pas annoncée : seules les suivantes le seront.' }),
+      tableau,
+      el('div', { class: 'ligne-form' }, [
+        el('div', {}, [el('label', { text: 'Type' }), type]),
+        el('div', { style: 'flex:2 1 220px' }, [el('label', { text: 'Chaîne ou flux' }), source]),
+        el('div', { style: 'flex:2 1 160px' }, [el('label', { text: 'Salon' }), salonChoix]),
+        el('div', { style: 'flex:2 1 160px' }, [el('label', { text: 'Mention' }), roleChoix]),
+        el('div', {}, [el('label', { text: 'Nom affiché' }), nom]),
+        el('div', { style: 'flex:2 1 180px' }, [el('label', { text: 'Message' }), message]),
+        el('button', {
+          class: 'bouton', text: 'Ajouter',
+          onclick: (e) => {
+            e.target.disabled = true;
+            agir(
+              { type: type.value, source: source.value, salonId: salonChoix.value, roleId: roleChoix.value || null, nom: nom.value || null, message: message.value || null },
+              (r) => 'Source ajoutée. Dernière publication repérée : ' + (r.dernier || '—')
+            ).finally(() => { e.target.disabled = false; });
+          },
+        }),
+      ]),
+    ]),
+    blocJeton,
+  ];
+}
+
+function vueApercus() {
+  const cache = '&t=' + Date.now();
+  const base = '/api/serveur/' + serveurId;
+  const choixTheme = el('select', {}, donnees.themes.map((t) => el('option', { value: t.cle, text: t.nom })));
+  const image = el('img', { class: 'apercu', alt: 'Aperçu de la carte de rank', src: base + '/apercu.png?type=rank' + cache });
+  const choixType = el('select', {}, [
+    el('option', { value: 'rank', text: 'Carte de rank' }),
+    el('option', { value: 'profil', text: 'Carte de profil' }),
+    el('option', { value: 'bienvenue', text: 'Carte de bienvenue' }),
+  ]);
+  const rafraichir = () => {
+    image.src = base + '/apercu.png?type=' + choixType.value + '&theme=' + choixTheme.value + '&t=' + Date.now();
+  };
+  choixTheme.addEventListener('change', rafraichir);
+  choixType.addEventListener('change', rafraichir);
+
+  const jours = el('select', {}, [7, 14, 30, 60, 90].map((j) => el('option', { value: j, text: j + ' jours' })));
+  jours.value = '30';
+  const graphique = el('img', { class: 'apercu', alt: "Graphique d'activité", src: base + '/stats.png?jours=30' + cache });
+  jours.addEventListener('change', () => { graphique.src = base + '/stats.png?jours=' + jours.value + '&t=' + Date.now(); });
+
+  return [
+    el('div', { class: 'carte' }, [
+      el('h3', { text: 'Cartes en image' }),
+      el('p', { class: 'aide-bloc', text: "Exemple généré à l'instant avec le décor et les couleurs actuels." }),
+      el('div', { class: 'ligne-form', style: 'margin:0 0 14px' }, [
+        el('div', {}, [el('label', { text: 'Carte' }), choixType]),
+        el('div', {}, [el('label', { text: 'Thème' }), choixTheme]),
+      ]),
+      image,
+    ]),
+    el('div', { class: 'carte' }, [
+      el('h3', { text: "Activité du serveur" }),
+      el('p', { class: 'aide-bloc', text: "La même image que la commande /stats." }),
+      el('div', { class: 'ligne-form', style: 'margin:0 0 14px' }, [
+        el('div', {}, [el('label', { text: 'Période' }), jours]),
+      ]),
+      graphique,
+    ]),
+    el('div', { class: 'carte' }, [
+      el('h3', { text: 'Thèmes de carte' }),
+      el('table', {}, el('tbody', {}, donnees.themes.map((t) => el('tr', {}, [
+        el('td', { text: (t.emoji || '') + ' ' + t.nom }),
+        el('td', { style: 'color:var(--texte2)', text: t.description }),
+        el('td', { class: 'droite', text: t.prix ? nb(t.prix) : 'offert' }),
+      ])))),
+    ]),
+  ];
+}
+
+function vueOutils() {
+  const liste = el('div', { class: 'vide', text: 'Chargement…' });
+  const recharger = async () => {
+    try {
+      const res = await api('/api/sauvegardes');
+      liste.className = '';
+      liste.replaceChildren(
+        res.liste.length
+          ? el('table', {}, [
+              el('thead', {}, el('tr', {}, [el('th', { text: 'Fichier' }), el('th', { class: 'droite', text: 'Taille' }), el('th', { class: 'droite', text: 'Date' })])),
+              el('tbody', {}, res.liste.map((s) => el('tr', {}, [
+                el('td', { text: s.nom }),
+                el('td', { class: 'droite', text: octets(s.taille) }),
+                el('td', { class: 'droite', text: new Date(s.date).toLocaleString('fr-FR') }),
+              ]))),
+            ])
+          : el('p', { class: 'vide', text: 'Aucune sauvegarde pour le moment.' })
+      );
+    } catch (e) { toast(e.message, true); }
+  };
+  recharger();
+
+  return el('div', {}, [
+    el('div', { class: 'carte' }, [
+      el('h3', { text: 'Copies de la base' }),
+      el('p', { class: 'aide-bloc', text: "Le bot en fait une par jour automatiquement. Elles sont dans data/sauvegardes." }),
+      liste,
+      el('div', { class: 'ligne-form' }, [
+        el('button', {
+          class: 'bouton', text: 'Sauvegarder maintenant',
+          onclick: async (e) => {
+            e.target.disabled = true;
+            try {
+              const res = await api('/api/sauvegarde', { method: 'POST' });
+              toast('Sauvegarde créée : ' + res.nom);
+              await recharger();
+            } catch (erreur) { toast(erreur.message, true); }
+            e.target.disabled = false;
+          },
+        }),
+      ]),
+    ]),
+    vueStructure(),
+  ]);
+}
+
+// Photos de la structure : rôles, salons et permissions.
+// On peut photographier, comparer et effacer ici ; la réparation reste sur
+// Discord, parce qu'elle modifie le serveur et doit laisser une trace.
+function vueStructure() {
+  const tableau = el('div', { class: 'vide', text: 'Chargement…' });
+  const comparaison = el('div');
+
+  const ligneDiff = (titre, valeurs) =>
+    valeurs.length ? el('li', {}, [el('strong', { text: titre + ' : ' }), document.createTextNode(valeurs.slice(0, 8).join(', ') + (valeurs.length > 8 ? ' …' : ''))]) : null;
+
+  const recharger = async () => {
+    try {
+      const res = await api('/api/serveur/' + serveurId + '/structure');
+      tableau.className = '';
+      tableau.replaceChildren(
+        res.photos.length
+          ? el('table', {}, [
+              el('thead', {}, el('tr', {}, [
+                el('th', { text: '#' }), el('th', { text: 'Nom' }),
+                el('th', { class: 'droite', text: 'Rôles' }), el('th', { class: 'droite', text: 'Salons' }),
+                el('th', { class: 'droite', text: 'Date' }), el('th', {}),
+              ])),
+              el('tbody', {}, res.photos.map((p) => el('tr', {}, [
+                el('td', { text: '#' + p.id }),
+                el('td', { text: (p.nom || 'Sans nom') + (p.automatique ? ' (auto)' : '') }),
+                el('td', { class: 'droite', text: String(p.nb_roles) }),
+                el('td', { class: 'droite', text: String(p.nb_salons) }),
+                el('td', { class: 'droite', text: new Date(p.cree_le).toLocaleString('fr-FR') }),
+                el('td', { class: 'droite' }, el('button', {
+                  class: 'bouton danger', text: 'Effacer',
+                  onclick: async () => {
+                    try {
+                      await api('/api/serveur/' + serveurId + '/structure', { method: 'POST', body: JSON.stringify({ supprimer: p.id }) });
+                      toast('Photo #' + p.id + ' effacée.');
+                      await recharger();
+                    } catch (e) { toast(e.message, true); }
+                  },
+                })),
+              ]))),
+            ])
+          : el('p', { class: 'vide', text: 'Aucune photo pour le moment.' })
+      );
+
+      const d = res.diff;
+      if (!d) comparaison.replaceChildren();
+      else if (!d.total) {
+        comparaison.replaceChildren(el('p', { class: 'aide-bloc', text: 'Le serveur est identique à la photo #' + d.id + '. Rien à réparer.' }));
+      } else {
+        comparaison.replaceChildren(
+          el('p', { class: 'aide-bloc', text: d.total + ' différence(s) depuis la photo #' + d.id + ' — répare avec /structure reparer photo:' + d.id + ' sur Discord.' }),
+          el('ul', { class: 'diff' }, [
+            ligneDiff('Rôles disparus', d.roles.manquants),
+            ligneDiff('Rôles renommés', d.roles.renommes),
+            ligneDiff('Permissions de rôle changées', d.roles.permissions),
+            ligneDiff('Salons disparus', d.salons.manquants),
+            ligneDiff('Salons renommés', d.salons.renommes),
+            ligneDiff('Permissions de salon changées', d.salons.permissions),
+            ligneDiff('Salons déplacés', d.salons.deplaces),
+            ligneDiff('Réglages du serveur', d.serveur),
+          ].filter(Boolean))
+        );
+      }
+    } catch (e) { toast(e.message, true); }
+  };
+  recharger();
+
+  return el('div', { class: 'carte' }, [
+    el('h3', { text: 'Structure du serveur' }),
+    el('p', { class: 'aide-bloc', text: "Une photo des rôles, des salons et de leurs permissions, pour tout remettre en place si quelqu'un casse quelque chose. Le bot en prend une par jour quand la structure a bougé. La réparation se lance depuis Discord avec /structure reparer — elle ne supprime jamais rien." }),
+    tableau,
+    comparaison,
+    el('div', { class: 'ligne-form' }, [
+      el('button', {
+        class: 'bouton', text: 'Photographier maintenant',
+        onclick: async (e) => {
+          e.target.disabled = true;
+          try {
+            await api('/api/serveur/' + serveurId + '/structure', { method: 'POST', body: JSON.stringify({}) });
+            toast('Photo enregistrée.');
+            await recharger();
+          } catch (erreur) { toast(erreur.message, true); }
+          e.target.disabled = false;
+        },
+      }),
+    ]),
+  ]);
+}
+
+// ============================================================= CONSOLE
+// Ce que le bot ecrit dans sa fenetre, releve par petits paquets. Le serveur
+// garde les 800 dernieres lignes en memoire ; on ne demande a chaque tour que
+// ce qui est arrive depuis la derniere fois, jamais tout le tampon.
+const NIVEAUX = { action: 'ACTION', info: 'INFO', succes: 'OK', avertissement: 'WARN', erreur: 'ERREUR', debug: 'DEBUG' };
+const LIGNES_AFFICHEES = 800;
+const PERIODE_CONSOLE = 1500;
+
+let minuteurConsole = null;
+function arreterConsole() {
+  clearInterval(minuteurConsole);
+  minuteurConsole = null;
+}
+
+function vueConsole() {
+  let curseur = 0;
+  let niveauFiltre = '';
+  let texteFiltre = '';
+  let colle = true; // on suit le bas tant que l'utilisateur n'a pas remonte
+
+  const flux = el('div', { class: 'console', tabindex: '0' });
+  const etat = el('span', { class: 'console-etat', text: 'Connexion…' });
+
+  const visible = (l) =>
+    (!niveauFiltre || l.niveau === niveauFiltre) &&
+    (!texteFiltre || l.texte.toLowerCase().includes(texteFiltre));
+
+  const ligneDom = (l) => {
+    const d = new Date(l.date);
+    const h = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0');
+    return el('div', { class: 'lc lc-' + l.niveau, 'data-niveau': l.niveau, 'data-texte': l.texte.toLowerCase() }, [
+      el('span', { class: 'lc-h', text: h }),
+      el('span', { class: 'lc-n', text: NIVEAUX[l.niveau] ?? l.niveau }),
+      el('span', { class: 'lc-t', text: l.texte }),
+    ]);
+  };
+
+  const auBas = () => flux.scrollHeight - flux.scrollTop - flux.clientHeight < 40;
+  flux.addEventListener('scroll', () => { colle = auBas(); });
+
+  /** Recalcule ce qui est masque par les filtres, sans redemander au bot. */
+  const appliquerFiltres = () => {
+    let montrees = 0;
+    for (const n of flux.children) {
+      const ok =
+        (!niveauFiltre || n.dataset.niveau === niveauFiltre) &&
+        (!texteFiltre || (n.dataset.texte ?? '').includes(texteFiltre));
+      n.hidden = !ok;
+      if (ok) montrees++;
+    }
+    majEtat(montrees);
+  };
+
+  let infos = {};
+  const majEtat = (montrees) => {
+    const total = flux.children.length;
+    const duree = infos.demarre ? formaterDuree(infos.demarre) : '—';
+    if (!total) {
+      etat.textContent = infos.demarre !== undefined
+        ? "Aucune ligne pour l'instant — le bot n'a rien écrit depuis " +
+          (infos.demarre < 90 ? 'son démarrage il y a ' + duree + '.' : duree + '.')
+        : 'Connexion…';
+      return;
+    }
+    etat.textContent =
+      (montrees === total ? total + ' ligne' + (total > 1 ? 's' : '') : montrees + ' sur ' + total) +
+      (infos.capacite ? ' · ' + infos.total + ' en mémoire sur ' + infos.capacite : '') +
+      ' · bot démarré depuis ' + duree +
+      (infos.memoire ? ' · ' + infos.memoire + ' Mo' : '') +
+      (infos.actions === false ? ' · actions non tracées' : '') +
+      (infos.debug ? ' · mode debug' : '');
+  };
+
+  const formaterDuree = (s) => {
+    if (s < 60) return s + ' s';
+    if (s < 3600) return Math.floor(s / 60) + ' min';
+    if (s < 86400) return Math.floor(s / 3600) + ' h ' + Math.floor((s % 3600) / 60) + ' min';
+    return Math.floor(s / 86400) + ' j ' + Math.floor((s % 86400) / 3600) + ' h';
+  };
+
+  const ajouter = (lignes) => {
+    if (!lignes.length) return;
+    const fragment = document.createDocumentFragment();
+    for (const l of lignes) {
+      const n = ligneDom(l);
+      n.hidden = !visible(l);
+      fragment.append(n);
+    }
+    flux.append(fragment);
+    // On borne le DOM : sur un bot qui tourne depuis des jours, laisser
+    // grossir la liste finirait par ramer.
+    while (flux.children.length > LIGNES_AFFICHEES) flux.firstChild.remove();
+    if (colle) flux.scrollTop = flux.scrollHeight;
+    majEtat([...flux.children].filter((n) => !n.hidden).length);
+  };
+
+  const relever = async () => {
+    if (document.visibilityState !== 'visible') return;
+    try {
+      const res = await api('/api/console?depuis=' + curseur);
+      infos = res;
+      if (res.probleme) {
+        etat.textContent = res.probleme;
+        arreterConsole();
+        return;
+      }
+      if (res.trou && curseur) {
+        ajouter([{ id: 0, date: Date.now(), niveau: 'avertissement', texte: '— des lignes plus anciennes ont été perdues (tampon plein) —' }]);
+      }
+      curseur = res.curseur;
+      ajouter(res.lignes);
+      // `ajouter` sort tot quand il n'y a rien de neuf : sans cet appel, la
+      // ligne d'etat resterait bloquee sur « Connexion… » sur un bot silencieux.
+      majEtat([...flux.children].filter((n) => !n.hidden).length);
+    } catch (e) {
+      etat.textContent = 'Console injoignable : ' + e.message;
+      arreterConsole();
+    }
+  };
+
+  arreterConsole();
+  relever();
+  minuteurConsole = setInterval(relever, PERIODE_CONSOLE);
+
+  const choixNiveau = el('select', {
+    onchange: (e) => { niveauFiltre = e.target.value; appliquerFiltres(); },
+  }, [
+    el('option', { value: '', text: 'Tous les niveaux' }),
+    el('option', { value: 'action', text: 'Actions des membres' }),
+    el('option', { value: 'erreur', text: 'Erreurs' }),
+    el('option', { value: 'avertissement', text: 'Avertissements' }),
+    el('option', { value: 'info', text: 'Informations' }),
+    el('option', { value: 'succes', text: 'Succès' }),
+    el('option', { value: 'debug', text: 'Debug' }),
+  ]);
+
+  const recherche = el('input', {
+    type: 'search', placeholder: 'Filtrer le texte…',
+    oninput: (e) => { texteFiltre = e.target.value.trim().toLowerCase(); appliquerFiltres(); },
+  });
+
+  return el('div', { class: 'carte' }, [
+    el('h3', { text: 'Console' }),
+    el('p', { class: 'aide-bloc', text: "Tout ce que le bot fait depuis son démarrage : commandes lancées, boutons cliqués, arrivées, départs, montées de niveau, sanctions, automod. Ces lignes vivent en mémoire — un redémarrage repart de zéro. Pour un historique qui dure, ce sont les salons de logs Discord." }),
+    el('div', { class: 'console-barre' }, [
+      choixNiveau,
+      recherche,
+      el('button', {
+        class: 'bouton secondaire', text: 'Bas de page',
+        onclick: () => { colle = true; flux.scrollTop = flux.scrollHeight; },
+      }),
+      el('button', {
+        class: 'bouton secondaire', text: 'Copier',
+        onclick: async (e) => {
+          const texte = [...flux.children].filter((n) => !n.hidden).map((n) => n.textContent.replace(/^(\d\d:\d\d:\d\d)/, '$1 ')).join('\n');
+          try {
+            await navigator.clipboard.writeText(texte);
+            toast('Console copiée.');
+          } catch {
+            toast('Copie refusée par le navigateur.', true);
+          }
+          e.target.blur();
+        },
+      }),
+      el('button', {
+        class: 'bouton danger', text: 'Vider',
+        onclick: async (e) => {
+          e.target.disabled = true;
+          try {
+            const res = await api('/api/console', { method: 'POST' });
+            flux.replaceChildren();
+            curseur = res.curseur;
+            // On garde les infos machine (capacité, mémoire) et on reprend le
+            // décompte du serveur, sinon la ligne d'état resterait sur
+            // l'ancien total jusqu'au prochain relevé.
+            infos = { ...infos, total: res.total };
+            ajouter(res.lignes);
+            toast('Console vidée.');
+          } catch (erreur) { toast(erreur.message, true); }
+          e.target.disabled = false;
+        },
+      }),
+    ]),
+    flux,
+    etat,
+  ]);
+}
+
+// ========================================================= STATISTIQUES
+// Des graphiques dessinés dans la page, pas une image générée : on peut
+// survoler et lire les valeurs. Le SVG est redessiné à la largeur réelle du
+// conteneur plutôt qu'étiré par un viewBox — sinon les textes grossiraient
+// avec la fenêtre.
+const NS = 'http://www.w3.org/2000/svg';
+const sv = (balise, attributs = {}, enfants = []) => {
+  const n = document.createElementNS(NS, balise);
+  for (const [k, v] of Object.entries(attributs)) if (v !== null && v !== undefined) n.setAttribute(k, v);
+  for (const e of [].concat(enfants)) if (e) n.append(e);
+  return n;
+};
+
+// Palette de données, validée pour le daltonisme sur les deux fonds du panneau
+// (bleu ↔ rouge : ΔE protan 21,6 en clair et 19,2 en sombre, seuil 8).
+// Elle est volontairement distincte du violet de l'interface : le violet dit
+// « ceci se clique », ces couleurs-ci disent « ceci est une donnée ».
+const sombre = () => matchMedia('(prefers-color-scheme: dark)').matches;
+const COULEURS = () => (sombre()
+  ? { serie: '#3987e5', negatif: '#e66767', grille: '#292d31', axe: '#3a3f45', texte: '#a2a8b0', surface: '#17191b' }
+  : { serie: '#2a78d6', negatif: '#e34948', grille: '#e9e9e6', axe: '#d6d6d1', texte: '#5b5f66', surface: '#ffffff' });
+
+const jourCourt = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
+
+/** Borne haute lisible : 5, 10, 20, 25, 50, 100… */
+function borneHaute(valeur) {
+  if (valeur <= 5) return 5;
+  const magnitude = 10 ** Math.floor(Math.log10(valeur));
+  for (const pas of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (pas * magnitude >= valeur) return pas * magnitude;
+  return 10 * magnitude;
+}
+
+/** Infobulle partagée par les trois graphiques. */
+function bulle() {
+  const n = el('div', { class: 'viz-bulle' });
+  n.hidden = true;
+  return n;
+}
+
+/**
+ * Courbe + aire, une seule série : pas de légende, le titre nomme la donnée.
+ * Réticule vertical qui accroche le jour le plus proche.
+ */
+function courbe(hote, serie, champ, unite, formater = nb) {
+  const C = COULEURS();
+  const L = Math.max(320, hote.clientWidth);
+  const H = 190;
+  const marge = { h: 18, b: 26, g: 46, d: 14 };
+  const gl = L - marge.g - marge.d;
+  const gh = H - marge.h - marge.b;
+
+  const valeurs = serie.map((j) => j[champ]);
+  const haut = borneHaute(Math.max(...valeurs, 1));
+  const x = (i) => marge.g + (serie.length === 1 ? gl / 2 : (gl * i) / (serie.length - 1));
+  const y = (v) => marge.h + gh - (gh * v) / haut;
+
+  const svg = sv('svg', { width: L, height: H, role: 'img' });
+  const divisions = haut % 4 === 0 ? 4 : 5;
+
+  for (let i = 0; i <= divisions; i++) {
+    const v = (haut / divisions) * i;
+    const yy = Math.round(y(v)) + 0.5;
+    svg.append(
+      sv('line', { x1: marge.g, x2: marge.g + gl, y1: yy, y2: yy, stroke: i ? C.grille : C.axe, 'stroke-width': 1 }),
+      sv('text', { x: marge.g - 8, y: yy + 4, 'text-anchor': 'end', fill: C.texte, 'font-size': 11 }, document.createTextNode(formater(Math.round(v))))
+    );
+  }
+
+  const points = serie.map((j, i) => [x(i), y(j[champ])]);
+  const trace = points.map(([px, py], i) => (i ? 'L' : 'M') + px.toFixed(1) + ' ' + py.toFixed(1)).join(' ');
+  svg.append(
+    sv('path', {
+      d: trace + ' L' + x(serie.length - 1).toFixed(1) + ' ' + y(0) + ' L' + x(0).toFixed(1) + ' ' + y(0) + ' Z',
+      fill: C.serie, 'fill-opacity': 0.1,
+    }),
+    sv('path', { d: trace, fill: 'none', stroke: C.serie, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' })
+  );
+
+  // Une date sur cinq environ : au-delà les étiquettes se chevauchent.
+  const pas = Math.max(1, Math.ceil(serie.length / 6));
+  serie.forEach((j, i) => {
+    if (i % pas && i !== serie.length - 1) return;
+    // Aux extremites, l'etiquette s'aligne vers l'interieur : centree, la
+    // premiere et la derniere depasseraient du cadre.
+    const ancre = i === 0 ? 'start' : i === serie.length - 1 ? 'end' : 'middle';
+    svg.append(sv('text', { x: x(i), y: H - 8, 'text-anchor': ancre, fill: C.texte, 'font-size': 11 }, document.createTextNode(jourCourt(j.jour))));
+  });
+
+  const reticule = sv('line', { y1: marge.h, y2: marge.h + gh, stroke: C.axe, 'stroke-width': 1 });
+  reticule.style.display = 'none';
+  const pastille = sv('circle', { r: 4.5, fill: C.serie, stroke: C.surface, 'stroke-width': 2 });
+  pastille.style.display = 'none';
+  svg.append(reticule, pastille);
+
+  const info = bulle();
+  const cadre = el('div', { class: 'viz-cadre' }, [svg, info]);
+
+  const bouger = (ev) => {
+    const r = svg.getBoundingClientRect();
+    const px = ev.clientX - r.left;
+    let i = Math.round(((px - marge.g) / gl) * (serie.length - 1));
+    i = Math.max(0, Math.min(serie.length - 1, i));
+    reticule.setAttribute('x1', x(i));
+    reticule.setAttribute('x2', x(i));
+    pastille.setAttribute('cx', x(i));
+    pastille.setAttribute('cy', y(serie[i][champ]));
+    reticule.style.display = pastille.style.display = '';
+    info.replaceChildren(
+      el('b', { text: formater(serie[i][champ]) + ' ' + unite }),
+      el('span', { text: serie[i].jour.split('-').reverse().join('/') })
+    );
+    info.hidden = false;
+    // L'infobulle bascule du côté opposé près du bord droit, sinon elle sort.
+    const gauche = Math.min(Math.max(x(i) + 12, 4), L - 150);
+    info.style.left = gauche + 'px';
+  };
+  cadre.addEventListener('pointermove', bouger);
+  cadre.addEventListener('pointerleave', () => {
+    info.hidden = true;
+    reticule.style.display = pastille.style.display = 'none';
+  });
+
+  return cadre;
+}
+
+/**
+ * Arrivées et départs : barres divergentes autour de zéro.
+ * Ce qui compte ici est le solde, et une ligne de partage le montre d'un coup
+ * d'œil mieux que deux courbes superposées.
+ */
+function divergent(hote, serie) {
+  const C = COULEURS();
+  const L = Math.max(320, hote.clientWidth);
+  const H = 190;
+  const marge = { h: 18, b: 26, g: 46, d: 14 };
+  const gl = L - marge.g - marge.d;
+  const gh = H - marge.h - marge.b;
+
+  const haut = borneHaute(Math.max(...serie.map((j) => Math.max(j.arrivees, j.departs)), 1));
+  const zero = marge.h + gh / 2;
+  const echelle = gh / 2 / haut;
+  const bande = gl / serie.length;
+  // Barres fines, 24 px au maximum, et 2 px de fond entre deux voisines.
+  const largeur = Math.max(2, Math.min(24, bande - 2));
+
+  const svg = sv('svg', { width: L, height: H, role: 'img' });
+  for (const [v, signe] of [[haut, -1], [haut / 2, -1], [0, 0], [haut / 2, 1], [haut, 1]]) {
+    const yy = Math.round(zero + signe * v * echelle) + 0.5;
+    svg.append(
+      sv('line', { x1: marge.g, x2: marge.g + gl, y1: yy, y2: yy, stroke: signe === 0 ? C.axe : C.grille, 'stroke-width': 1 }),
+      sv('text', { x: marge.g - 8, y: yy + 4, 'text-anchor': 'end', fill: C.texte, 'font-size': 11 }, document.createTextNode(nb(Math.round(v))))
+    );
+  }
+
+  const info = bulle();
+  serie.forEach((j, i) => {
+    const cx = marge.g + bande * i + bande / 2;
+    for (const [valeur, sens, couleur] of [[j.arrivees, -1, C.serie], [j.departs, 1, C.negatif]]) {
+      if (!valeur) continue;
+      const hb = Math.max(2, valeur * echelle);
+      const py = sens < 0 ? zero - hb : zero;
+      // Coin arrondi du côté de la donnée, carré sur la ligne de zéro.
+      const r = Math.min(4, largeur / 2, hb);
+      const d = sens < 0
+        ? `M${cx - largeur / 2} ${py + hb} L${cx - largeur / 2} ${py + r} Q${cx - largeur / 2} ${py} ${cx - largeur / 2 + r} ${py} L${cx + largeur / 2 - r} ${py} Q${cx + largeur / 2} ${py} ${cx + largeur / 2} ${py + r} L${cx + largeur / 2} ${py + hb} Z`
+        : `M${cx - largeur / 2} ${py} L${cx - largeur / 2} ${py + hb - r} Q${cx - largeur / 2} ${py + hb} ${cx - largeur / 2 + r} ${py + hb} L${cx + largeur / 2 - r} ${py + hb} Q${cx + largeur / 2} ${py + hb} ${cx + largeur / 2} ${py + hb - r} L${cx + largeur / 2} ${py} Z`;
+      svg.append(sv('path', { d, fill: couleur }));
+    }
+    // Zone de survol large : viser une barre de 2 px serait pénible.
+    const zone = sv('rect', { x: marge.g + bande * i, y: marge.h, width: bande, height: gh, fill: 'transparent' });
+    zone.addEventListener('pointerenter', () => {
+      info.replaceChildren(
+        el('b', { text: '+' + j.arrivees + ' / −' + j.departs }),
+        el('span', { text: j.jour.split('-').reverse().join('/') + ' · solde ' + (j.arrivees - j.departs > 0 ? '+' : '') + (j.arrivees - j.departs) })
+      );
+      info.hidden = false;
+      info.style.left = Math.min(Math.max(cx + 12, 4), L - 160) + 'px';
+    });
+    svg.append(zone);
+  });
+
+  const pas = Math.max(1, Math.ceil(serie.length / 6));
+  serie.forEach((j, i) => {
+    if (i % pas && i !== serie.length - 1) return;
+    const ancre = i === 0 ? 'start' : i === serie.length - 1 ? 'end' : 'middle';
+    const cx = marge.g + bande * i + bande / 2;
+    svg.append(sv('text', {
+      x: ancre === 'start' ? marge.g : ancre === 'end' ? marge.g + gl : cx,
+      y: H - 8, 'text-anchor': ancre, fill: C.texte, 'font-size': 11,
+    }, document.createTextNode(jourCourt(j.jour))));
+  });
+
+  const cadre = el('div', { class: 'viz-cadre' }, [svg, info]);
+  cadre.addEventListener('pointerleave', () => { info.hidden = true; });
+  return cadre;
+}
+
+/** Légende : deux séries, donc jamais la couleur seule pour distinguer. */
+const legende = (entrees) =>
+  el('div', { class: 'viz-legende' }, entrees.map(([texte, couleur]) =>
+    el('span', {}, [el('i', { style: 'background:' + couleur }), document.createTextNode(texte)])
+  ));
+
+function vueStatistiques() {
+  let jours = 30;
+  let donnees = null;
+  let tableauVisible = false;
+
+  const zone = el('div', { class: 'vide', text: 'Chargement…' });
+
+  const dessinerTout = () => {
+    if (!donnees) return;
+    const s = donnees.serie;
+    const C = COULEURS();
+    const totalMessages = s.reduce((a, j) => a + j.messages, 0);
+    const totalArrivees = s.reduce((a, j) => a + j.arrivees, 0);
+    const totalDeparts = s.reduce((a, j) => a + j.departs, 0);
+    const totalVocal = s.reduce((a, j) => a + j.vocal, 0);
+    const solde = totalArrivees - totalDeparts;
+
+    const tuile = (libelle, valeur, detail) =>
+      el('div', { class: 'stat' }, [
+        el('span', { text: libelle }),
+        el('b', { text: valeur }),
+        detail ? el('em', { text: detail }) : null,
+      ]);
+
+    const carte = (titre, sousTitre, contenuGraphique, sousLegende) => {
+      const hote = el('div', { class: 'viz-hote' });
+      const bloc = el('div', { class: 'carte' }, [
+        el('h3', { text: titre }),
+        el('p', { class: 'aide-bloc', text: sousTitre }),
+        sousLegende ?? null,
+        hote,
+      ]);
+      // Le graphique est dessiné une fois le bloc dans la page : avant, le
+      // conteneur n'a pas encore de largeur.
+      requestAnimationFrame(() => hote.replaceChildren(contenuGraphique(hote)));
+      return bloc;
+    };
+
+    const tableau = el('div', { class: 'carte' }, [
+      el('h3', { text: 'Les chiffres' }),
+      el('p', { class: 'aide-bloc', text: 'La même chose en tableau, jour par jour.' }),
+      el('div', { style: 'max-height:320px;overflow:auto' }, el('table', {}, [
+        el('thead', {}, el('tr', {}, [
+          el('th', { text: 'Jour' }),
+          el('th', { class: 'droite', text: 'Messages' }),
+          el('th', { class: 'droite', text: 'Arrivées' }),
+          el('th', { class: 'droite', text: 'Départs' }),
+          el('th', { class: 'droite', text: 'Vocal (min)' }),
+        ])),
+        el('tbody', {}, [...s].reverse().map((j) => el('tr', {}, [
+          el('td', { text: j.jour.split('-').reverse().join('/') }),
+          el('td', { class: 'droite', text: nb(j.messages) }),
+          el('td', { class: 'droite', text: nb(j.arrivees) }),
+          el('td', { class: 'droite', text: nb(j.departs) }),
+          el('td', { class: 'droite', text: nb(j.vocal) }),
+        ]))),
+      ])),
+    ]);
+
+    zone.className = '';
+    zone.replaceChildren(
+      el('div', { class: 'grille-stats', style: 'margin-bottom:18px' }, [
+        tuile('Messages', nb(totalMessages), Math.round(totalMessages / s.length) + ' par jour en moyenne'),
+        tuile('Solde de membres', (solde > 0 ? '+' : '') + nb(solde), totalArrivees + ' arrivées, ' + totalDeparts + ' départs'),
+        tuile('Temps en vocal', nb(Math.round(totalVocal / 60)) + ' h', Math.round(totalVocal / s.length) + ' min par jour'),
+        tuile('Salon le plus vivant', donnees.salons[0] ? '#' + donnees.salons[0].nom : '—',
+          donnees.salons[0] ? nb(donnees.salons[0].messages) + ' messages' : 'pas encore de données'),
+      ]),
+      carte('Messages par jour', 'Ce qui s\'écrit sur le serveur, jour par jour.', (h) => courbe(h, s, 'messages', 'messages')),
+      carte('Arrivées et départs', 'Au-dessus de la ligne, les arrivées ; en dessous, les départs.',
+        (h) => divergent(h, s),
+        legende([['Arrivées', C.serie], ['Départs', C.negatif]])),
+      carte('Temps passé en vocal', 'Minutes cumulées par jour, tous salons confondus.', (h) => courbe(h, s, 'vocal', 'min')),
+      tableauVisible ? tableau : null
+    );
+  };
+
+  const charger = async () => {
+    try {
+      donnees = await api('/api/serveur/' + serveurId + '/evolution?jours=' + jours);
+      dessinerTout();
+    } catch (e) {
+      zone.className = 'vide';
+      zone.textContent = e.message;
+    }
+  };
+
+  const bouton = (texte, valeur) =>
+    el('button', {
+      class: 'bouton ' + (jours === valeur ? '' : 'secondaire'),
+      text: texte,
+      onclick: (ev) => {
+        jours = valeur;
+        [...ev.target.parentElement.children].forEach((b, i) => {
+          b.className = 'bouton ' + ([7, 30, 90][i] === valeur ? '' : 'secondaire');
+        });
+        charger();
+      },
+    });
+
+  charger();
+
+  // Redessiner à la largeur réelle quand la fenêtre change, sans harceler :
+  // un redessin par fin de redimensionnement suffit.
+  let minuteurRedim;
+  const surRedim = () => {
+    clearTimeout(minuteurRedim);
+    minuteurRedim = setTimeout(dessinerTout, 200);
+  };
+  addEventListener('resize', surRedim);
+  zone.dataset.nettoyage = '1';
+
+  return el('div', {}, [
+    el('div', { class: 'viz-filtres' }, [
+      el('div', { class: 'viz-plages' }, [bouton('7 jours', 7), bouton('30 jours', 30), bouton('90 jours', 90)]),
+      el('button', {
+        class: 'bouton secondaire', text: 'Voir le tableau',
+        onclick: (e) => {
+          tableauVisible = !tableauVisible;
+          e.target.textContent = tableauVisible ? 'Masquer le tableau' : 'Voir le tableau';
+          dessinerTout();
+        },
+      }),
+    ]),
+    zone,
+  ]);
+}
+
+// ========================================================= MAINTENANCE
+// Deux gestes de nature tres differente : recharger ne coupe rien,
+// redémarrer coupe tout. La page doit rendre cette différence évidente.
+function vueMaintenance() {
+  const etat = el('p', { class: 'aide-bloc', text: 'Chargement…' });
+  const boutonRedemarrer = el('button', { class: 'bouton danger', text: 'Redémarrer le bot', disabled: 'true' });
+  let superviseur = null;
+
+  const recharger = async () => {
+    try {
+      const res = await api('/api/maintenance');
+      superviseur = res.superviseur;
+      boutonRedemarrer.removeAttribute('disabled');
+      etat.textContent = superviseur
+        ? `${res.commandes} commandes chargées · Node ${res.version} · relancé automatiquement par ${superviseur}.`
+        : `${res.commandes} commandes chargées · Node ${res.version} · ⚠️ aucun relanceur détecté : le bot ne redémarrera pas tout seul.`;
+    } catch (e) { etat.textContent = e.message; }
+  };
+  recharger();
+
+  // L'avertissement change du tout au tout selon qu'un relanceur existe :
+  // sans lui, ce bouton éteint le bot pour de bon.
+  boutonRedemarrer.addEventListener('click', async () => {
+    const avertissement = superviseur
+      ? `Le bot va s'arrêter et ${superviseur} le relancera dans quelques secondes.\n\nContinuer ?`
+      : "ATTENTION : aucun relanceur n'a été détecté.\n\nLe bot va s'arrêter et NE REDÉMARRERA PAS tout seul : il faudra le relancer à la main sur l'ordinateur.\n\nContinuer quand même ?";
+    if (!confirm(avertissement)) return;
+    boutonRedemarrer.disabled = true;
+    try {
+      await api('/api/redemarrer', { method: 'POST' });
+      toast(superviseur ? 'Redémarrage en cours…' : 'Bot arrêté. Relance-le sur ton ordinateur.');
+    } catch (erreur) { toast(erreur.message, true); }
+  });
+
+  return el('div', { class: 'carte' }, [
+    el('h3', { text: 'Maintenance' }),
+    etat,
+    el('div', { class: 'ligne-form' }, [
+      el('button', {
+        class: 'bouton secondaire', text: 'Recharger les commandes',
+        onclick: async (e) => {
+          e.target.disabled = true;
+          try {
+            const res = await api('/api/recharger', { method: 'POST' });
+            toast(
+              res.chargees + ' commandes rechargées' + (res.erreurs.length ? ' — ' + res.erreurs.length + ' en erreur' : '.'),
+              res.erreurs.length > 0
+            );
+            await recharger();
+          } catch (erreur) { toast(erreur.message, true); }
+          e.target.disabled = false;
+        },
+      }),
+      boutonRedemarrer,
+    ]),
+    el('p', { class: 'aide-bloc', style: 'margin:12px 0 0', text:
+      "Recharger relit le code des commandes sans couper le bot : c'est ce qu'il faut après avoir modifié une commande. " +
+      "Les événements, config.js et la base ne sont pas relus — pour ça, il faut redémarrer." }),
+  ]);
+}
+
+// ============================================================== RENDU
+function dessiner() {
+  const onglet = ONGLETS.find((o) => o.cle === ongletActif);
+  $('#titre-page').textContent = onglet.titre;
+  $('#sous-titre').textContent = onglet.soustitre;
+
+  // La console interroge le bot en boucle : on coupe la boucle des qu'on
+  // quitte l'onglet, sinon elle continuerait a tourner dans le vide.
+  arreterConsole();
+
+  const contenu = $('#contenu');
+  // Chaque vue passe par `poser` : sans ca, les onglets qui sortent plus haut
+  // (veille, outils…) echapperaient au verrou de lecture seule et offriraient
+  // des boutons qui ne repondent que 403.
+  const poser = (...noeuds) => {
+    contenu.replaceChildren(...noeuds);
+    verrouillerSiLecture();
+  };
+  if (ongletActif === 'resume') return poser(...vueResume().filter(Boolean));
+  if (ongletActif === 'veille') return poser(...vueVeille().filter(Boolean));
+  if (ongletActif === 'stats') return poser(vueStatistiques());
+  if (ongletActif === 'apercus') return poser(...vueApercus());
+  if (ongletActif === 'outils') return poser(vueOutils());
+  // La console et la maintenance concernent le BOT, pas un serveur : elles
+  // restent actives quel que soit le serveur choisi.
+  if (ongletActif === 'console') return contenu.replaceChildren(vueConsole(), vueMaintenance());
+
+  const blocs = (onglet.blocs ?? []).map((b) =>
+    el('div', { class: 'carte' }, [
+      el('h3', { text: b.titre }),
+      b.aide ? el('p', { class: 'aide-bloc', text: b.aide }) : null,
+      ...b.champs.map(construireChamp),
+    ])
+  );
+  if (onglet.apres === 'recompenses') blocs.push(vueRecompenses());
+  if (onglet.apres === 'boutique') blocs.push(vueBoutique());
+  contenu.replaceChildren(...blocs);
+  verrouillerSiLecture();
+}
+
+/**
+ * Grise tout ce qui modifie, sur un serveur qui n'est pas le support.
+ *
+ * C'est de l'HABILLAGE, pas une protection : le vrai refus est cote serveur,
+ * dans routerApi. Ici on evite juste de laisser cliquer sur des boutons qui
+ * repondront 403, et on dit pourquoi.
+ */
+function verrouillerSiLecture() {
+  const contenu = $('#contenu');
+  if (serveurModifiable) {
+    contenu.querySelectorAll('[data-verrou]').forEach((n) => n.remove());
+    return;
+  }
+
+  contenu.querySelectorAll('input, select, textarea, button').forEach((n) => {
+    n.disabled = true;
+  });
+
+  const bandeau = el('div', { class: 'carte', 'data-verrou': '1' }, [
+    el('h3', { text: 'Lecture seule' }),
+    el('p', {
+      class: 'aide-bloc',
+      text:
+        "Ce serveur n'est pas le tien : ses réglages se configurent avec /demarrer et /config, "
+        + 'par ses administrateurs. Tu vois tout, tu ne changes rien.',
+    }),
+  ]);
+  contenu.prepend(bandeau);
+}
+
+// ======================================================= ENREGISTREMENT
+$('#enregistrer').addEventListener('click', async () => {
+  if (!modifs.size) return;
+  const corps = Object.fromEntries(modifs);
+  $('#enregistrer').disabled = true;
+  try {
+    const res = await api('/api/serveur/' + serveurId + '/config', { method: 'POST', body: JSON.stringify(corps) });
+    donnees.config = res.config;
+    modifs.clear();
+    majBarre();
+    dessiner();
+    toast('Enregistré.');
+  } catch (e) {
+    toast(e.message, true);
+  }
+  $('#enregistrer').disabled = false;
+});
+
+$('#annuler').addEventListener('click', () => {
+  modifs.clear();
+  majBarre();
+  dessiner();
+});
+
+window.addEventListener('beforeunload', (e) => {
+  if (modifs.size) { e.preventDefault(); e.returnValue = ''; }
+});
+
+// Si une session est deja ouverte (cookie encore valide), on entre directement ;
+// sinon l'ecran de connexion reste affiche.
+demarrer().catch(() => {});
+</script>
+</body>
+</html>

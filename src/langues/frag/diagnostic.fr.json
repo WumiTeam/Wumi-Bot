@@ -1,0 +1,57 @@
+{
+  "diagnostic": {
+    "description_commande": "Vérifie les réglages du serveur et dit ce qui empêche le bot de fonctionner correctement",
+    "titre": "Diagnostic de {serveur}",
+    "intro": "Ce que je peux voir moi-même : permissions, salons, rôles et intents. Je ne répare rien, je dis seulement ce qui cloche.",
+
+    "bloquant_titre": "Ça empêche une fonction de marcher",
+    "attention_titre": "À surveiller",
+    "sain_titre": "Tout va bien",
+    "sain_titre_partiel": "Le reste est en ordre",
+    "sain_texte": "Aucun problème détecté : les permissions, les salons et les rôles nécessaires sont bien en place.",
+    "reste_texte": "Rien d'autre à signaler : le reste des permissions, salons, rôles et intents est en ordre.",
+
+    "permissions_texte": "Il me manque {liste}. Un administrateur a dû les retirer après mon arrivée, ou mon rôle est mal placé.\n**Quoi faire** : redonne-les moi dans Paramètres du serveur → Rôles, ou réinvite-moi avec le bouton ci-dessous.",
+
+    "role_texte": "Mon rôle est trop bas pour donner ces rôles-là (ou ils sont gérés par une intégration) :",
+    "role_source_niveau": "récompense du niveau {detail}",
+    "role_source_invitation": "récompense du palier {detail} invitations",
+    "role_source_boutique": "objet de boutique « {detail} »",
+    "role_source_candidature": "poste de candidature « {detail} »",
+    "role_raison_gere": "géré par une intégration, je ne pourrai jamais le donner",
+    "role_raison_position": "trop haut — fais glisser mon rôle au-dessus dans Paramètres → Rôles",
+
+    "salons_supprimes_texte": "Ces réglages pointent vers un salon qui n'existe plus. Choisis-en un autre dans `/config`, ou vide le réglage :",
+    "salons_illisibles_texte": "Ces salons existent, mais je n'ai plus le droit d'y écrire. Redonne-moi Voir le salon + Envoyer des messages, ou choisis-en un autre :",
+
+    "incomplet_titre": "Des réglages à moitié faits — prêts, mais qui ne se déclencheront jamais sans le dernier :",
+    "incomplet_bienvenue": "Un message de bienvenue est écrit, mais aucun salon de bienvenue n'est choisi : il ne partira jamais. Choisis un salon dans `/config`, catégorie Arrivées.",
+    "incomplet_aurevoir": "Un message d'au revoir est écrit, mais aucun salon n'est choisi : il ne partira jamais. Choisis un salon dans `/config`, catégorie Départs.",
+    "incomplet_verification": "La vérification à l'entrée est activée, mais aucun rôle n'est donné après validation : elle refuse tout le monde. Choisis un rôle dans `/config`, catégorie Sécurité.",
+    "incomplet_appels": "Les appels de sanction sont activés, mais aucun salon ne les reçoit : ils restent bloqués. Choisis un salon d'appels.",
+    "incomplet_candidatures": "Un rôle de staff est choisi pour les candidatures, mais aucun salon ne les reçoit : personne ne peut candidater. Choisis un salon dans `/config`, catégorie Communauté.",
+    "incomplet_suggestions": "Un rôle de staff est choisi pour les suggestions, mais aucun salon ne les reçoit : personne ne peut en envoyer. Choisis un salon dans `/config`, catégorie Communauté.",
+    "incomplet_tickets": "Un rôle de staff est choisi pour les tickets, mais aucune catégorie n'est choisie : les tickets se créeront à la racine du serveur, non triés. Choisis une catégorie dans `/config`, catégorie Tickets.",
+
+    "intents_texte": "L'application n'a pas accès à {liste}. Ce n'est pas un réglage de ton serveur : seul le propriétaire du bot peut l'activer sur le Developer Portal. En attendant, certaines fonctions que tu as activées tournent en mode dégradé."
+  },
+
+  "_note_permissions": "Ajouts au namespace `permissions`, deja present dans fr.json/en.json avec seulement 7 des 21 permissions de src/utils/liens.js. Complete plutot que remplace : merge en profondeur, pas en ecrasant les 7 deja la.",
+  "permissions": {
+    "ViewChannel": "Voir le salon",
+    "SendMessages": "Envoyer des messages",
+    "EmbedLinks": "Intégrer des liens",
+    "AttachFiles": "Joindre des fichiers",
+    "ReadMessageHistory": "Lire l'historique des messages",
+    "AddReactions": "Ajouter des réactions",
+    "UseExternalEmojis": "Utiliser des émojis externes",
+    "SendMessagesInThreads": "Envoyer des messages dans les fils",
+    "CreatePublicThreads": "Créer des fils publics",
+    "ManageThreads": "Gérer les fils",
+    "ManageNicknames": "Gérer les pseudos",
+    "Connect": "Se connecter",
+    "MoveMembers": "Déplacer des membres",
+    "MuteMembers": "Rendre muet des membres",
+    "DeafenMembers": "Assourdir des membres"
+  }
+}

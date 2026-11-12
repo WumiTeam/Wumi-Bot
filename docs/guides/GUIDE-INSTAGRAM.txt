@@ -1,0 +1,215 @@
+=============================================================================
+  ANNONCER TES POSTS INSTAGRAM SUR DISCORD — LE GUIDE COMPLET
+=============================================================================
+
+A quoi ca sert : des que tu publies sur Instagram, le bot poste une annonce
+dans le salon de ton choix, avec l'image, la legende et le lien.
+
+Combien de temps : environ 10 minutes, une seule fois.
+Le bot s'occupe ensuite du reste tout seul, pour toujours.
+
+Pourquoi c'est un peu long : Instagram a ferme son ancienne API publique fin
+2024. Aujourd'hui il faut passer par une petite application creee chez Meta.
+Ce n'est pas le bot qui complique les choses, c'est Instagram.
+
+A savoir avant de commencer :
+  - Il faut que le compte Instagram t'appartienne (tu dois pouvoir t'y connecter).
+    On ne peut PAS surveiller le compte de quelqu'un d'autre.
+  - Le compte doit etre en "professionnel" (Createur ou Entreprise).
+    C'est gratuit, ca ne change rien a ton compte, et c'est reversible.
+  - Si tu ne veux pas faire tout ca : YouTube et les flux RSS fonctionnent
+    sans aucune configuration. Voir tout en bas.
+
+
+-----------------------------------------------------------------------------
+  ETAPE 1 — PASSER TON COMPTE INSTAGRAM EN PROFESSIONNEL
+-----------------------------------------------------------------------------
+
+Sur ton telephone, dans l'application Instagram :
+
+  1. Va sur ton profil (ta photo en bas a droite).
+  2. Menu (les trois traits en haut a droite) > Parametres et confidentialite.
+  3. Cherche "Type de compte et outils".
+  4. Touche "Passer a un compte professionnel".
+  5. Choisis une categorie (par exemple "Jeu video" ou "Communaute").
+     Si on te propose "Createur" ou "Entreprise", prends CREATEUR, c'est le
+     plus simple et ca n'affiche pas d'infos professionnelles sur ton profil.
+  6. Si Instagram te demande de lier une Page Facebook : tu peux IGNORER
+     ou passer cette etape. Ce n'est pas necessaire pour ce qu'on fait.
+
+C'est fait. Tu peux revenir en compte normal quand tu veux, au meme endroit
+(mais alors les annonces s'arreteront de fonctionner).
+
+
+-----------------------------------------------------------------------------
+  ETAPE 2 — CREER L'APPLICATION CHEZ META
+-----------------------------------------------------------------------------
+
+Sur ton ordinateur, dans ton navigateur :
+
+  1. Va sur :  https://developers.facebook.com/
+  2. Clique "Se connecter" en haut a droite et connecte-toi avec ton compte
+     Facebook. (Si tu n'en as pas, il faut en creer un — c'est Meta qui
+     l'impose, meme pour Instagram.)
+  3. La premiere fois, le site va te demander de confirmer que tu es
+     developpeur : accepte, entre ton numero de telephone si demande.
+
+  4. En haut a droite : "Mes applications" (My Apps), puis le bouton vert
+     "Creer une application" (Create App).
+
+  5. Le site pose des questions :
+
+     "Quel cas d'utilisation ?"   ->  choisis  AUTRE  (Other)
+     "Type d'application ?"       ->  choisis  ENTREPRISE  (Business)
+
+     Nom de l'application         ->  par exemple :  Annonces Zhaak
+        ATTENTION : le nom ne doit contenir NI "Instagram" NI "Facebook",
+        Meta refuse. "Annonces Zhaak" passe tres bien.
+
+     Email de contact             ->  ton adresse email
+
+  6. Clique "Creer une application". Meta redemande ton mot de passe Facebook.
+
+
+-----------------------------------------------------------------------------
+  ETAPE 3 — AJOUTER INSTAGRAM A L'APPLICATION
+-----------------------------------------------------------------------------
+
+  1. Tu arrives sur le tableau de bord de ton application.
+  2. Fais defiler jusqu'a la section "Ajouter un produit" (Add a Product).
+  3. Trouve la carte  INSTAGRAM  et clique  "Configurer"  (Set Up).
+
+  4. Dans le menu de GAUCHE, sous "Instagram", clique sur :
+
+         API setup with Instagram login
+         (parfois affiche en francais : "Configuration de l'API avec
+          connexion Instagram")
+
+     ATTENTION : ne prends PAS "API setup with Facebook login".
+     Celle-la demande une Page Facebook, on veut eviter ca.
+
+
+-----------------------------------------------------------------------------
+  ETAPE 4 — RECUPERER LE JETON (LA PARTIE IMPORTANTE)
+-----------------------------------------------------------------------------
+
+  Toujours sur la page "API setup with Instagram login" :
+
+  1. Section  "1. Generate access tokens"  (Generer des jetons d'acces).
+  2. Clique  "Add account"  (Ajouter un compte).
+  3. Une fenetre Instagram s'ouvre : connecte-toi avec TON compte Instagram
+     et autorise l'application.
+  4. Ton nom d'utilisateur apparait maintenant dans la liste.
+  5. A cote de ton nom, clique  "Generate token"  (Generer un jeton).
+  6. Une fenetre affiche une longue suite de caracteres qui commence souvent
+     par IGAA... : c'est LE JETON.
+
+     >>> COPIE-LE ENTIEREMENT (bouton copier, ou Ctrl+A puis Ctrl+C) <<<
+
+     Il fait plusieurs centaines de caracteres, c'est normal.
+     Ne le partage avec PERSONNE : il donne acces a ton compte.
+     Ne le mets pas dans une capture d'ecran.
+
+
+-----------------------------------------------------------------------------
+  ETAPE 5 — COLLER LE JETON DANS LE BOT
+-----------------------------------------------------------------------------
+
+  1. Ouvre le dossier du bot :
+        C:\Users\toi\Desktop\zhaak-bot\zhaak-bot
+
+  2. Clic droit sur le fichier  .env  >  Ouvrir avec  >  Bloc-notes.
+     (Si tu ne vois pas ".env", active "Extensions de noms de fichiers"
+      dans l'onglet Affichage de l'explorateur.)
+
+  3. Tout en bas du fichier, ajoute cette ligne, avec ton jeton colle
+     juste apres le signe = , SANS espace et SANS guillemets :
+
+        INSTAGRAM_TOKEN=IGAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  4. Enregistre (Ctrl+S) et ferme le Bloc-notes.
+
+  5. Dans PowerShell, dans le dossier du bot :
+
+        npm start
+
+
+-----------------------------------------------------------------------------
+  ETAPE 6 — ACTIVER LES ANNONCES SUR DISCORD
+-----------------------------------------------------------------------------
+
+  Dans ton serveur Discord, tape :
+
+        /veille ajouter type:Instagram salon:#ton-salon
+
+  Tu peux ajouter si tu veux :
+        role:@Abonnes          pour mentionner un role a chaque post
+        nom:Instagram Zhaak    le nom affiche dans l'annonce
+        message:Nouveau post ! un texte au-dessus de l'annonce
+
+  Le bot repond en confirmant, et il te dit quelle est ta derniere
+  publication actuelle. Celle-la ne sera PAS annoncee : le bot part de
+  maintenant, sinon il deverserait tout ton historique d'un coup.
+
+  Publie quelque chose sur Instagram : l'annonce arrive dans les 10 minutes.
+
+  Pour verifier tout de suite sans attendre :
+        /veille tester numero:1
+
+  Tu peux aussi tout faire a la souris depuis le panneau de controle,
+  onglet "Annonces auto".
+
+
+-----------------------------------------------------------------------------
+  ET APRES ? (RIEN A FAIRE)
+-----------------------------------------------------------------------------
+
+  Le jeton Instagram est valable 60 jours. Le bot le renouvelle TOUT SEUL
+  tous les 40 jours, tant qu'il tourne. Tu n'as plus rien a faire.
+
+  Pour verifier son etat quand tu veux :
+        /veille jeton
+
+  Le SEUL cas ou il faut recommencer : si le bot reste eteint plus de
+  60 jours d'affilee, le jeton meurt. Il faut alors refaire seulement
+  l'ETAPE 4 et l'ETAPE 5 (le reste est deja en place).
+
+
+-----------------------------------------------------------------------------
+  SI CA NE MARCHE PAS
+-----------------------------------------------------------------------------
+
+  "aucun jeton Instagram"
+      La ligne INSTAGRAM_TOKEN n'est pas lue. Verifie qu'elle est bien dans
+      le fichier .env A LA RACINE du dossier du bot (le meme que celui qui
+      contient DISCORD_TOKEN), sans espace autour du = , et relance le bot.
+
+  "Error validating access token" / "Session has expired"
+      Le jeton est perime ou incomplet. Refais l'ETAPE 4 en veillant a
+      copier la chaine ENTIERE, puis l'ETAPE 5.
+
+  "The user is not an Instagram Business"
+      Le compte n'est pas passe en professionnel : refais l'ETAPE 1.
+
+  Le jeton semble tres court / expire au bout de quelques heures
+      Tu as recupere un jeton court. Dans le tableau de bord Meta, section
+      "Instagram > API setup with Instagram login", reprends bien le bouton
+      "Generate token" (et non un jeton obtenu ailleurs).
+
+  Aucune annonce alors que tu as publie
+      - Verifie avec  /veille liste  qu'il n'y a pas d'erreur affichee.
+      - Le bot verifie toutes les 10 minutes, pas instantanement.
+      - Les stories ne comptent pas : seuls les posts et reels du fil.
+
+
+-----------------------------------------------------------------------------
+  SANS INSTAGRAM : YOUTUBE ET SITES WEB
+-----------------------------------------------------------------------------
+
+  Ces deux-la ne demandent AUCUNE configuration, aucun compte, aucune cle :
+
+        /veille ajouter type:YouTube salon:#annonces source:@TaChaine
+        /veille ajouter type:Flux RSS salon:#annonces source:https://unsite.fr/rss
+
+  Pour YouTube tu peux donner @pseudo, l'adresse de la chaine, ou son
+  identifiant qui commence par UC.

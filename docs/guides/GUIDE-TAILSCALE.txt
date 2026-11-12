@@ -1,0 +1,130 @@
+=====================================================================
+  METTRE WUMI EN LIGNE AVEC TAILSCALE FUNNEL
+  (sans toucher a la box, sans Caddy, sans ouvrir de port)
+=====================================================================
+
+Tailscale est deja installe sur ton serveur. « Funnel » lui permet de
+rendre une page accessible depuis Internet, en HTTPS, avec une adresse
+du genre :
+
+    https://ton-serveur.<ton-tailnet>.ts.net
+
+Pas de box a configurer, pas de certificat a gerer : Tailscale s'occupe
+de tout. Il faut juste copier-coller les commandes ci-dessous sur le
+serveur (en SSH ou directement dessus).
+
+---------------------------------------------------------------------
+ ETAPE 1 — Autoriser Funnel (une seule fois, 1 minute)
+---------------------------------------------------------------------
+
+Tape :
+
+    sudo tailscale funnel --bg 3100
+
+La premiere fois, Tailscale affiche un LIEN. Ouvre-le dans ton
+navigateur, connecte-toi a Tailscale et clique sur le bouton pour
+activer Funnel (et HTTPS si on te le demande). Puis relance la meme
+commande.
+
+Quand ca marche, il affiche ton adresse :
+
+    Available on the internet:
+    https://ton-serveur.tailXXXX.ts.net/
+    |-- / proxy http://127.0.0.1:3100
+
+=> NOTE CETTE ADRESSE, on l'appellera <ADRESSE> dans la suite.
+
+---------------------------------------------------------------------
+ ETAPE 2 — Le tableau de bord sur un deuxieme port
+---------------------------------------------------------------------
+
+    sudo tailscale funnel --bg --https=8443 3101
+
+Le tableau de bord sera sur <ADRESSE>:8443
+(Funnel n'accepte que les ports 443, 8443 et 10000 : c'est normal.)
+
+Pour verifier ce qui est en ligne :
+
+    tailscale funnel status
+
+---------------------------------------------------------------------
+ ETAPE 3 — Le .env du bot
+---------------------------------------------------------------------
+
+Ouvre le .env (nano ~/Blueprint/.env) et remplis :
+
+    SERVEUR_PUBLIC_PORT=3100
+    SERVEUR_PUBLIC_HOTE=127.0.0.1
+    DASHBOARD_URL=https://ton-serveur.tailXXXX.ts.net:8443
+    DASHBOARD_PORT=3101
+
+(remplace par TON adresse de l'etape 1, avec :8443 a la fin)
+
+Puis :
+
+    pm2 restart all
+
+IMPORTANT : si Caddy tourne encore et utilise le port 3100, arrete-le :
+    sudo systemctl stop caddy && sudo systemctl disable caddy
+
+---------------------------------------------------------------------
+ ETAPE 4 — Discord Developer Portal
+---------------------------------------------------------------------
+
+https://discord.com/developers/applications > Wumi
+
+  a) OAuth2 > Redirects > Add Redirect :
+        https://ton-serveur.tailXXXX.ts.net:8443/callback
+     puis Save Changes.
+
+  b) (Activite de verification, facultatif) Activities > URL Mappings :
+        Root Mapping  ->  ton-serveur.tailXXXX.ts.net
+     (sans https:// et sans le :8443)
+     Puis dans le .env : ACTIVITE_ACTIVE=true et pm2 restart all.
+
+---------------------------------------------------------------------
+ ETAPE 5 — Tester
+---------------------------------------------------------------------
+
+Depuis ton telephone EN 4G (pas en Wi-Fi, pour tester « de dehors ») :
+
+    <ADRESSE>/sante        -> doit afficher {"ok":true,...}
+    <ADRESSE>:8443         -> la page du tableau de bord
+
+La premiere fois, ca peut prendre 1 a 2 minutes avant de repondre
+(le temps que le certificat HTTPS soit cree).
+
+---------------------------------------------------------------------
+ ETAPE 6 — La page de statut wumi.fr/statut
+---------------------------------------------------------------------
+
+Dans le depot GitHub Zhaak63/Wumi, fichier statut/index.html, cherche
+la ligne :
+
+    const API = 'https://verif.wumi.fr/api/statut';
+
+et remplace par :
+
+    const API = 'https://ton-serveur.tailXXXX.ts.net/api/statut';
+
+(Je peux le faire pour toi si tu me donnes l'adresse.)
+
+---------------------------------------------------------------------
+ EN CAS DE SOUCI
+---------------------------------------------------------------------
+
+  « Funnel not available » / « not enabled »
+      -> refais l'etape 1 et clique bien sur le lien d'autorisation.
+
+  La page ne repond pas
+      -> pm2 logs : tu dois voir « Serveur public sur http://127.0.0.1:3100 »
+      -> tailscale funnel status : les deux lignes doivent apparaitre.
+
+  « EADDRINUSE » dans les logs
+      -> un autre programme (souvent Caddy) prend deja le port :
+         sudo ss -ltnp | grep 310   pour voir lequel.
+
+  Tout couper :
+      sudo tailscale funnel reset
+
+  Les funnels survivent au redemarrage du serveur (grace a --bg).

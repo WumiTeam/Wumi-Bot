@@ -1,0 +1,83 @@
+{
+  "sanctions": {
+    "description_commande": "View and manage the sanction history",
+    "sous_liste": "Show a member's history",
+    "sous_retirer": "Delete a sanction by its number",
+    "sous_vider": "Cancel every active warning of a member",
+    "opt_membre": "The member",
+    "opt_id": "Sanction number",
+    "introuvable": "No sanction #{n} on this server.",
+    "retiree": "Sanction **#{n}** ({type}) removed from the history.",
+    "videes": "**{n}** warning cancelled for {membre}. || **{n}** warnings cancelled for {membre}.",
+    "vide": "**{membre}** has no sanction: clean record.",
+    "titre": "{pseudo}'s sanctions",
+    "resume": "Summary",
+    "total": "**{n}** sanction in total || **{n}** sanctions in total",
+    "actifs": "**{n}** active warning || **{n}** active warnings",
+    "par": "by {moderateur}",
+    "duree": "duration {duree}",
+    "plus_recentes": "**{max}** most recent sanctions out of **{total}**.",
+    "id_compte": "ID: {id}",
+    "type": {
+      "warn": "Warning",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "kick": "Kick",
+      "ban": "Ban",
+      "unban": "Unban",
+      "automod": "Automod",
+      "clear": "Purge",
+      "lockdown": "Lockdown"
+    }
+  },
+  "signaler": {
+    "pas_configure": "Reports aren't set up on this server.\nA staff member can pick the channel with `/config` → **Community**.",
+    "pas_de_bot": "No point reporting a bot message.",
+    "pas_soi_meme": "You can't report your own message.",
+    "deja_signale": "This message has already been reported: the team has it waiting to be handled.",
+    "trop_vite": "You already reported a message a moment ago. Try again {quand}.",
+    "fenetre_titre": "Report this message",
+    "champ_label": "Why are you reporting this message?",
+    "champ_exemple": "Insults, spam, suspicious link, repeated off-topic…"
+  },
+  "slowmode": {
+    "description_commande": "Set the slowmode of a channel",
+    "opt_duree": "E.g. 5s, 30s, 2m, 1h — \"0\" to turn it off",
+    "opt_salon": "Target channel (this one by default)",
+    "duree_invalide": "Invalid duration. Examples: `5s`, `30s`, `2m`, `1h`, `0`.",
+    "maximum": "Slowmode is capped at **6 hours**.",
+    "desactive": "Slowmode turned off in {salon}.",
+    "regle": "Slowmode set to **{duree}** in {salon}.",
+    "audit": "Slowmode changed by {moderateur}"
+  },
+  "unban": {
+    "description_commande": "Unban a member",
+    "opt_utilisateur": "ID of the user to unban",
+    "opt_raison": "Reason for the unban",
+    "id_invalide": "Invalid ID.",
+    "pas_banni": "This user isn't banned.",
+    "fait": "**{membre}** has been unbanned.",
+    "audit": "{raison} — by {moderateur}"
+  },
+  "unmute": {
+    "description_commande": "Remove a member's mute",
+    "opt_membre": "The member",
+    "opt_raison": "Reason for lifting it",
+    "pas_sur_serveur": "This member isn't on the server.",
+    "pas_muet": "This member isn't muted.",
+    "fait": "**{membre}** can speak again.",
+    "audit": "{raison} — by {moderateur}"
+  },
+  "warn": {
+    "description_commande": "Warn a member",
+    "opt_membre": "The member to warn",
+    "opt_raison": "Reason for the warning",
+    "pas_sur_serveur": "This member isn't on the server.",
+    "fait": "**{membre}** has been warned (**{n}** in total).",
+    "escalade_mute": "Automatic escalation: **{duree} mute**.",
+    "escalade_kick": "Automatic escalation: **kick**.",
+    "escalade_ban": "Automatic escalation: **ban**.",
+    "escalade_impossible": "Automatic escalation failed (permissions or role hierarchy).",
+    "escalade_raison": "Automatic escalation — {n} warnings"
+  }
+}

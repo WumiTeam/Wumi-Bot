@@ -1,0 +1,95 @@
+=====================================================================
+  WUMI — LE WEB : tableau de bord, page de statut, Activité
+=====================================================================
+
+Trois adresses, une seule machine :
+
+  dash.wumi.fr    le tableau de bord (connexion Discord)
+  verif.wumi.fr   l'Activité de vérification + l'API de statut + top.gg
+  wumi.fr/statut  la page de statut (sur GitHub Pages, comme ton site)
+
+Le bot fait tourner UN petit serveur web (SERVEUR_PUBLIC_PORT). Caddy reçoit
+les visites d'Internet en HTTPS et les lui passe ; le bot regarde le nom de
+domaine pour savoir quoi afficher.
+
+
+---------------------------------------------------------------------
+ 1. DNS CHEZ OVH (zone de wumi.fr)
+---------------------------------------------------------------------
+Deux entrées de type A, toutes les deux vers ton IP PUBLIQUE (pas
+192.168.x.x) :
+
+  Sous-domaine  verif   →  TON_IP_PUBLIQUE
+  Sous-domaine  dash    →  TON_IP_PUBLIQUE
+
+(Si ton IP change un jour, mets la nouvelle ici.)
+
+
+---------------------------------------------------------------------
+ 2. LA LIVEBOX (http://192.168.1.1)
+---------------------------------------------------------------------
+  Réseau → DHCP : réserve l'IP 192.168.1.X pour la machine du bot.
+  Réseau → NAT/PAT : ports 80 et 443 (TCP) → 192.168.1.X.
+
+
+---------------------------------------------------------------------
+ 3. CADDY SUR LA MACHINE DU BOT
+---------------------------------------------------------------------
+  sudo apt install caddy
+  sudo cp ~/Blueprint/outils/Caddyfile /etc/caddy/Caddyfile
+  sudo systemctl reload caddy
+
+
+---------------------------------------------------------------------
+ 4. LE .env
+---------------------------------------------------------------------
+  SERVEUR_PUBLIC_PORT=3200
+  SERVEUR_PUBLIC_HOTE=127.0.0.1
+  DASHBOARD_URL=https://dash.wumi.fr
+  CLIENT_SECRET=...      (Developer Portal > OAuth2 > Client Secret)
+
+Puis : pm2 restart all
+
+
+---------------------------------------------------------------------
+ 5. LE DEVELOPER PORTAL
+---------------------------------------------------------------------
+OAuth2 > Redirects, ajoute ces deux lignes EXACTEMENT :
+  https://dash.wumi.fr/callback
+  https://127.0.0.1                 (pour l'Activité)
+
+
+---------------------------------------------------------------------
+ 6. LA PAGE DE STATUT (GitHub Pages)
+---------------------------------------------------------------------
+Copie le dossier  site-wumi/statut/  dans le dépôt GitHub de ton site, pour
+obtenir  statut/index.html  à la racine du dépôt. Pousse : la page est en
+ligne sur https://wumi.fr/statut/
+
+Elle lit les chiffres sur https://verif.wumi.fr/api/statut (en haut du
+script de la page : const API = ...). Si le bot est éteint, elle affiche
+« Wumi est injoignable » : c'est voulu.
+
+
+---------------------------------------------------------------------
+ 7. TESTER
+---------------------------------------------------------------------
+Depuis ton téléphone EN 4G (pas en wifi) :
+  https://verif.wumi.fr/sante        → {"ok":true,...}
+  https://dash.wumi.fr               → page « Se connecter avec Discord »
+  https://wumi.fr/statut/            → la page de statut
+
+Ensuite, pour l'Activité de vérification : voir GUIDE-ACTIVITE.txt (la
+partie Developer Portal > Activities).
+
+
+---------------------------------------------------------------------
+ SÉCURITÉ DU TABLEAU DE BORD (pour info)
+---------------------------------------------------------------------
+- Connexion via Discord uniquement ; aucun mot de passe, aucun jeton
+  Discord gardé (il est révoqué juste après la connexion).
+- À chaque lecture ou modification, le bot revérifie que la personne a
+  « Gérer le serveur » sur ce serveur, à cet instant.
+- Les sessions durent 7 jours ; « Déconnexion » les efface.
+- Le panneau local (localhost:3000) reste ton outil de fondateur : il n'est
+  toujours pas exposé sur Internet.
