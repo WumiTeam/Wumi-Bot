@@ -1,4 +1,296 @@
-# Wumi 2.0 — ce qui change
+# Wumi — ce qui change
+
+## 3.0.2
+
+- **Stickers recadrés** : plus rien n'est coupé (bulles, confettis, larmes, « zz ») — chaque sticker est recadré avec une marge. `outils/stickers-serveur.js --remplacer` repose les stickers Wumi déjà posés par le bot.
+- **Premium · Wumi à ton image sur le tableau de bord** : nom, avatar, bannière et bio du bot propres au serveur, réglables dans l'onglet Premium (comme `/premium bot`), avec un bouton pour revenir au Wumi d'origine.
+
+## 3.0.1
+
+- **Stickers de serveur** : 15 stickers de la mascotte (`outils/generer-stickers.js`, 320 × 320, contour blanc façon autocollant, bulles « Hello! », « Merci ! », « GG »…). `outils/stickers-serveur.js` les pose sans rien effacer.
+
+## 3.0.0 · Wumi v3
+
+La v3 regroupe tout ce qui est sorti de la 2.36 à la 2.41, plus :
+- **Page de statut** : la version du bot est affichée (`versionBot` dans `/api/statut`), avec un lien vers les nouveautés.
+- **Affiche v3** : `node outils/affiche-da.js --v3` (fr / en).
+
+Ce qu'apporte la v3, en bref :
+- **Nouvelle identité** : la mascotte orange, une DA chaude partout (bot, cartes, bannières, site, dashboard), nouvel avatar, emojis Kubai et « tête de Wumi », nouvelle pièce.
+- **Nouveau site** : accueil, Fonctionnalités, Docs, Premium, Statut (légende, version), Nouveautés, pages légales complètes, mode sombre par défaut, bandeau des serveurs (sur accord), avis.
+- **Nouveau tableau de bord** : menu latéral, icônes, choix du serveur, recherche.
+- **Musique** : lecteur web, jeux musicaux (quiz, qui l'a choisie, vibe check).
+- **Alertes stylées** : une carte image pour chaque live et vidéo.
+- **Avis** : `/avis`, relus avant publication sur le site et dans le salon des avis.
+- **Support** : bot Modmail à part avec prise en charge, `/admin` sur le serveur staff.
+
+## 2.41.2
+
+- **Modmail : prise en charge.** La fiche d'une conversation a un bouton « ✋ Prendre en charge » : le bouton devient « Pris en charge : <nom> », le fil est renommé `✋ <nom> · <membre>`, le membre est prévenu en MP. Un nouveau clic (de la même personne ou d'un fondateur) libère la conversation.
+- Visuels du bot Modmail : `outils/generer-visuels-modmail.js` (avatar, bannière de profil, bannière de salon).
+
+## 2.41.1
+
+- **Avis** : cliquer « Publier » poste aussi l'avis dans le salon des avis du serveur support (`AVIS_SALON_ID`, par défaut 1561112714804199526) ; « Masquer », « Supprimer » ou un avis réécrit le retirent.
+
+## 2.41.0 · Le lecteur web
+
+- **Lecteur de musique web** sur le tableau de bord : `dash.wumi.fr/musique/<id du serveur>`. Pochette, barre de progression (cliquer pour avancer), pause, précédent, suivant, boucle, mélange, volume, recherche avec « Ajouter » / « Ensuite », la file avec « jouer maintenant » et « retirer ». Mise à jour toutes les 4 secondes.
+- Ouvert à **tous les membres** du serveur (pas besoin de gérer le serveur), avec exactement les mêmes règles que dans Discord : être dans le salon vocal, rôle DJ s'il y en a un, vote pour passer. Sans lecteur en cours, chercher un titre lance la musique dans ton salon vocal.
+- Bouton **🌐 Lecteur web** sur le panneau musique de Discord, et entrée « Lecteur web » dans le menu du tableau de bord. Après la connexion Discord, on revient sur la page demandée.
+- Code : `src/public/musiqueWeb.js` (routes `/api/musique/...`).
+
+## 2.40.1 · Emojis tête de Wumi, bot Modmail
+
+- **Emojis « tête de Wumi »** (`outils/generer-emojis-tete.js`) : 17 expressions de la mascotte (joie, amour, triste, colère, choc, cool, mdr, ok, non…), sur tuile orange comme le logo. `outils/emojis-tete.js` les pose sur le serveur support sans jamais rien effacer.
+- **Nouvelle pièce** `ku_wumicoin` : la monnaie (économie) n'utilise plus l'ancien emoji.
+- **`publier-pages.js --tout`** : remet à jour toutes les pages du support déjà publiées (nouveaux emojis), sans reposter.
+- **Édition Modmail** (`WUMI_EDITION=modmail`, `.env.modmail`, `ecosystem.modmail.config.js`) : un bot à part, rien que pour le modmail — aucune commande, seuls les MP, les fils du staff et les boutons. Salon via `MODMAIL_SALON_ID`. Panneau : `outils/panneau-modmail.js`. Côté Wumi, `MODMAIL_BOT_ID` renvoie les MP et l'ancien panneau vers ce bot.
+- **Dashboard** : thème sombre par défaut.
+
+## 2.40.0 · Alertes stylées et avis
+
+- **Alertes Twitch / YouTube / TikTok / Instagram / RSS** : chaque annonce porte maintenant une **carte image** aux couleurs de Wumi (`src/utils/carteAlerte.js`) — la vignette en grand avec une pastille « EN DIRECT » / « NOUVELLE VIDÉO », l'avatar de la chaîne, son nom, le titre, le jeu et les spectateurs. Si la carte échoue, l'annonce part comme avant.
+- **`/review` (`/avis`)** : `ecrire` (note 1 à 5 + texte), `voir`, `supprimer`. Un avis par personne. Chaque avis arrive en attente dans `LOG_AVIS` (repli `LOG_DEFAUT`, puis MP aux fondateurs) avec les boutons Publier / Masquer / Supprimer, réservés aux fondateurs.
+- **`/api/avis`** : les avis publiés (moyenne, nombre, liste), affichés sur la page d'accueil de wumi.fr. Rien n'apparaît sans avoir été publié à la main.
+
+## 2.39.4 · Le logo tel quel
+
+- Plus jamais de mascotte orange : dans les grandes bannières, l'affiche, l'image de partage du site et la bannière du serveur, la mascotte est montrée comme dans le logo (tuile orange, mascotte brun noir `#221B10`, yeux blancs). Nouvelle fonction `logo()` dans `src/utils/mascotte.js`.
+- Toutes les bannières du support et des pages sont regénérées.
+
+## 2.39.3
+
+- Le bleu pâle `#dce3ff` (ancienne couleur principale) disparaît : modèle « règlement » de `/embed` en orange, motif « autre » des tickets en orange clair, et `rafraichir-bannieres.js` le remplace aussi sur les messages déjà publiés.
+
+## 2.39.2
+
+- Les derniers filets bleus passent à l'orange : panneau de vérification, rôles du support, pages FAQ, réponses de `/admin`, maintenance des incidents (ambre).
+- `outils/rafraichir-bannieres.js` recolore aussi, sur place, le filet des messages déjà publiés (anciens bleus → orange).
+
+## 2.39.1
+
+- `outils/rafraichir-bannieres.js` lit aussi les images des messages Components V2 (Discord ne les liste pas dans les pièces jointes) ; sans identifiant, il vise le serveur support.
+
+## 2.39.0 · Nouveau tableau de bord, dernières images à l'orange
+
+- **Tableau de bord** : menu latéral rangé en *Vue d'ensemble*, *Modules* et *Outils*, avec une icône par module ; choix du serveur en haut du menu ; recherche dans la liste des serveurs ; nouvel écran de connexion avec la mascotte ; tout aux couleurs orange (sombre et clair).
+- **Dernières images** : le décor des cartes (`fond.png`, utilisé par les thèmes Océan, Braise…) passe au brun chaud ; couleur d'accent des cartes, embed « annonce » de `/embed`, Wrapped et motif « question » des tickets en orange.
+- **`outils/rafraichir-bannieres.js <id_serveur> [--essai]`** : remplace sur place les bannières des messages déjà publiés (tickets, vérification, idées, bugs, pages support…), sans reposter : liens, boutons et menus restent.
+
+## 2.38.0 · Nouvelle identité : la mascotte orange
+
+- **Couleurs** : l'orange du logo (#FF9D1B) et son brun noir (#221B10) remplacent le bleu et le violet partout : couleur principale des messages, thème de carte /rank par défaut (« Wumi », dégradé brun et orange), cartes de niveau, classement, économie, infos, bienvenue et /wrapped.
+- **La mascotte** (`src/utils/mascotte.js`, tracés du logo pour le canvas) remplace le « W. » dans le filigrane des cartes et sur toutes les bannières.
+- **Bannières régénérées** : serveur support (bienvenue, règlement, informations, FAQ), tickets (panneau, ticket, formulaire, fermé), vérification, idées, bugs, giveaways, modmail, recrutement, vote ; bannière du profil du bot (`outils/generer-banniere-profil.js`).
+- Nouvel emoji `ku_wumi` (la mascotte).
+
+## 2.37.1 · Correctif des éditions
+
+- **Déployeur** : une édition héritait de l'environnement de Wumi (le deployeur avait chargé le `.env` principal) : port public, base et identifiants de Wumi passaient avant les siens, d'où la page de statut servie par le mauvais bot. L'édition est maintenant lancée avec un environnement nettoyé (`envEdition`) et redémarrée de zéro (`pm2 delete` + `pm2 start ecosystem.<nom>.config.js` + `pm2 save`).
+
+## 2.37.0 · Les jeux musicaux
+
+- **`/musicgame` (`/jeu-musical`)** : trois jeux pour le vocal, à côté du blind test (une seule partie à la fois par serveur).
+  - **Quiz musical** (`quiz`) : un extrait, 4 titres en boutons, une réponse par personne. Plus on répond vite, plus on marque (1000 → 300 points), et une série de bonnes réponses ajoute jusqu'à +500. La manche s'arrête dès que tout le vocal a répondu.
+  - **Qui l'a choisie ?** (`who-picked` / `qui-l-a-choisie`) : inscriptions 90 s, chacun propose 1 à 3 titres en secret (nom ou lien YouTube, Spotify, Deezer…). Chaque titre passe 30 s, on devine qui l'a mis dans un menu. Bonne réponse +1 ; si personne ne trouve, l'auteur gagne +2. 3 joueurs minimum, 25 au plus.
+  - **Vibe check** (`vibe-check`) : chacun note le titre de 1 à 10 en secret ; points = 10 − écart à la moyenne du vocal. « Hot take » pour l'avis le plus éloigné (3 joueurs et plus). Marche en solo.
+- Mêmes thèmes que le blind test, lecteur en « mode jeu » pendant la partie, arrêt par le lanceur, le rôle DJ ou un admin.
+
+## 2.36.2
+
+- Emoji `langue` redessiné (l'icône Kubai d'origine contenait un caractère sans police sur le serveur) : nouveau nom `ku_langue_v2`, l'ancien reste sur l'application. Mécanisme `VERSIONS` dans `src/utils/emojis.js` pour les prochains dessins corrigés.
+
+## 2.36.1 · Banderole des serveurs sur wumi.fr
+
+- **`/config` › Communauté › « Afficher sur wumi.fr »** (désactivé par défaut) : le serveur apparaît dans la banderole défilante du site, avec son nom, son icône et son nombre de membres. Rien n'est montré sans cet accord.
+- Nouvelle API publique **`/api/vitrine`** (serveurs volontaires d'au moins 20 membres, 40 au plus, dix minutes de cache).
+
+## 2.36.0 · Emojis Kubai
+
+- **Nouveau jeu d'emojis** dessiné à partir des icônes [Kubai](https://icons.kubai.design) (style « layered », licence MIT) : `outils/generer-emojis-kubai.js` les télécharge une fois (cache `outils/kubai-icons/`), les recolore selon leur sens (vert réussite, rouge erreur, or économie…) et produit `src/assets/emojis/ku_*.png`.
+- Au démarrage, le bot téléverse les `ku_` et les préfère ; s'il en manque un, il reprend l'ancien `wi_`, puis `wu_`, puis l'emoji Unicode.
+
+## 2.35.0 · Éditions, packs de statistiques, commandes plus lisibles
+
+- **Éditions** (`src/edition.js`, `src/editions/`) : le même code peut tourner comme un AUTRE bot, avec son token, sa base, sa langue fixe, ses modules et son propre deck. `WUMI_EDITION=auvergne` + `WUMI_ENV=.env.auvergne` (voir `ecosystem.auvergne.config.js` et `outils/edition-auvergne.env.exemple`). Le nom « Wumi » est remplacé par celui de l'édition dans tous les messages ; tous les plafonds Premium sont ouverts.
+- Le déployeur suit les éditions : `DEPLOY_EDITIONS="Nom:.env.nom"` dans le .env → commandes redéployées et redémarrage après chaque mise à jour. La clé de chiffrement d'une édition va dans SON fichier d'environnement.
+- **`/server stats pack`** : un pack de salons statistiques stylés dans leur catégorie (élégant « 🧭 Membres : 9555 », minimal, points), plus jusqu'à 2 salons fixes (invitation, site).
+- **Un emoji devant la description de chaque commande** dans la liste « / » de Discord.
+
+## 2.34.0 · Les cartes à collectionner
+
+- **`/cards` (`/cartes`)** : 72 créatures de l'univers Wumi (Série 1), 6 familles (Pixel, Nuage, Glitch, Néon, Nuit, Cosmos), 6 raretés (commune → mythique) et une version **brillante** (1 chance sur 40). Les cartes sont dessinées par le bot (`src/utils/cartes/`) : aucune image stockée.
+- **Boosters** de 5 cartes : un tous les 100 messages comptés (même anti-spam que l'XP, 🎴 en réaction), un gratuit par jour (`/cards daily`), ou achetés avec la monnaie du serveur (`/cards buy`, 500 par défaut). Stock max 20.
+- **Ouverture animée** : le paquet, puis les cartes une par une (de la moins rare à la plus rare), puis le récapitulatif. Les cartes sont enregistrées dès l'ouverture.
+- **Classeur** (`/cards binder`) famille par famille avec les cases vides en silhouette, **vitrine** de 5 cartes (`/cards showcase`, `/cards deck`), `/cards view`, `/cards info`, `/cards leaderboard`.
+- **Pas de don ni d'échange**, voulu. Les doubles se recyclent en poussière (`/cards recycle`, 100 = un booster).
+- Chaque serveur a sa propre collection. Réglages dans `/config` › Économie : activer, messages par booster, prix, booster quotidien.
+
+## 2.33.1
+
+- FAQ : étalonnage sur le serveur avec de vraies questions. MiniLM séparait mal les bonnes fiches des mauvaises (une question hors sujet pouvait dépasser une bonne) ; passage à mpnet, nettement meilleur. Chaque fiche est comparée par sa question ET par le début de sa réponse, sans les mots-clés en vrac (qui brouillaient le sens). Seuils : 0,43 de similarité = 55.
+
+## 2.33.0 · La FAQ comprend les questions
+
+- **FAQ intelligente** : en plus des mots-clés, un modèle d'IA (Xenova/paraphrase-multilingual-mpnet-base-v2, sur le serveur de Wumi) compare le SENS de la question à celui des fiches. « le bot répond plus » trouve « Wumi ne marche pas », et une question en anglais trouve une fiche en français. Le score final est le meilleur des deux (mots-clés ou sens). Sert aux réponses automatiques, à `/faq chercher` et `/faq tester` (qui montre les deux scores).
+- Une question sans « ? » est reconnue dans les 6 langues (how, wie, cómo, perché…), plus seulement en français.
+- **Tickets : la FAQ répond à l'ouverture.** Si le sujet ou la description du ticket correspond à une fiche, elle est postée dans le ticket avec deux boutons : « C'est réglé » (ferme le ticket, raison « Résolu par la FAQ ») et « J'attends l'équipe ». Tickets de tous les serveurs ET du serveur support. Réglage `ticket_faq` dans `/config` (activé par défaut).
+- Le modèle de sens est préchargé au démarrage s'il sert, et rendu après 30 min sans question (~300 Mo en mémoire).
+- `outils/faq-support.js` : fiches du support mises à jour (6 langues, permissions, modération).
+
+## 2.32.2
+
+- Serveur support : une FAQ en anglais et en français (`faq` et `faq-fr`), 10 sujets qui s'ouvrent en privé (démarrer, panne, permissions, langue, modération, niveaux, annonces, musique, Premium, données), avec sa bannière.
+- Page d'informations : « 6 langues », automod IA, renvoi vers la FAQ.
+
+## 2.32.1
+
+- Vérification du support : le code de secours répond tout de suite, puis donne le rôle. Avant, quand beaucoup de monde arrivait en même temps, donner le rôle prenait plus de 3 secondes et Discord renvoyait « Unknown interaction » (le membre était pourtant vérifié).
+
+## 2.32.0 · L'IA de Wumi (en local)
+
+- **Automod · IA messages toxiques** (`/automod module ia`) : un modèle multilingue repère les insultes, la haine et le harcèlement, même mal orthographiés ou déguisés. Seuil de certitude 90 %, réglable dans `config.js` (`automod.iaSeuil`).
+- **Automod · IA images NSFW** (`/automod module images`) : les images choquantes sont supprimées hors des salons marqués NSFW. L'image n'est jamais recopiée dans le journal.
+- **Automod · Arnaques** (`/automod module arnaques`, actif par défaut avec l'automod) : faux Nitro, faux cadeaux Steam, « je t'ai signalé par erreur », faux airdrops crypto, domaines qui imitent Discord ou Steam. Six langues. Il faut presque toujours un lien pour déclencher : une conversation sur le Nitro n'est jamais supprimée.
+- **Traduire un message** : clic droit sur un message › Applications › Traduire. Traduit dans la langue Discord de la personne qui clique, visible d'elle seule.
+- Tout tourne **sur le serveur du bot** (@huggingface/transformers, modèles ONNX) : aucun message n'est envoyé à un service externe. Une seule analyse à la fois, pour ne jamais saturer le processeur.
+- Bibliothèque **optionnelle** : sans `npm install`, le bot tourne comme avant et les modules IA affichent « IA indisponible ». `IA_DESACTIVEE=1` coupe tout. Modèles téléchargés une fois dans `data/modeles`.
+
+## 2.31.0 — Quatre nouvelles langues
+
+- Wumi parle aussi **espagnol, allemand, portugais (Brésil) et italien**. Chaque serveur choisit sa langue (`/setup`, `/config` → Serveur) ; un serveur qui arrive avec une de ces langues sur Discord la reçoit d'office.
+- **Tout le bot est traduit** : messages, commandes, options, boutons, menus, cartes, logs, tickets, modmail, panneaux du support, console du fondateur (4 654 textes par langue). Un texte manquant s'afficherait en anglais, jamais vide.
+- Les descriptions des commandes **et les noms des choix** (menus des options) suivent la langue Discord de chaque membre (es-ES, es-419, de, pt-BR, it).
+- Quiz : les 65 questions et les noms des pays (drapeaux) dans les quatre langues. Pendu : une liste de mots par langue. Candidatures : questions par défaut traduites. Graphiques d'activité dans la langue du serveur.
+- `outils/faq-support.js` : FAQ du serveur support (13 fiches).
+
+## 2.30.3
+
+- Commandes du fondateur (`/admin`, `/sauvegarde`) sur le serveur staff (`STAFF_GUILD_ID`) ; les commandes propres au support (`/noel`) y restent.
+- Wumi Staff : rôle visible « Bots » donné à Wumi.
+
+## 2.30.2
+
+- Le `.env` fait foi au démarrage : une valeur changée dans le `.env` (salon de logs…) remplace celle que pm2 gardait de l'ancien lancement. Corrige « Wumi est en ligne » encore posté sur le serveur support.
+
+## 2.30.1
+
+- Les rapports de déploiement vont dans `🚀・deployments` sur Wumi Staff (`LOG_DEPLOIEMENTS`) ; le MP au fondateur ne sert plus que de secours.
+
+## 2.30.0 — Serveur Wumi Staff
+
+- `outils/serveur-staff.js` monte le serveur staff : rôles (Founder, Bot Developer, Web Developer, Moderator), catégories, salons, permissions, salons de logs du bot (écrits dans le `.env`) et boîte du modmail. Personne ne peut inviter.
+- Modmail : la boîte peut être sur un autre serveur que le support ; la fiche du membre reste celle du serveur support.
+
+## 2.29.0
+
+- Blocklist communautaire retirée : plus de `/blocklist`, plus d'alerte à l'arrivée d'un membre signalé. Les fiches restent en base, intactes. `/signaler` (signaler un message aux modérateurs du serveur) ne change pas.
+
+## 2.28.0 — Carte de boost
+
+- Un boost s'annonce maintenant comme une montée de niveau : le remerciement au-dessus, une carte image dessous (avatar dans un anneau rose, nombre de boosts du serveur, barre vers le palier suivant, rôle débloqué).
+- `/boost test` : aperçu privé de l'annonce, sans attendre un vrai boost.
+
+## 2.27.1
+
+- Message Informations : boutons Website, Add Wumi (lien d'invitation calculé, `{{lien_invitation}}`) et Status.
+
+## 2.27.0 — Pages du serveur support
+
+- Serveur support : message « Informations » fait sur discord.builders (`src/assets/pages-support/informations.json`). Le 1er conteneur est posté dans le salon ; chaque bouton `page_…` ouvre, en privé, le conteneur suivant (ex. `page_rules` → le règlement).
+- `node outils/publier-pages.js <salon>` publie le message, puis le met à jour sans le reposter.
+- Nouvel emoji `wi_wumi` (le « W. ») ; `{{wumi}}` dans un texte de page devient cet emoji.
+- Bannières dans la DA officielle (`outils/banniere-da.js`) : Bienvenue, Informations, Règlement, en FR et EN.
+
+## 2.26.1
+
+- Embeds : les emojis Wumi ne s'affichent plus en code brut (`<:wi_instagram:…>`) dans la ligne d'auteur ou le pied d'un embed (annonces /veille, journaux de modération, boosts, invitations…). Discord ne les affiche pas à ces endroits : l'emoji devient l'icône de la ligne.
+
+## 2.26.0 — Instagram par @pseudo
+
+- `/veille` Instagram suit maintenant **n'importe quel compte public Créateur ou Entreprise par son @pseudo** (API Business Discovery de Meta), au lieu du seul compte du jeton. Rien à configurer pour les serveurs.
+- Sans pseudo, l'ancien mode (compte de `INSTAGRAM_TOKEN`) est réservé au serveur support : un autre serveur ne peut plus annoncer ce compte-là par erreur.
+- `outils/instagram-decouverte.js` : transforme un jeton court en jeton de Page qui n'expire pas, et vérifie la configuration, sans jamais afficher de jeton. Voir le haut de `GUIDE-INSTAGRAM.txt`.
+
+## 2.25.4
+
+- `/veille` : TikTok mis en pause. La passerelle publique rsshub.app refuse désormais les bots (403). Le choix « TikTok » disparaît de `/veille ajouter`, les sources TikTok existantes ne sont plus interrogées (plus d'erreurs en boucle). Pour le réactiver un jour : héberger RSSHub, mettre `TIKTOK_PASSERELLE` vers lui et `TIKTOK_ACTIF=1` dans le `.env`.
+
+## 2.25.3
+
+- La carte de montée de niveau suit maintenant le thème de carte (celui du membre, sinon celui du serveur) : accent, anneau, barre et teinte du fond. Le thème Wumi garde les couleurs par palier.
+- Dashboard, onglet Premium : l'aperçu montre la carte de rang ET la carte de niveau avec le thème et le fond du serveur, et change dès qu'on choisit un thème.
+
+## 2.25.2
+
+- Dashboard : la liste des serveurs se complète en direct avec ceux où Wumi est présent et où tu peux gérer le serveur (avant, elle restait figée à la connexion pendant 7 jours).
+- Dashboard : le lien « Ajouter Wumi » demande les permissions utiles au lieu d'« Administrateur ».
+
+## 2.25.0 — nouveaux emojis
+
+- **Nouveaux emojis de Wumi**, dessinés à partir des @icons (licence MIT, `outils/at-icons/`) dans le style des tuiles de Wumi : couleur selon le sens (vert réussite, rouge erreur, or économie…). Ils remplacent ceux de la 2.20 dans tous les messages du bot (préfixe `wi_`, les `wu_` restent en repli).
+- **Catalogue complet** : les 705 icônes, une couleur par catégorie, sont téléversées sur l'application (préfixe `at_`), en fond au démarrage, et utilisables dans le code avec `I('dragon')`.
+- **Emojis du serveur support** remplacés par une sélection des icônes (`node outils/emojis-serveur.js`, sauvegarde des anciens dans `data/`).
+- Générateur : `node outils/generer-emojis-at.js --planche`.
+
+## 2.24.1
+
+- Correction : une variable restée vide dans l'environnement de pm2 (ex. `TWITCH_CLIENT_ID`) empêchait le bot de lire celle du `.env`. Les valeurs vides sont maintenant complétées depuis le `.env` au démarrage.
+
+## 2.24.0 — essai Premium, Wumi en anglais pour de vrai, onglet Premium du tableau de bord
+
+- **Essai Premium gratuit de 7 jours** : `/premium essai` ou le bouton du message d'arrivée et de `/premium info`. Une fois par serveur, pour toujours. MP la veille de la fin et à la fin (avec le bouton d'abonnement) ; à la fin, l'avatar, la bannière et la bio du bot sur ce serveur reviennent à ceux de Wumi (aussi quand un abonnement Discord s'arrête).
+- **Nouveau message d'arrivée** (Components V2) : bouton « Configurer Wumi » qui ouvre `/demarrer`, bouton d'essai Premium, dashboard et support. Un serveur dont la langue Discord est le français reçoit Wumi en français d'office.
+- **Tableau de bord, onglet Premium** : état de l'abonnement, lancer l'essai, envoyer ou retirer le fond des cartes du serveur avec aperçu, et **thème de carte par défaut du serveur** (nouveau, premium) pour les membres qui n'en ont pas choisi.
+- **Traduction anglaise complète** : les cartes (rang, profil, rang animé), les graphiques de `/stats` et `/messtats`, les suggestions, les appels, l'automod (message public), l'historique, la FAQ automatique, la veille (Twitch, Instagram, TikTok), les transcriptions de tickets, la réparation de structure, les fonds perso, le prestige, les badges, les objets et les thèmes étaient encore en français en dur sur les serveurs anglais.
+- **Commandes en anglais britannique** : les traductions `en-US` sont recopiées en `en-GB`, et les descriptions ont l'anglais pour base (les clients ni français ni anglais voyaient du français).
+- Noms des thèmes, objets et badges corrigés : config.js contenait du texte doublement encodé (`ðŸ”¥ Braise`) visible dans les choix de commande.
+- `/profil` s'appelle `/profile` en anglais ; textes qui citaient de mauvais noms de commande corrigés (`/aide`, `/demarrer`, `/xp exclure`, `/daily`).
+- Correction : le bouton « Fermer » d'un ticket cliqué trop tard (bot occupé, double clic) remontait en alerte « Unknown interaction ». Ces clics expirés sont désormais ignorés proprement partout.
+
+## 2.23.0 — rappel de vote, série, /setup complet
+
+- **Rappel de vote** : bouton « Me rappeler » dans `/vote` ; un MP quand on peut revoter (un seul par vote, bouton pour arrêter, coupé tout seul si les MP sont fermés).
+- **Série de votes** : revoter dans les 36 h prolonge la série ; chaque vote de série ajoute 1 h au bonus d'XP (jusqu'à +12 h).
+- **`/setup` complet** : 9 étapes (langue, bienvenue, rôle automatique, logs, AutoMod, anti-raid, niveaux, salon des montées de niveau, économie), barre de progression, et liens vers le tableau de bord, Premium et le support à la fin.
+- Nouvelle bannière du bot (`outils/banniere-bot.js`).
+
+## 2.22.0 — Wumi Premium
+
+- **`/premium info`** refait : exclusivités, plafonds relevés, bouton d'abonnement Discord (si le SKU existe) et lien du support. Rien de gratuit ne devient payant.
+- **4 thèmes de carte exclusifs** (Aurore, Néon, Sakura, Émeraude), offerts à tous les membres d'un serveur premium dans `/theme`. Sans premium, ils restent visibles mais fermés ; un membre qui en portait un revient au thème par défaut si le premium s'arrête.
+- **`/premium fond-cartes`** : un fond pour les cartes de rang, de profil et de montée de niveau de tout le serveur (les fonds perso des membres restent prioritaires).
+- **`/premium bot`** : nom, avatar, bannière et bio de Wumi propres au serveur.
+
+## 2.21.0 — défi de la semaine, pièces, sauvegardes, déploiement automatique
+
+- **Défi de la semaine Wumi Run** : un niveau par semaine (le même partout), chaque partie terminée compte, pas seulement les records. Classement en direct dans le salon choisi (`/wumirun config salon-defi`), podium annoncé et récompensé chaque lundi (500/300/150 de monnaie + 300/200/100 XP, 25 pour chaque participant). `/wumirun defi` pour voir sa place.
+- **Pièces Wumi Run → monnaie du serveur** : `/wumirun convertir [montant]`, au taux choisi par le serveur (`/wumirun config taux-pieces`, 1 par défaut, 0 pour couper). Les pièces converties sont retirées du jeu, même s'il est ouvert.
+- **Reçus de sanction** (warn, mute, kick, ban) : couleur selon la gravité, avatar, modérateur, raison, durée, numéro de dossier.
+- **Sauvegardes** : la copie hors serveur part chaque jour (au lieu de chaque semaine), compressée et chiffrée avec la clé de la base ; son empreinte est affichée pour vérifier la clé rangée. Restauration : `node outils/restaurer-sauvegarde.js fichier.wumibak`.
+- **Déployeur automatique** (`outils/deployeur.js`, processus pm2 « Wumi-Deploy ») : un paquet `.tgz` déposé dans `deploiements/` est vérifié, appliqué, les commandes redéployées si besoin, le bot redémarré et surveillé ; en cas d'échec, l'ancienne version revient toute seule. Compte rendu en MP.
+
+## 2.20.0 — nouveaux emojis
+
+- **72 emojis redessinés** : tuiles en dégradé, pictogrammes blancs pleins, une couleur par famille (vert réussite, rouge erreur et modération, or économie, violet progression, bleu info, cyan vocal, rose fun, ardoise outils). Médailles or/argent/bronze, et un emoji pour la musique.
+- Ils sont générés par `outils/generer-emojis.js` et installés sous le préfixe `wu_` : les anciens `bp_` restent sur l'application pour que les vieux messages les affichent encore.
+- Pictogrammes : Font Awesome Free (CC BY 4.0, https://fontawesome.com/license/free).
+
+## 2.19.0 — la montée de niveau en image
+
+- **Carte de montée de niveau** : avatar dans un anneau lumineux, passage de niveau en grand (« 9 → 10 »), barre vers le niveau suivant, pastilles (rôle débloqué, XP totale, rang sur le serveur, bonus). Couleur selon le palier : bleu (1-9), bronze (10-24), argent (25-49), or (50-74), rubis (75-99), diamant (100+).
+- Le message personnalisé (`message_levelup`) reste au-dessus de la carte et notifie le membre ; les rôles cités ne pingent personne.
+- La montée de niveau en vocal a désormais la même carte. Repli sur l'ancien encadré si l'image échoue.
+- Statut du bot en rotation : nombre de serveurs, contact du staff par MP (modmail), Wumi Run.
+
+## 2.18.0 — chiffrement au repos
+
+**À faire :** rien. Au premier démarrage, une clé `CHIFFREMENT_CLE` est générée et ajoutée au `.env`, puis les textes existants sont chiffrés. **Sauvegarde cette clé avec la base** : sans elle, les textes chiffrés (et les sauvegardes) sont illisibles.
+
+- Les textes écrits par les membres et le staff sont chiffrés dans la base (AES-256-GCM, IV aléatoire, authentifié) : contenu et raison des signalements, suggestions et réponses, appels, candidatures, tickets (sujet, description, raison de fermeture), tickets du support, raisons des sanctions, notes du staff. Requis par la politique développeurs de Discord.
+- Transparent pour le code : les écritures sur ces colonnes sont chiffrées automatiquement, toute valeur chiffrée est déchiffrée à la lecture. Les anciennes valeurs sont migrées au démarrage.
+- Politique de confidentialité : chiffrement indiqué, et précision sur le modmail (MP relayés sur Discord, pas écrits dans la base).
 
 ## 2.17.0 — la pièce de Wumi Run devient la monnaie de Wumi
 

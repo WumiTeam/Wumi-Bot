@@ -43,9 +43,7 @@ async function gererInteraction(interaction) {
 
   const guildId = interaction.guild.id;
   const r = progression.passerPrestige(guildId, interaction.user.id);
-  // r.raison vient de progression.js, un utilitaire hors de ce lot qui rend
-  // encore du francais en dur (contrairement a peutSanctionner, deja corrige) :
-  // on l'affiche tel quel, faute de pouvoir le traduire sans y toucher.
+  // r.raison est deja dans la langue du serveur (progression.js, 2.24).
   if (!r.ok) return interaction.update(C.envoi([C.conteneur([C.texte(`${E('erreur')} ${r.raison}`)])]));
 
   progression.verifierBadges(guildId, interaction.user.id, interaction.member);

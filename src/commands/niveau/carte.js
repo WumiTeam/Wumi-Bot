@@ -58,6 +58,7 @@ module.exports = {
       const infos = infosNiveau(ligne?.xp ?? 0);
       const membre = interaction.member;
       return genererCarteRank({
+        langue: require('../../utils/langues').langueDe(guildId),
         pseudo: membre?.displayName ?? interaction.user.username,
         tag: interaction.user.username,
         avatarUrl: interaction.user.displayAvatarURL({ extension: 'png', size: 256 }),
@@ -85,7 +86,7 @@ module.exports = {
       // convention que /clear, deja validee).
       return interaction.editReply(C.envoi([
         C.conteneur([
-          C.texte(fondsPerso.fondDe(guildId, userId) ? t('carte.voir_perso') : t('carte.voir_serveur')),
+          C.texte(fondsPerso.fondDe(guildId, userId) && fondsPerso.fondDe(guildId, userId) !== fondsPerso.fondServeur(guildId) ? t('carte.voir_perso') : t('carte.voir_serveur')),
           C.image('attachment://carte.png'),
         ]),
       ], { files: [new AttachmentBuilder(png, { name: 'carte.png' })] }));
@@ -105,12 +106,7 @@ module.exports = {
     await interaction.deferReply();
     const piece = interaction.options.getAttachment('image');
     const r = await fondsPerso.enregistrer(guildId, userId, piece);
-    // ATTENTION : r.raison vient de src/utils/fondsPerso.js, un utilitaire
-    // partage hors de ce lot, et elle est ecrite en dur en francais (taille,
-    // format, echec de telechargement...). Impossible de la traduire au
-    // point d'appel sans reimplementer sa logique de validation : elle
-    // ressort telle quelle, meme sur un serveur anglophone. Signale dans le
-    // rapport.
+    // r.raison est dans la langue du serveur (fondsPerso.js, 2.24).
     if (!r.ok) return interaction.editReply(C.erreur(r.raison));
 
     // Le cache garde l'ancienne image : on l'oublie avant de redessiner.

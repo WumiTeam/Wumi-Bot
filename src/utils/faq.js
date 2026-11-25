@@ -28,6 +28,16 @@ function memeMot(a, b) {
   return a.slice(0, 4) === b.slice(0, 4) && Math.abs(a.length - b.length) <= 3;
 }
 
+// Un message sans « ? » est une question s'il commence par l'un de ces mots (6 langues).
+const QUESTION = new RegExp('^(' + [
+  "comment", "pourquoi", "o[uù]", "quand", "combien", "est-ce", "c'est quoi", "quelqu'un sait", "y a-t-il", "il y a moyen",
+  'how', 'why', 'where', 'when', 'what', 'which', 'can', 'is there', 'does', 'do i', 'anyone know',
+  'c[oó]mo', 'por ?qu[eé]', 'd[oó]nde', 'cu[aá]ndo', 'qu[eé]', 'hay', 'puedo',
+  'wie', 'warum', 'wo', 'wann', 'was', 'kann', 'gibt es',
+  'como', 'onde', 'quando', 'o que', 'posso', 'tem como',
+  'come', 'perch[eé]', 'dove', 'quando', 'cosa', 'posso', "c'[eè]",
+].join('|') + ")(?=[\\s,?!']|$)", 'i');
+
 const derniereReponse = new Map(); // salonId -> { faqId, date }
 
 /** Normalise et decoupe un texte en mots utiles. */
@@ -90,24 +100,95 @@ function chercher(guildId, texte) {
   return meilleure;
 }
 
+// ------------------------------------------------- RECHERCHE PAR LE SENS (2.33)
+/**
+ * Les mots-cles ne trouvent que les questions ecrites avec les memes mots.
+ * Un petit modele d'IA (sur le serveur de Wumi, sans service externe) donne a
+ * chaque phrase un « vecteur de sens » : « le bot repond plus » et « Wumi est
+ * hors ligne ? » se ressemblent, meme en anglais contre une fiche en francais.
+ *
+ * Le score final est le MEILLEUR des deux : une fiche bien trouvee par ses
+ * mots-cles le reste, l'IA ne fait qu'en trouver davantage.
+ */
+const vecteursFiches = new Map(); // ficheId -> { cle, vec }
+// Etalonne sur le serveur avec de vraies questions (2.33.1) : les bonnes
+// fiches sortent entre 0,43 et 0,70, les questions hors sujet sous 0,40.
+// 0,43 -> 55 (le seuil par defaut de la FAQ).
+const SENS_BAS = 0.32;  // similarite en dessous de laquelle le sens vaut 0
+const SENS_HAUT = 0.52; // similarite qui vaut 100
+
+/** Similarite cosinus -> score 0-100 comparable a celui des mots-cles. */
+function scoreSens(sim) {
+  return Math.max(0, Math.min(100, Math.round(((sim - SENS_BAS) / (SENS_HAUT - SENS_BAS)) * 100)));
+}
+
+// Chaque fiche a DEUX vecteurs : sa question, et le debut de sa reponse. Une
+// question compare aux deux et garde le meilleur : « is the bot down ? »
+// ressemble peu a la question « Is Wumi online? » mais beaucoup a sa reponse.
+// (Les mots-cles, eux, servent aux mots-cles : en vrac, ils brouillent le sens.)
+const cleFiche = (f) => `${f.question}\u0000${f.reponse}`;
+
+async function vecteursDe(fiches) {
+  const ia = require('./ia');
+  const manquantes = fiches.filter((f) => vecteursFiches.get(f.id)?.cle !== cleFiche(f));
+  if (manquantes.length) {
+    const textes = manquantes.flatMap((f) => [f.question, f.reponse.slice(0, 300)]);
+    const vecs = await ia.vecteurs(textes);
+    if (!vecs) return null;
+    manquantes.forEach((f, i) => vecteursFiches.set(f.id, { cle: cleFiche(f), vec: [vecs[2 * i], vecs[2 * i + 1]] }));
+  }
+  return fiches.map((f) => vecteursFiches.get(f.id)?.vec ?? null);
+}
+
+/**
+ * Comme chercher(), en ajoutant le sens quand l'IA est la.
+ * @returns {Promise<{fiche, score, mots, sens}|null>}
+ */
+async function chercherIntelligent(guildId, texte) {
+  const fiches = req.toutesFaq.all(guildId);
+  if (!fiches.length) return null;
+  const mots = motsUtiles(texte);
+  const resultats = fiches.map((fiche) => ({ fiche, mots: score(mots, fiche), sens: null }));
+
+  const ia = require('./ia');
+  if (ia.disponible() && String(texte ?? '').trim().length >= 6) {
+    try {
+      const [question] = (await ia.vecteurs([texte])) ?? [];
+      const vecs = question ? await vecteursDe(fiches) : null;
+      if (vecs) {
+        resultats.forEach((r, i) => {
+          r.sens = vecs[i] ? scoreSens(Math.max(...vecs[i].map((v) => ia.similarite(question, v)))) : null;
+        });
+      }
+    } catch (e) {
+      logger.debug('FAQ sens :', e.message);
+    }
+  }
+  for (const r of resultats) r.score = Math.max(r.mots, r.sens ?? 0);
+  resultats.sort((a, b) => b.score - a.score);
+  return resultats[0];
+}
+
 /** Embed d'affichage d'une fiche. */
 function construireEmbed(fiche, automatique = false) {
+  // 2.24 : dans la langue du serveur de la fiche.
+  const t = (cle, v) => require('./langues').t(cle, require('./langues').langueDe(fiche.guild_id), v);
   return new EmbedBuilder()
     .setColor(conf.couleurs.principale)
     .setTitle(`${E('message')} ${tronquer(fiche.question, 250)}`)
     .setDescription(tronquer(fiche.reponse, 4000))
     .setFooter({
       text: automatique
-        ? `Réponse automatique · fiche #${fiche.id} · /faq voir pour tout consulter`
-        : `Fiche #${fiche.id} · consultée ${fiche.utilisations} fois`,
+        ? t('faq.u.pied_auto', { id: fiche.id })
+        : t('faq.u.pied', { id: fiche.id, n: fiche.utilisations }),
     });
 }
 
-function boutons(ficheId) {
+function boutons(ficheId, langue = 'fr') {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(`faq_inutile:${ficheId}`)
-      .setLabel("Ce n'était pas ma question")
+      .setLabel(require('./langues').t('faq.u.pas_ma_question', langue))
       .setEmoji('🙅')
       .setStyle(ButtonStyle.Secondary)
   );
@@ -129,11 +210,11 @@ async function repondreAuto(message) {
   const contenu = message.content ?? '';
   // On ne reagit qu'a ce qui ressemble a une question
   if (contenu.length < 12) return false;
-  if (!contenu.includes('?') && !/^(comment|pourquoi|ou|quand|combien|est-ce|c'est quoi|quelqu'un sait)/i.test(contenu.trim())) {
+  if (!contenu.includes('?') && !QUESTION.test(contenu.trim())) {
     return false;
   }
 
-  const resultat = chercher(message.guild.id, contenu);
+  const resultat = await chercherIntelligent(message.guild.id, contenu);
   if (!resultat || resultat.score < cfg.faq_seuil) return false;
 
   // Anti-repetition : pas deux fois la meme fiche dans le meme salon coup sur coup
@@ -144,7 +225,7 @@ async function repondreAuto(message) {
   try {
     await message.reply({
       embeds: [construireEmbed(resultat.fiche, true)],
-      components: [boutons(resultat.fiche.id)],
+      components: [boutons(resultat.fiche.id, require('./langues').langueDe(message.guild.id))],
       allowedMentions: { repliedUser: false },
     });
     req.incrementerFaq.run(resultat.fiche.id);
@@ -173,14 +254,14 @@ async function gererInteraction(interaction) {
 
     if (!autorise) {
       return interaction.reply({
-        embeds: [embeds.erreur("Seule la personne qui a posé la question peut retirer cette réponse.")],
+        embeds: [embeds.erreur(require('./langues').traducteur(interaction.guild).t('faq.u.seul_auteur'))],
         flags: MessageFlags.Ephemeral,
       });
     }
 
     await interaction.message.delete().catch(() => null);
     return interaction.reply({
-      embeds: [embeds.info('Réponse retirée. Un membre de l\'équipe te répondra.')],
+      embeds: [embeds.info(require('./langues').traducteur(interaction.guild).t('faq.u.retiree'))],
       flags: MessageFlags.Ephemeral,
     });
   } catch (e) {
@@ -188,4 +269,4 @@ async function gererInteraction(interaction) {
   }
 }
 
-module.exports = { motsUtiles, score, chercher, construireEmbed, boutons, repondreAuto, gererInteraction };
+module.exports = { QUESTION, motsUtiles, score, scoreSens, chercher, chercherIntelligent, construireEmbed, boutons, repondreAuto, gererInteraction };

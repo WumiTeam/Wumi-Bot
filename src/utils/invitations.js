@@ -161,16 +161,15 @@ async function traiterDepart(membre) {
   if (!salon?.isTextBased()) return;
 
   const stats = totalDe(membre.guild.id, arrivee.inviteur_id);
+  const { t } = require('./langues').traducteur(membre.guild);
   await salon
     .send({
       embeds: [
         new EmbedBuilder()
           .setColor(conf.couleurs.erreur)
-          .setAuthor({ name: `${E('porte')} ${membre.user.tag} est parti`, iconURL: membre.user.displayAvatarURL() || undefined })
+          .setAuthor({ name: `${E('porte')} ${t('invitations.u.parti', { nom: membre.user.tag })}`, iconURL: membre.user.displayAvatarURL() || undefined })
           .setDescription(
-            `Invité par <@${arrivee.inviteur_id}>, arrivé ${ts(arrivee.date, 'R')}.\nIl lui reste **${stats.total}** invitation${
-              stats.total > 1 ? 's' : ''
-            }.`
+            t('invitations.u.parti_detail', { inviteur: `<@${arrivee.inviteur_id}>`, quand: ts(arrivee.date, 'R'), n: stats.total })
           )
           .setTimestamp(),
       ],

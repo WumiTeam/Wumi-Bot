@@ -317,4 +317,155 @@ async function retirerSanction(guild, membre, id) {
   return { ok: true };
 }
 
-module.exports = { statistiques, listeRR, actionRR, publierEmbed, listeSanctions, retirerSanction, problemeRole };
+
+// ------------------------------------------------------------ PREMIUM (2.24)
+/**
+ * L'onglet Premium : l'etat de l'abonnement, l'essai gratuit, le fond des
+ * cartes du serveur et son theme par defaut. Ecrire demande « Gerer le
+ * serveur » (deja verifie) ET le premium pour le fond et le theme.
+ */
+function premiumEtat(guild) {
+  const premium = require('../utils/premium');
+  const essai = require('../utils/essaiPremium');
+  const themes = require('../utils/themesRank');
+  const fs = require('node:fs');
+  const { config } = require('../database/db');
+  const langue = require('../utils/langues').langueDe(guild.id);
+  const d = premium.details(guild.id);
+  return {
+    premium: Boolean(d.premium),
+    source: d.source ?? null,
+    jusqu_a: d.jusqu_a ?? null,
+    essai: essai.disponibilite(guild.id),
+    fond: fs.existsSync(require('../utils/fondsPerso').cheminServeur(guild.id)),
+    themeDefaut: config(guild.id).theme_defaut ?? null,
+    cleDefaut: themes.CLE_DEFAUT,
+    themes: themes.liste(langue).map((th) => ({
+      cle: th.cle, nom: th.nom, emoji: th.emoji ?? '', premium: Boolean(th.premium),
+      accent: th.accent, degrade: th.degrade ?? null, sombre: Boolean(th.sombre), description: th.description ?? '',
+    })),
+    profil: (() => {
+      const moi = guild.members.me;
+      return {
+        nom: moi?.nickname ?? '',
+        bio: config(guild.id).profil_bio ?? '',
+        avatar: moi?.displayAvatarURL({ extension: 'png', size: 256 }) ?? null,
+        banniere: moi?.bannerURL?.({ extension: 'png', size: 600 }) ?? guild.client.user.bannerURL?.({ extension: 'png', size: 600 }) ?? null,
+        perso: Boolean(moi?.avatar || moi?.banner || moi?.nickname || config(guild.id).profil_bio),
+      };
+    })(),
+    abonnement: process.env.CLIENT_ID ? `https://discord.com/application-directory/${String(process.env.CLIENT_ID).trim()}/store` : null,
+  };
+}
+
+/**
+ * L'apercu : la carte de RANG du membre connecte (la ou le theme se voit le
+ * plus) et, dessous, sa carte de montee de niveau. Avec le fond et le theme
+ * par defaut du serveur, comme les verra un membre qui n'a rien choisi.
+ */
+async function premiumApercu(guild, membre) {
+  const { t, langue } = require('../utils/langues').traducteur(guild);
+  const { createCanvas, loadImage } = require('@napi-rs/canvas');
+  const themes = require('../utils/themesRank');
+  const theme = themes.parCle(themes.themeServeur(guild.id) ?? themes.CLE_DEFAUT, langue);
+  const fond = require('../utils/fondsPerso').fondServeur(guild.id);
+  const avatarUrl = membre?.displayAvatarURL({ extension: 'png', size: 256 }) ?? null;
+  const rang = await require('../utils/carteRank').genererCarteRank({
+    langue, pseudo: membre?.displayName ?? 'Wumi', tag: membre?.user?.username ?? 'wumi', avatarUrl,
+    niveau: 10, rang: 1, totalMembres: guild.memberCount, xpActuel: 120, xpRequis: 600, xpTotal: 6120,
+    messages: 1234, accent: null, theme, fondPerso: fond, prestige: 0, badges: [],
+  });
+  const niveau = await premiumCarteNiveau(guild, membre, theme, fond, t, avatarUrl);
+  const [a, b] = await Promise.all([loadImage(rang), loadImage(niveau)]);
+  const L = Math.max(a.width, b.width);
+  const hb = Math.round((b.height * L) / b.width);
+  const cv = createCanvas(L, a.height + 24 + hb);
+  const ctx = cv.getContext('2d');
+  ctx.drawImage(a, (L - a.width) / 2, 0);
+  ctx.drawImage(b, 0, a.height + 24, L, hb);
+  return cv.encode('png');
+}
+
+async function premiumCarteNiveau(guild, membre, theme, fond, t, avatarUrl) {
+  const { genererCarteNiveau } = require('../utils/carteNiveau');
+  return genererCarteNiveau({
+    theme,
+    pseudo: membre?.displayName ?? 'Wumi',
+    avatarUrl,
+    avant: 9, niveau: 10, xpActuel: 120, xpRequis: 600, xpTotal: 6120, bonus: null, rang: 1, roles: [],
+    fond,
+    textes: {
+      titre: t('niveaux_carte.carte_titre'), niveau: t('niveaux_carte.carte_niveau'), xp: t('niveaux_carte.carte_xp'),
+      total: t('niveaux_carte.carte_total'), bonus: t('niveaux_carte.carte_bonus'), rang: t('niveaux_carte.carte_rang'), role: t('niveaux_carte.carte_role'),
+    },
+  });
+}
+
+async function premiumAction(guild, membre, corps) {
+  const premium = require('../utils/premium');
+  const action = String(corps?.action ?? '');
+  if (action === 'essai') {
+    const essai = require('../utils/essaiPremium');
+    const dispo = essai.disponibilite(guild.id);
+    if (dispo !== 'ok') return { erreur: dispo === 'premium' ? 'deja_premium' : 'essai_utilise' };
+    const fin = essai.lancer(guild.id, membre.id, require('../utils/langues').langueDe(guild.id));
+    noterJournal(guild.id, 'premium_essai', String(fin), membre.id);
+    return { ok: true, jusqu_a: fin };
+  }
+  if (!premium.estPremium(guild.id)) return { erreur: 'premium_requis' };
+  const fonds = require('../utils/fondsPerso');
+
+  if (action === 'fond') {
+    const m = String(corps?.image ?? '').match(/^data:image\/(png|jpeg|webp|gif);base64,([A-Za-z0-9+/=]+)$/);
+    if (!m) return { erreur: 'image_format' };
+    const octets = Buffer.from(m[2], 'base64');
+    if (octets.length > 8 * 1024 * 1024) return { erreur: 'image_taille' };
+    const r = await fonds.enregistrerServeurOctets(guild.id, octets);
+    if (!r.ok) return { erreur: 'image_illisible', detail: r.raison };
+    noterJournal(guild.id, 'premium_fond', 'image', membre.id);
+    return { ok: true };
+  }
+  if (action === 'retirer_fond') {
+    fonds.retirerServeur(guild.id);
+    noterJournal(guild.id, 'premium_fond', null, membre.id);
+    return { ok: true };
+  }
+  // 3.0.2 : « Wumi a ton image » depuis le tableau de bord (comme /premium bot).
+  if (action === 'profil' || action === 'profil_reinit') {
+    const { majConfig } = require('../database/db');
+    const maj = {};
+    if (action === 'profil_reinit') Object.assign(maj, { nick: null, avatar: null, banner: null, bio: null });
+    else {
+      if (typeof corps.nom === 'string') maj.nick = corps.nom.trim().slice(0, 32) || null;
+      if (typeof corps.bio === 'string') maj.bio = corps.bio.trim().slice(0, 190) || null;
+      for (const [cle, champ] of [['avatar', 'avatar'], ['banniere', 'banner']]) {
+        if (corps[cle] === null) maj[champ] = null;
+        else if (typeof corps[cle] === 'string') {
+          const m = corps[cle].match(/^data:image\/(png|jpeg|webp|gif);base64,([A-Za-z0-9+/=]+)$/);
+          if (!m) return { erreur: 'image_format' };
+          if (Buffer.from(m[2], 'base64').length > 8 * 1024 * 1024) return { erreur: 'image_taille' };
+          maj[champ] = corps[cle];
+        }
+      }
+    }
+    if (!Object.keys(maj).length) return { ok: true };
+    try {
+      await guild.members.editMe({ ...maj, reason: `Wumi Premium (tableau de bord) · ${membre.user.tag}` });
+    } catch (e) {
+      return { erreur: 'profil_echec', detail: String(e.message).slice(0, 150) };
+    }
+    if ('bio' in maj) majConfig(guild.id, { profil_bio: maj.bio });
+    noterJournal(guild.id, 'premium_profil', action === 'profil_reinit' ? null : Object.keys(maj).join(', '), membre.id);
+    return { ok: true };
+  }
+  if (action === 'theme') {
+    const cle = corps?.cle ? String(corps.cle) : null;
+    if (cle && !require('../utils/themesRank').existe(cle)) return { erreur: 'valeur_inconnue' };
+    require('../database/db').majConfig(guild.id, { theme_defaut: cle });
+    noterJournal(guild.id, 'theme_defaut', cle, membre.id);
+    return { ok: true, themeDefaut: cle };
+  }
+  return { erreur: 'introuvable' };
+}
+
+module.exports = { statistiques, listeRR, actionRR, publierEmbed, listeSanctions, retirerSanction, problemeRole, premiumEtat, premiumApercu, premiumAction };

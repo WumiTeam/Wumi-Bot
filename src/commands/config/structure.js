@@ -63,9 +63,7 @@ function blocsComparaison(t, diff) {
   if (c.manquants.length || c.renommes.length || c.permissions.length || c.deplaces.length || c.reglages.length) {
     blocs.push(C.texte([
       `**${E('message')} ${t('structure.salons_titre')}**`,
-      // structure.nomType() renvoie un libelle en dur en francais (utilitaire
-      // hors de mon lot) : signale dans le rapport, pas traduisible ici.
-      c.manquants.length ? t('structure.salons_disparus', { n: c.manquants.length, liste: liste(t, c.manquants.map((x) => `${x.nom} (${structure.nomType(x.type)})`)) }) : null,
+      c.manquants.length ? t('structure.salons_disparus', { n: c.manquants.length, liste: liste(t, c.manquants.map((x) => `${x.nom} (${structure.cleType(x.type) ? t(structure.cleType(x.type)) : x.type})`)) }) : null,
       c.renommes.length ? t('structure.salons_renommes', { n: c.renommes.length, liste: liste(t, c.renommes.map((x) => `${x.avant} → ${x.apres}`)) }) : null,
       c.permissions.length ? t('structure.salons_permissions', { n: c.permissions.length, liste: liste(t, c.permissions.map((x) => x.nom)) }) : null,
       c.deplaces.length ? t('structure.salons_deplaces', { n: c.deplaces.length, liste: liste(t, c.deplaces.map((x) => x.nom)) }) : null,

@@ -6,6 +6,7 @@ const C = require('../../utils/composants');
 const { config } = require('../../database/db');
 const { musique } = require('../../musique/lecteur');
 const bt = require('../../musique/blindtest');
+const jm = require('../../musique/jeuxMusicaux');
 const { traducteur, localisations, t: tr, DEFAUT } = require('../../utils/langues');
 
 const d = (o, cle) => o.setDescription(tr(cle, DEFAUT)).setDescriptionLocalizations(localisations(cle));
@@ -43,7 +44,7 @@ module.exports = {
 
     if (!musique.configure()) return interaction.reply(C.erreurPrivee(t('musique.non_configure')));
     if (!musique.disponible()) return interaction.reply(C.erreurPrivee(t('musique.indisponible')));
-    if (bt.enCours(guild.id)) return interaction.reply(C.erreurPrivee(t('blindtest.en_cours')));
+    if (bt.enCours(guild.id) || jm.enCours(guild.id)) return interaction.reply(C.erreurPrivee(t('blindtest.en_cours')));
     const vocal = interaction.member.voice?.channel;
     if (!vocal) return interaction.reply(C.erreurPrivee(t('musique.rejoins_vocal')));
     const perms = vocal.permissionsFor(guild.members.me);

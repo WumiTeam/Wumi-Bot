@@ -47,6 +47,8 @@ CREATE TABLE IF NOT EXISTS modmail (
 CREATE INDEX IF NOT EXISTS idx_modmail_user ON modmail (user_id, statut);
 CREATE INDEX IF NOT EXISTS idx_modmail_fil ON modmail (thread_id);
 `);
+// 2.41.1 : la prise en charge (« claim ») d'une conversation par le staff.
+try { db.exec('ALTER TABLE modmail ADD COLUMN pris_par TEXT'); } catch { /* deja la */ }
 
 const q = {
   ouverteDe: db.prepare("SELECT * FROM modmail WHERE user_id = ? AND statut = 'ouvert'"),
@@ -54,6 +56,7 @@ const q = {
   creer: db.prepare('INSERT INTO modmail (user_id, thread_id, langue, cree_le) VALUES (?, ?, ?, ?)'),
   fermer: db.prepare("UPDATE modmail SET statut = 'ferme', ferme_le = ?, ferme_par = ? WHERE id = ?"),
   precedentes: db.prepare('SELECT COUNT(*) AS n FROM modmail WHERE user_id = ?'),
+  prendre: db.prepare('UPDATE modmail SET pris_par = ? WHERE id = ?'),
 };
 
 const ATTENTE_MS = 10 * 60_000;
@@ -69,15 +72,36 @@ const tt = (langue) => (cle, v) => tLangue(`modmail.${cle}`, LANGUES[langue] ? l
 const langueDeLocale = (locale) => (String(locale ?? '').startsWith('fr') ? 'fr' : 'en');
 
 function reglages() {
-  return { salon: store.lire('modmail.salon'), role: store.lire('modmail.role') };
+  // 2.40 : l'edition Modmail n'a pas /admin, son salon vient du .env.
+  return {
+    salon: store.lire('modmail.salon') || process.env.MODMAIL_SALON_ID || null,
+    role: store.lire('modmail.role') || process.env.MODMAIL_ROLE_ID || null,
+  };
+}
+
+/**
+ * 2.40 : le modmail a son propre bot. Quand MODMAIL_BOT_ID est rempli dans
+ * le .env de Wumi, Wumi ne prend plus de conversations : il renvoie vers ce
+ * bot (une fois par heure et par personne, pour ne pas spammer).
+ */
+const BOT_MODMAIL = String(process.env.MODMAIL_BOT_ID ?? '').trim();
+const redirige = () => /^\d{17,20}$/.test(BOT_MODMAIL) && !require('../edition').profil?.modmailSeul;
+const derniersRenvois = new Map();
+function messageRenvoi(prive = false) {
+  const fr = tt('fr');
+  const en = tt('en');
+  const v = { bot: `<@${BOT_MODMAIL}>` };
+  return (prive ? C.envoiPrive : C.envoi)([C.conteneur([
+    C.texte(`## 📨 ${fr('renvoi_titre')}\n${fr('renvoi_texte', v)}\n\n-# 🇬🇧 ${en('renvoi_texte', v)}`),
+  ], conf.couleurs.principale)]);
 }
 
 /** Le salon prive du staff ou s'ouvrent les fils, ou null. */
 function boite(client) {
-  const support = fondateur.serveurSupport();
-  const guild = support ? client.guilds.cache.get(support) : null;
+  // 2.30 : le salon peut etre sur un autre serveur que le support (le
+  // serveur staff) : on le cherche partout ou le bot est.
   const id = reglages().salon;
-  const salon = id ? guild?.channels.cache.get(id) : null;
+  const salon = id ? client.channels.cache.get(id) : null;
   return salon && (salon.type === ChannelType.GuildText || salon.type === ChannelType.GuildAnnouncement) ? salon : null;
 }
 
@@ -129,7 +153,10 @@ async function ouvrir(client, user, langue, premier) {
   ouvertures.set(user.id, Date.now());
 
   const t = tt('fr'); // la fiche est pour le staff, qui lit en francais
-  const membre = await salon.guild.members.fetch(user.id).catch(() => null);
+  // La fiche decrit le membre sur le serveur SUPPORT (la boite peut etre
+  // sur le serveur staff, ou il n'est pas).
+  const support = client.guilds.cache.get(fondateur.serveurSupport() ?? '') ?? salon.guild;
+  const membre = await support.members.fetch(user.id).catch(() => null);
   const avant = q.precedentes.get(user.id).n;
   const serveurs = client.guilds.cache.filter((g) => g.ownerId === user.id).size;
 
@@ -156,13 +183,15 @@ async function ouvrir(client, user, langue, premier) {
     C.texte([
       `🗓️ **${t('fiche_compte')}** · <t:${Math.floor(user.createdTimestamp / 1000)}:R>`,
       `🏠 **${t('fiche_support')}** · ${membre ? t('fiche_oui', { date: `<t:${Math.floor(membre.joinedTimestamp / 1000)}:R>` }) : t('fiche_non')}`,
-      `👑 **${t('fiche_serveurs')}** · ${serveurs}`,
+      // L'edition Modmail n'est que sur le support : ce compte ne voudrait rien dire.
+      require('../edition').profil?.modmailSeul ? null : `👑 **${t('fiche_serveurs')}** · ${serveurs}`,
       `🗂️ **${t('fiche_precedentes')}** · ${avant}`,
-      `🌐 **${t('fiche_langue')}** · ${langue === 'fr' ? 'Français' : 'English'}`,
-    ].join('\n')),
+      `🌐 **${t('fiche_langue')}** · ${LANGUES[langue]?.nom ?? langue}`,
+    ].filter(Boolean).join('\n')),
     C.separateur(),
     C.texte(`-# ${t('fiche_aide')}`),
     new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId(`mm_prendre:${user.id}`).setStyle(ButtonStyle.Primary).setEmoji('✋').setLabel(t('bouton_prendre')),
       new ButtonBuilder().setCustomId(`mm_fermer:${user.id}`).setStyle(ButtonStyle.Danger).setEmoji('🔒').setLabel(t('bouton_fermer'))
     ),
   ], conf.couleurs.principale);
@@ -183,6 +212,12 @@ async function relayerVersStaff(fil, user, contenu, fichiers = []) {
 /** Un MP recu par Wumi. Renvoie true s'il a ete traite. */
 async function surMP(message) {
   if (message.author.bot || message.system) return false;
+  if (redirige()) {
+    if (Date.now() - (derniersRenvois.get(message.author.id) ?? 0) < 3_600_000) return true;
+    derniersRenvois.set(message.author.id, Date.now());
+    await message.reply(messageRenvoi()).catch(() => null);
+    return true;
+  }
   const client = message.client;
   if (!reglages().salon) return false;
 
@@ -267,10 +302,65 @@ async function fermer(interaction, userId) {
   return null;
 }
 
+// ------------------------------------------------------- PRISE EN CHARGE
+/**
+ * « Prendre en charge » : un membre du staff s'occupe de la conversation.
+ * Le bouton devient « Pris en charge : <nom> » (un nouveau clic de la meme
+ * personne, ou d'un fondateur, la libere), le fil est renomme et le membre
+ * est prevenu en MP.
+ */
+async function prendre(interaction, userId, liberer) {
+  const conversation = q.ouverteDe.get(userId);
+  const t = tt('fr');
+  if (!conversation || conversation.thread_id !== interaction.channelId) {
+    return interaction.reply(C.infoPrivee(t('deja_fermee')));
+  }
+  const actuel = conversation.pris_par;
+  if (liberer) {
+    if (actuel !== interaction.user.id && !fondateur.estFondateur(interaction.user.id)) {
+      return interaction.reply(C.infoPrivee(t('pris_deja', { membre: `<@${actuel}>` })));
+    }
+    q.prendre.run(null, conversation.id);
+  } else {
+    if (actuel && actuel !== interaction.user.id) return interaction.reply(C.infoPrivee(t('pris_deja', { membre: `<@${actuel}>` })));
+    q.prendre.run(interaction.user.id, conversation.id);
+  }
+  const nom = interaction.member?.displayName ?? interaction.user.username;
+  // Le bouton de la fiche change d'etat (on retouche le JSON du message).
+  const composants = JSON.parse(JSON.stringify(interaction.message.components.map((c) => c.toJSON())));
+  const changer = (c) => {
+    if (c.type === 2 && String(c.custom_id ?? '').match(/^mm_(prendre|liberer):/)) {
+      c.custom_id = `${liberer ? 'mm_prendre' : 'mm_liberer'}:${userId}`;
+      c.style = liberer ? ButtonStyle.Primary : ButtonStyle.Success;
+      c.label = (liberer ? t('bouton_prendre') : t('bouton_pris', { nom })).slice(0, 80);
+      c.emoji = { name: '✋' };
+    }
+    for (const enfant of c.components ?? []) changer(enfant);
+    if (c.accessory) changer(c.accessory);
+  };
+  composants.forEach(changer);
+  await interaction.update({ components: composants });
+  const fil = interaction.channel;
+  const membre = await interaction.client.users.fetch(userId).catch(() => null);
+  const base = `📨 ${membre?.username ?? userId}`;
+  await fil.setName((liberer ? base : `✋ ${nom} · ${membre?.username ?? userId}`).slice(0, 90)).catch(() => null);
+  await fil.send(C.envoi([C.conteneur([C.texte(liberer ? t('libere', { membre: `${interaction.user}` }) : t('pris_staff', { membre: `${interaction.user}` }))], conf.couleurs.principale)], { allowedMentions: { parse: [] } })).catch(() => null);
+  if (!liberer && membre) {
+    const tm = tt(conversation.langue);
+    await membre.send(C.envoi([C.conteneur([C.texte(`✋ ${tm('pris_membre', { nom })}`)], conf.couleurs.principale)])).catch(() => null);
+  }
+  return null;
+}
+
 // ------------------------------------------------------------- INTERACTIONS
 async function gererInteraction(interaction) {
   const [action, arg] = interaction.customId.split(':');
+  // Ancien panneau poste par Wumi : on renvoie vers le bot du modmail.
+  if (redirige() && (action === 'mm_ouvrir' || action === 'mm_go')) {
+    return interaction.reply(messageRenvoi(true));
+  }
   try {
+    if (action === 'mm_prendre' || action === 'mm_liberer') return prendre(interaction, arg, action === 'mm_liberer');
     if (action === 'mm_non') {
       enAttente.delete(interaction.user.id);
       return interaction.update(C.envoi([C.conteneur([C.texte(`-# ${tt(langueDeLocale(interaction.locale))('annule')}`)], conf.couleurs.principale)]));

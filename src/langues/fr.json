@@ -19,11 +19,12 @@
     "suivant": "Suivant",
     "fermer": "Fermer",
     "page": "page {n} sur {total}",
-    "annule_court": "Annulé."
+    "annule_court": "Annulé.",
+    "serveur_uniquement": "Cette commande ne peut être utilisée que dans un serveur."
   },
   "erreur": {
     "generique": "Une erreur est survenue pendant l'exécution de la commande.",
-    "commande_inconnue": "Cette commande n'existe plus. Relance `npm run deploy`.",
+    "commande_inconnue": "Cette commande n'existe plus. Elle va disparaître de la liste d'ici quelques minutes.",
     "bloque": "Tu ne peux plus utiliser ce bot.",
     "bloque_raison": "Raison : {raison}",
     "serveur_seulement": "Cette commande ne fonctionne que sur un serveur.",
@@ -44,15 +45,19 @@
     "titre": "Merci de m'avoir ajouté !",
     "presentation": "Je suis **{bot}**. Je m'occupe des niveaux, de l'économie, de la modération, des tickets, des suggestions et des annonces automatiques — et tout est réglable serveur par serveur.",
     "demarrer_titre": "Pour démarrer",
-    "demarrer_valeur": "`/demarrer` — la configuration guidée, en quelques menus. C'est le plus simple.\n`/aide` — toutes les commandes, rangées par catégorie.\n`/config` — le panneau de réglages, catégorie par catégorie.",
+    "demarrer_valeur": "Clique sur **Configurer Wumi** ci-dessous (ou tape `/demarrer`) : 9 étapes rapides — langue, bienvenue, rôle d'arrivée, logs, automod, anti-raid, XP, niveaux, économie. Deux minutes, et tout se règle ensuite dans `/config`.",
     "savoir_titre": "Bon à savoir",
     "savoir_valeur": "Seuls les **niveaux** sont actifs d'entrée — c'est ce pour quoi on ajoute un bot comme moi.\nLes logs, l'économie et la modération automatique attendent que tu les allumes.\nLes commandes de modération et de configuration sont masquées pour ceux qui n'ont pas les permissions.",
     "permissions_titre": "Permissions manquantes",
     "permissions_valeur": "Je n'ai pas : **{liste}**.\nLes fonctions qui en dépendent ne marcheront pas tant que le rôle du bot ne les a pas.",
     "pied": "{n} commandes · /aide pour la liste",
     "langue_titre": "Langue",
-    "langue_valeur": "Le bot écrit en anglais par défaut. `/config` → **Serveur** → **Langue du bot** pour passer au français.",
-    "prive": "Je viens d'être ajouté à **{serveur}**, mais je n'ai le droit d'écrire dans aucun salon."
+    "langue_valeur": "Wumi parle **français** ici, d'après la langue de ton serveur. Pour passer en anglais : première étape de `/demarrer`, ou `/config` → **Serveur**.",
+    "prive": "Je viens d'être ajouté à **{serveur}**, mais je n'ai le droit d'écrire dans aucun salon.",
+    "bouton_configurer": "Configurer Wumi",
+    "bouton_dashboard": "Dashboard",
+    "premium_ligne": "🎁 **Wumi Premium offert 7 jours** : thèmes exclusifs, fond de cartes, bot à l'image du serveur. Une fois par serveur, sans carte bancaire.",
+    "prive_suite": "Lance `/demarrer` dans ton serveur pour tout configurer en deux minutes."
   },
   "permissions": {
     "ManageRoles": "Gérer les rôles",
@@ -127,6 +132,18 @@
       "merci_titre": "Merci pour ton vote !",
       "compteur": "Tu en es à **{n}** vote(s). Merci de soutenir le bot !",
       "prochain": "Prochain vote possible {quand}."
+    },
+    "rappel": {
+      "bouton_activer": "Me rappeler",
+      "bouton_arreter": "Arrêter les rappels",
+      "titre": "Tu peux revoter pour Wumi !",
+      "texte": "Ça fait 12 heures : ton vote est de nouveau disponible sur top.gg. Une fois voté, tape `/voter` sur ton serveur et appuie sur « J'ai voté » pour ta récompense.",
+      "serie": "Ta série : **{n} votes** d'affilée. Revote dans les 24 heures pour la garder !",
+      "serie_statut": "Série de **{n} votes** · ton prochain vote donne **+{bonus} h** de bonus",
+      "serie_merci": "Série de **{n} votes** : **+{bonus} h** de bonus en plus !",
+      "pied": "Tu reçois ce message parce que tu as demandé un rappel dans /voter.",
+      "active": "Rappel activé : je t'enverrai un message privé dès que tu pourras revoter.",
+      "coupe": "Rappels de vote arrêtés."
     }
   },
   "ping": {
@@ -202,13 +219,53 @@
       },
       "langue": {
         "fr": "Français",
-        "en": "English"
+        "en": "English",
+        "es": "Español",
+        "de": "Deutsch",
+        "pt": "Português (Brasil)",
+        "it": "Italiano"
       },
       "antiphishing_action": {
         "supprimer": "Supprimer le message",
         "avertir": "Supprimer et avertir",
         "exclure": "Exclure le membre",
         "bannir": "Bannir le membre"
+      },
+      "automod_arnaques": {
+        "nom": "Arnaques",
+        "aide": "Faux Nitro, faux cadeaux Steam, « signalé par erreur », crypto"
+      },
+      "automod_ia": {
+        "nom": "IA · messages toxiques",
+        "aide": "Insultes et haine repérées même déguisées, dans toutes les langues"
+      },
+      "automod_images": {
+        "nom": "IA · images NSFW",
+        "aide": "Supprime les images choquantes hors des salons NSFW"
+      },
+      "ticket_faq": {
+        "nom": "FAQ à l'ouverture",
+        "aide": "Propose une fiche de la FAQ quand un ticket est ouvert"
+      },
+      "cartes_actif": {
+        "nom": "Cartes à collectionner",
+        "aide": "Active les boosters et les cartes"
+      },
+      "cartes_messages": {
+        "nom": "Messages par booster",
+        "aide": "Nombre de messages comptés pour gagner un booster"
+      },
+      "cartes_prix": {
+        "nom": "Prix d'un booster",
+        "aide": "Prix dans la monnaie du serveur (0 = pas de vente)"
+      },
+      "cartes_quotidien": {
+        "nom": "Booster quotidien",
+        "aide": "Un booster gratuit par jour avec /cartes quotidien"
+      },
+      "vitrine_site": {
+        "nom": "Afficher sur wumi.fr",
+        "aide": "Montre le nom, l'icône et le nombre de membres du serveur dans la banderole du site"
       }
     },
     "r": {
@@ -291,7 +348,7 @@
       },
       "eco_daily": {
         "nom": "Récompense quotidienne",
-        "aide": "Ce que rapporte /daily"
+        "aide": "Ce que rapporte /economie daily"
       },
       "banque_actif": {
         "nom": "Banque",
@@ -575,7 +632,16 @@
     "invite_par": "Invité par",
     "tickets_recents": "Derniers tickets",
     "arrive": "Arrivé",
-    "compte_cree": "Compte créé"
+    "compte_cree": "Compte créé",
+    "r_avert_actifs": "{n} avertissement actif || {n} avertissements actifs",
+    "r_bannis": "déjà banni {n} fois",
+    "r_expulse": "expulsé {n} fois",
+    "r_signales": "{n} de ses messages signalés",
+    "r_prononcees": "a prononcé {n} sanction || a prononcé {n} sanctions",
+    "r_amenes": "{n} membres amenés",
+    "r_prestige": "prestige {n}",
+    "r_rien": "Rien de particulier à signaler.",
+    "r_vierge": "Aucun antécédent : ce membre n'a jamais été sanctionné."
   },
   "botinfo": {
     "description_commande": "L'état du bot : serveurs, membres, temps en ligne, latence",
@@ -587,15 +653,16 @@
     "latence": "Latence"
   },
   "premium": {
-    "description_commande": "L'état du premium sur ce serveur",
-    "titre": "Blueprint Premium",
+    "description_commande": "Wumi Premium : avantages, bot personnalisé, fond des cartes",
+    "titre": "Wumi Premium",
     "actif": "**{serveur}** a le premium.",
-    "inactif": "Ce serveur n'a pas le premium. Tout marche quand même : le premium **relève des plafonds**, il ne déverrouille rien.",
+    "inactif": "Ce serveur n'a pas le premium. Tout ce qui est gratuit le reste : le premium **ajoute** des exclusivités et **relève les plafonds**.",
     "jusqu_a": "Jusqu'au",
     "sans_limite": "Sans date de fin.",
     "source": {
       "discord": "Abonnement Discord",
-      "offert": "Offert par l'équipe du bot"
+      "offert": "Offert par l'équipe du bot",
+      "essai": "Essai gratuit"
     },
     "ce_que_ca_change": "**Ce que ça change**",
     "limite": {
@@ -604,8 +671,62 @@
       "giveaways": "Concours en même temps",
       "tickets": "Tickets par membre"
     },
-    "jamais_retire": "Aucune fonction n'est réservée au premium. Ce qui marche aujourd'hui marchera toujours.",
-    "bientot": "Les abonnements ne sont pas encore ouverts. Passe par le serveur de support en attendant."
+    "jamais_retire": "Rien de ce qui est gratuit aujourd'hui ne deviendra payant. Le premium finance Wumi et ajoute des choses en plus.",
+    "bientot": "Les abonnements ne sont pas encore ouverts. Passe par le serveur de support en attendant.",
+    "sous_info": "Ce que le premium apporte, et son état sur ce serveur",
+    "sous_bot": "Premium : change le nom, l'avatar, la bannière et la bio de Wumi sur ce serveur",
+    "opt_nom": "Le surnom de Wumi sur ce serveur",
+    "opt_avatar": "L'avatar de Wumi sur ce serveur (PNG, JPEG, WebP ou GIF)",
+    "opt_banniere": "La bannière du profil de Wumi sur ce serveur",
+    "opt_bio": "La bio du profil de Wumi sur ce serveur",
+    "opt_reset_bot": "Remettre le nom, l'avatar, la bannière et la bio d'origine",
+    "sous_fond": "Premium : un fond pour les cartes de tous les membres (rang, profil, niveau)",
+    "opt_image": "L'image de fond (PNG, JPEG ou WebP, 8 Mo max)",
+    "opt_retirer": "Retirer le fond du serveur",
+    "exclusif_titre": "Exclusivités premium",
+    "ex_themes": "4 thèmes de carte exclusifs",
+    "ex_themes_detail": "Offerts à tous les membres du serveur, dans /theme.",
+    "ex_fond": "Un fond pour les cartes de tout le serveur",
+    "ex_fond_detail": "Rang, profil et montée de niveau, pour chaque membre sans fond perso.",
+    "ex_bot": "Wumi à l'image du serveur",
+    "ex_bot_detail": "Son nom, son avatar, sa bannière et sa bio, rien que sur ce serveur.",
+    "plafonds_titre": "Plafonds relevés",
+    "permission": "Il faut la permission « Gérer le serveur ».",
+    "requis_titre": "Réservé au premium",
+    "requis": "Cette option fait partie de **Wumi Premium**. Tout le reste de Wumi reste gratuit : `/premium info` pour voir ce que le premium ajoute.",
+    "image_format": "Format non reconnu. Envoie une image PNG, JPEG, WebP ou GIF.",
+    "image_taille": "Image trop lourde : 8 Mo maximum.",
+    "image_illisible": "Impossible de lire cette image.",
+    "bot_rien": "Rien à changer : choisis au moins une option (nom, avatar, bannière, bio ou réinitialiser).",
+    "bot_echec": "Discord a refusé la modification : {erreur}",
+    "bot_titre": "Wumi a changé de look ici",
+    "bot_nom": "Nom : **{nom}**",
+    "bot_avatar": "Nouvel avatar",
+    "bot_banniere": "Nouvelle bannière",
+    "bot_bio": "Nouvelle bio",
+    "bot_reinitialise": "Nom, avatar, bannière et bio remis à l'origine.",
+    "bot_pied": "Ces changements ne valent que sur ce serveur. Discord peut mettre quelques minutes à les afficher partout.",
+    "fond_retire": "Le fond des cartes du serveur est retiré.",
+    "fond_actuel": "Ce serveur a un fond de cartes. Envoie une nouvelle image pour le remplacer, ou utilise l'option retirer.",
+    "fond_aucun": "Ce serveur n'a pas encore de fond de cartes : ajoute une image à la commande.",
+    "fond_ok_titre": "Fond des cartes enregistré",
+    "fond_ok": "Il s'applique aux cartes de rang, de profil et de montée de niveau de tous les membres qui n'ont pas leur propre fond. Les thèmes sans décor (Minuit, Or, thèmes premium) gardent leur dégradé.",
+    "sous_essai": "Essayer Wumi Premium gratuitement pendant 7 jours (une fois par serveur)",
+    "essai": {
+      "bouton": "Essai gratuit 7 jours",
+      "bouton_site": "Voir le Premium",
+      "ligne": "**Essai gratuit** · 7 jours de Premium offerts, une fois par serveur, sans carte bancaire.",
+      "permission": "Seul quelqu'un qui peut gérer le serveur peut lancer l'essai.",
+      "deja": "Ce serveur a déjà utilisé son essai gratuit. L'abonnement se prend avec `/premium info`.",
+      "deja_premium": "Ce serveur a déjà Wumi Premium.",
+      "lance_titre": "Essai Premium lancé !",
+      "lance": "**{serveur}** a Wumi Premium jusqu'à {fin}. Tout est débloqué :\n{E_palette} 4 thèmes de carte exclusifs dans `/theme`\n{E_dossier} un fond de cartes pour tout le serveur : `/premium fond-cartes`\n{E_robot} Wumi à l'image du serveur : `/premium bot`\n{E_xp} des limites plus hautes partout\n\n-# Tu recevras un message privé la veille de la fin. Rien n'est prélevé : l'essai s'arrête tout seul.",
+      "en_cours": "Essai gratuit en cours, fin {fin}.",
+      "veille_titre": "Ton essai Premium se termine demain",
+      "veille": "L'essai de Wumi Premium sur **{serveur}** se termine {fin}. Pour garder les thèmes exclusifs, le fond de cartes et le bot à l'image du serveur, l'abonnement se prend en un clic ci-dessous.",
+      "fin_titre": "Ton essai Premium est terminé",
+      "fin": "L'essai de Wumi Premium sur **{serveur}** est terminé. Tout ce qui est gratuit continue de marcher, et le profil de Wumi est revenu à l'original. Merci d'avoir essayé ! Si ça t'a plu, l'abonnement se prend ci-dessous."
+    }
   },
   "aide": {
     "description_commande": "Affiche la liste des commandes du bot",
@@ -877,7 +998,7 @@
     "solde_achats": "Derniers achats",
     "image_pastille": "Les plus riches",
     "image_ta_place": "Ta place : #{rang} · {valeur}",
-    "image_pas_classe": "Tu n'as pas encore de pièces : essaie /economy daily !",
+    "image_pas_classe": "Tu n'as pas encore de pièces : essaie /economie daily !",
     "image_sous_titre": "Page {page}/{total} · {membres} membre classé || Page {page}/{total} · {membres} membres classés",
     "carte_fortune": "Fortune totale",
     "carte_poche": "Poche",
@@ -904,7 +1025,7 @@
     "btn_boutique": "Boutique",
     "solde_achats_titre": "Derniers achats",
     "monnaie_emoji_invalide": "Je ne trouve pas l'emoji **{emoji}**. Choisis-le dans le sélecteur d'emojis (il doit être sur ce serveur) ou mets un emoji classique comme 💰.",
-    "monnaie_defaut": "Pièce de Wumi Run (par défaut)",
+    "monnaie_defaut": "pièces",
     "config_section_monnaie": "Monnaie",
     "config_section_gains": "Gains",
     "config_section_stats": "Chiffres",
@@ -1046,6 +1167,63 @@
       "delai": "Le délai pour contester est dépassé ({duree}).",
       "en_attente": "Tu as déjà un appel en attente pour cette sanction.",
       "deja_examinee": "Cette sanction a déjà été examinée en appel."
+    },
+    "u": {
+      "contester": "Contester cette sanction",
+      "modal_titre": "Contester la sanction #{id}",
+      "modal_label": "Explique ton point de vue",
+      "modal_ph": "Ce qui s'est passé, pourquoi tu penses que la sanction n'est pas justifiée...",
+      "accepter": "Accepter l'appel",
+      "refuser": "Refuser l'appel",
+      "aucun_antecedent": "aucun antécédent",
+      "titre": "Appel #{id}",
+      "membre_inconnu": "Membre inconnu",
+      "membre": "Membre",
+      "sanction_contestee": "Sanction contestée",
+      "duree": "Durée : {duree}",
+      "moderateur": "Modérateur",
+      "raison": "Raison de la sanction",
+      "aucune": "Aucune",
+      "dit_membre": "Ce que dit le membre",
+      "historique": "Historique ({n} sanction) || Historique ({n} sanctions)",
+      "pied": "Accepter lève la sanction · Refuser la maintient",
+      "salon_inaccessible": "Le salon des appels n'est plus accessible. Contacte un responsable du serveur.",
+      "transmis": "Ton appel **#{id}** a été transmis à l'équipe de **{serveur}**.\nTu recevras la réponse ici même, en message privé. Inutile de relancer.",
+      "effet_ban_leve": "bannissement levé",
+      "effet_ban_deja": "bannissement déjà levé",
+      "effet_absent": "membre absent du serveur",
+      "effet_mute_leve": "mute levé",
+      "effet_mute_non": "mute non levable",
+      "effet_warn": "avertissement annulé",
+      "effet_kick": "aucune action automatique (expulsion)",
+      "effet_maintenue": "sanction maintenue",
+      "effet_impossible": "levée impossible (permissions ?)",
+      "message_membre": "Message envoyé au membre",
+      "ph_accepter": "Ta sanction est levée, fais attention à...",
+      "ph_refuser": "Après vérification, la sanction est maintenue parce que...",
+      "deja_traite": "Cet appel a déjà été traité.",
+      "deja_traite_par": "Cet appel a déjà été traité par {staff}.",
+      "mp_accepte": "Ton appel a été accepté",
+      "mp_refuse": "Ton appel a été refusé",
+      "mp_accepte_texte": "L'équipe de **{serveur}** a revu ta sanction **#{id}** : elle est levée.",
+      "mp_refuse_texte": "L'équipe de **{serveur}** a examiné ta sanction **#{id}** et la maintient.",
+      "message_equipe": "Message de l'équipe",
+      "accepte": "Appel accepté",
+      "refuse": "Appel refusé",
+      "par": "Par {staff} {quand}",
+      "effet": "Effet : {effet}",
+      "reponse": "Réponse : {texte}",
+      "non_prevenu": "Le membre n'a pas pu être prévenu (messages privés fermés).",
+      "log_auteur": "Appel #{id} {decision}",
+      "log_accepte": "accepté",
+      "log_refuse": "refusé",
+      "log_membre": "**Membre :** {membre}",
+      "log_sanction": "**Sanction :** #{id}",
+      "log_decision": "**Décision :** {decision} — {effet}",
+      "log_par": "**Par :** {staff}",
+      "reserve": "Réservé à l'équipe de modération.",
+      "introuvable": "Appel introuvable.",
+      "erreur": "Une erreur est survenue."
     }
   },
   "blocklist": {
@@ -1144,7 +1322,7 @@
     "opt_membre": "Le membre à rendre muet",
     "opt_duree": "Durée : 10m, 2h, 1j… (max 28 jours)",
     "opt_raison": "Raison du mute",
-    "trop_long": "Discord limite les mutes à **28 jours**. Utilise `/ban` pour plus long.",
+    "trop_long": "Discord limite les mutes à **28 jours**. Utilise `/bannir` pour plus long.",
     "absent": "Ce membre n'est pas sur le serveur.",
     "pas_moderable": "Je ne peux pas rendre ce membre muet (permissions ou hiérarchie).",
     "impossible": "Mute impossible : {erreur}",
@@ -1332,7 +1510,10 @@
       "liens": "Liens",
       "mots": "Mots interdits",
       "mentions": "Mentions en masse",
-      "majuscules": "Majuscules"
+      "majuscules": "Majuscules",
+      "arnaques": "Arnaques",
+      "ia": "IA · messages toxiques",
+      "images": "IA · images NSFW"
     },
     "opt_module_actif": "Activer ou désactiver ce module",
     "grp_mots": "Gère la liste des mots interdits",
@@ -1378,7 +1559,35 @@
     "etat_sanction_titre": "Sanction automatique",
     "etat_sanction_valeur": "**{n}** avertissements en **{minutes}** minutes déclenchent une exclusion de **{mute}** minutes",
     "etat_mots_titre": "Mots interdits",
-    "etat_mots_valeur": "**{n}** mot(s) dans la liste"
+    "etat_mots_valeur": "**{n}** mot(s) dans la liste",
+    "u": {
+      "invitation": "Invitation Discord",
+      "invitation_d": "Les invitations vers d'autres serveurs sont interdites.",
+      "lien": "Lien interdit",
+      "lien_d": "Les liens ne sont pas autorisés ici.",
+      "mot": "Mot interdit",
+      "mot_d": "Ton message contient un terme interdit sur ce serveur.",
+      "mentions": "Mentions massives",
+      "mentions_d": "Maximum {n} mentions par message.",
+      "majuscules": "Abus de majuscules",
+      "majuscules_d": "Évite d'écrire tout en majuscules.",
+      "spam": "Spam",
+      "spam_d": "Pas plus de {n} messages en {s} secondes.",
+      "repetition": "Répétition",
+      "repetition_d": "Arrête de répéter le même message.",
+      "declenchements": "{n} déclenchements",
+      "arnaque": "Arnaque",
+      "arnaque_d": "Ce message ressemble à une arnaque (faux Nitro, faux cadeau, faux signalement…). Ne clique sur aucun lien.",
+      "toxique": "Message toxique",
+      "toxique_d": "L'IA a jugé ce message insultant ou haineux.",
+      "image": "Image inappropriée",
+      "image_d": "Les images NSFW sont réservées aux salons marqués NSFW.",
+      "certitude": "Certitude de l'IA"
+    },
+    "ia_chargement": "Le modèle d'IA se prépare (téléchargement la première fois, une minute environ). Tout tourne sur le serveur de Wumi : aucun message n'est envoyé ailleurs.",
+    "ia_indisponible": "L'IA n'est pas installée sur ce bot pour le moment : le module est enregistré et s'activera dès qu'elle le sera.",
+    "ia_indisponible_court": "IA indisponible",
+    "ia_automod_eteint": "L'automod est éteint : active-le avec /automod enable pour que ce module agisse."
   },
   "boost": {
     "description_commande": "Ce que le serveur offre aux boosteurs",
@@ -1414,7 +1623,18 @@
     "config_recompense": "Récompense",
     "config_message": "Message de remerciement",
     "config_boosts": "Boosts actuels",
-    "config_boosts_valeur": "**{n}** · niveau **{niveau}**"
+    "config_boosts_valeur": "**{n}** · niveau **{niveau}**",
+    "message_defaut": "Merci {mention} pour ton boost ! {emoji}\n**{serveur}** compte maintenant **{boosts}** boost(s), niveau **{niveau}**.",
+    "carte": {
+      "titre": "BOOST DU SERVEUR",
+      "boosts": "BOOSTS",
+      "barre": "{a} / {b} boosts pour le niveau {n}",
+      "max": "Niveau maximum atteint",
+      "badge": "NIVEAU {n}",
+      "role": "Débloqué : {r}"
+    },
+    "sous_test": "Aperçu de l'annonce de boost (avec la carte)",
+    "test_echec": "La carte n'a pas pu être générée. Réessaie dans un instant."
   },
   "demarrer": {
     "description_commande": "Assistant de configuration guidée, pour démarrer en quelques clics",
@@ -1448,8 +1668,27 @@
       "automod": {
         "titre": "Modération automatique",
         "explication": "Filtre le spam, les invitations, les liens et les mentions en masse tout seul. Réglable en détail avec `/automod`."
+      },
+      "langue": {
+        "titre": "Langue du bot",
+        "explication": "Dans quelle langue Wumi parle sur ce serveur : messages, cartes et réponses."
+      },
+      "role": {
+        "titre": "Rôle automatique",
+        "explication": "Le rôle donné à chaque nouveau membre dès son arrivée. Passe cette étape si tu utilises une vérification."
+      },
+      "antiraid": {
+        "titre": "Anti-raid",
+        "explication": "Surveille les vagues d'arrivées et les comptes tout neufs, et prévient le staff en cas de raid. Réglable avec `/antiraid`."
+      },
+      "levelup": {
+        "titre": "Salon des montées de niveau",
+        "explication": "Où annoncer les montées de niveau avec leur carte. Passe cette étape pour les annoncer dans le salon où le membre écrit."
       }
-    }
+    },
+    "choisir_role": "Choisis un rôle",
+    "role_impossible": "Je ne peux pas donner ce rôle : il est géré par Discord ou placé au-dessus du mien. Monte le rôle de Wumi dans la liste des rôles, ou choisis-en un autre.",
+    "bouton_dashboard": "Tableau de bord"
   },
   "serveur": {
     "description_commande": "Vérification à l'entrée et salons statistiques",
@@ -1506,7 +1745,17 @@
     "stats_modele_invalide": "Ton modèle ne contient aucune variable. Utilise l'une de celles-ci :\n{variables}\n\nExemple : {exemple}",
     "stats_lie": "{salon} affichera **{rendu}**.",
     "stats_creation_impossible": "Création impossible : {erreur}",
-    "stats_cree": "Salon créé : **{nom}**\nPersonne ne peut s'y connecter, il sert uniquement d'affichage.\nMise à jour toutes les {minutes} minutes."
+    "stats_cree": "Salon créé : **{nom}**\nPersonne ne peut s'y connecter, il sert uniquement d'affichage.\nMise à jour toutes les {minutes} minutes.",
+    "sous_pack": "Crée un pack de salons statistiques stylés, dans leur catégorie",
+    "opt_style": "Le style des salons",
+    "opt_lien": "Un salon fixe en plus : invitation, site… (ex. .gg/monserveur)",
+    "style_elegant": "Élégant (🧭 Membres : 9555)",
+    "style_minimal": "Minimal (👥 9555)",
+    "style_points": "Points (・Membres・9555)",
+    "stats_pack_categorie": "Statistiques",
+    "stats_mot_enligne": "en ligne",
+    "stats_mot_boosts": "boosts",
+    "stats_pack_ok": "Salons créés : {liste}\nLes chiffres se mettent à jour toutes les {minutes} min."
   },
   "structure": {
     "description_commande": "Photographie les rôles, salons et permissions du serveur, et les remet en place",
@@ -1615,19 +1864,42 @@
     "import_fait": "📥 Photo n°{n} importée : **{roles}** rôles, **{salons}** salons. Rien n'a encore été modifié sur le serveur.",
     "import_differences": "**{n}** différence(s) avec ce serveur : vérifie avec `/structure comparer` puis applique avec `/structure reparer`.",
     "import_identique": "Ce serveur correspond déjà à cette photo.",
-    "import_membres_retires": "{n} permission(s) données à des membres précis ont été ignorées : ces membres ne sont pas sur ce serveur."
+    "import_membres_retires": "{n} permission(s) données à des membres précis ont été ignorées : ces membres ne sont pas sur ce serveur.",
+    "u": {
+      "absent": "Je ne me trouve pas sur ce serveur.",
+      "manque_roles": "il me manque la permission **Gérer les rôles**",
+      "manque_salons": "il me manque la permission **Gérer les salons**",
+      "manque_serveur": "il me manque **Gérer le serveur** : je ne pourrai pas remettre le nom, le niveau de vérification ni le salon AFK",
+      "hors_portee": "{n} rôle(s) sont au-dessus du mien et je ne peux pas y toucher : {liste}. Monte mon rôle au-dessus dans les paramètres du serveur pour que je puisse les réparer.",
+      "geres": "{n} rôle(s) appartiennent à des bots ou au boost : Discord interdit de les recréer.",
+      "creation_role": "création du rôle {nom}",
+      "role": "rôle {nom}",
+      "role_hors_portee": "rôle {nom} (au-dessus du mien)",
+      "creation_salon": "création du salon {nom}",
+      "salon": "salon {nom}",
+      "permissions_de": "permissions de {nom}"
+    },
+    "type": {
+      "textuel": "textuel",
+      "vocal": "vocal",
+      "categorie": "catégorie",
+      "annonces": "annonces",
+      "conference": "conférence",
+      "forum": "forum",
+      "galerie": "galerie"
+    }
   },
   "veille": {
-    "description_commande": "Annonce automatiquement les nouveaux posts Instagram, YouTube, Twitch, TikTok ou RSS",
+    "description_commande": "Annonce automatiquement les nouveaux posts Instagram, YouTube, Twitch ou RSS",
     "sous_ajouter": "Surveille un compte ou un flux",
     "opt_type": "Ce que tu veux surveiller",
     "type_twitch": "🔴 Twitch (annonce les directs)",
     "type_tiktok": "🎶 TikTok (via passerelle, fragile)",
-    "type_instagram": "📸 Instagram (ton compte, jeton requis)",
+    "type_instagram": "📸 Instagram (compte pro, par @pseudo)",
     "type_youtube": "▶️ YouTube (une chaîne)",
     "type_rss": "📰 Flux RSS (un site)",
     "opt_salon": "Salon des annonces",
-    "opt_source": "Pseudo Twitch, chaîne YouTube (@pseudo ou UC...), ou adresse du flux. Inutile pour Instagram.",
+    "opt_source": "Pseudo Twitch ou Instagram, chaîne YouTube (@pseudo ou UC...), ou adresse du flux RSS.",
     "opt_role": "Rôle mentionné à chaque annonce",
     "opt_nom": "Nom affiché dans l'annonce",
     "opt_message": "Texte ajouté au-dessus",
@@ -1643,7 +1915,7 @@
     "ajouter_plafond": "Ce serveur suit déjà **{deja}** sources, c'est le maximum.\nEnlève-en une avec `/veille retirer` pour en ajouter une autre.",
     "ajouter_plafond_premium": "-# Le premium monte ce plafond à **{n}** — `/premium`.",
     "ajouter_lecture_impossible": "Impossible de lire cette source :\n```{erreur}```",
-    "ajouter_guide_instagram": "\nSuis les étapes de **GUIDE-INSTAGRAM.txt** pour obtenir un jeton.",
+    "ajouter_guide_instagram": "\nVérifie que le compte est **public** et en mode **Créateur** ou **Entreprise** (Instagram → Paramètres → Type de compte et outils).",
     "ajouter_guide_twitch": "\nSuis les étapes de **GUIDE-TWITCH.txt** pour créer l'application Twitch.",
     "cadence": "Vérification toutes les **{n} minutes**.",
     "etat_twitch_direct": "**{nom}** est en direct en ce moment — ce direct-là ne sera pas annoncé, le bot part de maintenant.",
@@ -1669,7 +1941,22 @@
     "test_lecture_impossible": "Lecture impossible :\n```{erreur}```",
     "test_ignoree": "Source ignorée : {motif}.",
     "test_rien": "Source lisible, mais aucune publication à annoncer.",
-    "test_reussi": "Test réussi : {n} annonce(s) envoyée(s) dans {salon}."
+    "test_reussi": "Test réussi : {n} annonce(s) envoyée(s) dans {salon}.",
+    "u": {
+      "en_direct": "{nom} est en direct",
+      "en_direct_auteur": "{nom} est en direct !",
+      "spectateurs": "{n} spectateur || {n} spectateurs",
+      "insta_video": "Nouvelle vidéo Instagram",
+      "insta_post": "Nouveau post Instagram",
+      "tiktok_video": "Nouvelle vidéo TikTok",
+      "nouveaute": "Nouveauté",
+      "pastille_direct": "EN DIRECT",
+      "pastille_video": "NOUVELLE VIDÉO",
+      "pastille_post": "NOUVEAU POST",
+      "pastille_nouveau": "NOUVEAUTÉ"
+    },
+    "ajouter_source_manquante_instagram": "Donne le **@pseudo** du compte Instagram à suivre (ou l'adresse de son profil). Il doit s'agir d'un compte **Créateur** ou **Entreprise** public.",
+    "ajouter_instagram_indisponible": "Le suivi Instagram n'est pas encore activé sur Wumi. Il arrive bientôt !"
   },
   "badges": {
     "description_commande": "Les badges que tu as débloqués, et ceux qui restent",
@@ -1680,7 +1967,8 @@
     "aucun": "Aucun pour l'instant. Ils arrivent tout seuls, il suffit de vivre sur le serveur.",
     "section_a_debloquer": "À débloquer ({n})",
     "obtenu": "obtenu {quand}",
-    "pied": "{n} badge sur {total} || {n} badges sur {total}"
+    "pied": "{n} badge sur {total} || {n} badges sur {total}",
+    "annonce_debloque": "{membre} débloque {badges} !"
   },
   "carte": {
     "description_commande": "Choisis ta propre image de fond pour ta carte de rank",
@@ -2178,7 +2466,11 @@
     "voir_prochaine_recompense_label": "Prochaine récompense",
     "voir_prochaine_recompense": "{role} à **{palier}** invitations — encore **{reste}**.",
     "voir_dernieres_label": "Dernières arrivées",
-    "voir_pied_desactive": "Le suivi des invitations est éteint : ces chiffres ne bougent plus."
+    "voir_pied_desactive": "Le suivi des invitations est éteint : ces chiffres ne bougent plus.",
+    "u": {
+      "parti": "{nom} est parti",
+      "parti_detail": "Invité par {inviteur}, arrivé {quand}.\nIl lui reste **{n}** invitation. || Invité par {inviteur}, arrivé {quand}.\nIl lui reste **{n}** invitations."
+    }
   },
   "prestige": {
     "description_commande": "Ton prestige, et le passage au suivant",
@@ -2203,7 +2495,11 @@
     "succes_recompense": "Et {somme} en récompense.",
     "succes_pied": "Le compteur repart de zéro. Les étoiles restent.",
     "consultation": "**{pseudo}** a {etoiles} étoile de prestige.\n{badges}\nBonus d'XP : **+{bonus} %** || **{pseudo}** a {etoiles} étoiles de prestige.\n{badges}\nBonus d'XP : **+{bonus} %**",
-    "consultation_vide": "**{pseudo}** n'a pas encore d'étoile de prestige."
+    "consultation_vide": "**{pseudo}** n'a pas encore d'étoile de prestige.",
+    "raison_desactive": "Le prestige est désactivé sur ce serveur.",
+    "raison_sans_xp": "Tu n'as pas encore d'XP.",
+    "raison_maximum": "Tu as atteint le prestige maximum ({n} étoiles).",
+    "raison_niveau": "Il faut être **niveau {requis}** pour passer un prestige (tu es niveau {niveau})."
   },
   "profil": {
     "description_commande": "Ta fiche complète, en image",
@@ -2259,7 +2555,10 @@
     "equipe_public": "**{nom}** est maintenant sur ta carte.",
     "liste_pilotee": "Cette liste n'est pas la tienne. Lance `/theme liste` pour avoir la tienne.",
     "essai_possede": "**{nom}** — tu l'as déjà.",
-    "essai_a_acheter": "**{nom}** — {somme} pour le débloquer."
+    "essai_a_acheter": "**{nom}** — {somme} pour le débloquer.",
+    "premium_requis": "Le thème **{nom}** est réservé aux serveurs **Wumi Premium**. `/premium info` pour en savoir plus.",
+    "etat_premium": "Premium",
+    "bouton_premium": "Premium"
   },
   "xp": {
     "description_commande": "Régler l'XP, les récompenses et les bonus",
@@ -2381,7 +2680,8 @@
     "jour_demain": "demain",
     "jour_dans": "dans {n} jour || dans {n} jours",
     "liste_titre": "Prochains anniversaires",
-    "liste_pied": "{n} date enregistrée · l'année n'est jamais affichée || {n} dates enregistrées · l'année n'est jamais affichée"
+    "liste_pied": "{n} date enregistrée · l'année n'est jamais affichée || {n} dates enregistrées · l'année n'est jamais affichée",
+    "message_defaut": "Joyeux anniversaire {mention} ! Toute l'équipe te souhaite une excellente journée."
   },
   "confidentialite": {
     "description_commande": "Voir ou effacer les données que le bot garde sur toi",
@@ -2432,7 +2732,7 @@
     "annule": "Annulé. Rien n'a été effacé.",
     "succes_titre": "Effacé",
     "succes_corps": "**{n}** ligne retirée. Je ne sais plus rien de toi sur ce serveur, à part les éventuelles sanctions, qui appartiennent à la modération. || **{n}** lignes retirées. Je ne sais plus rien de toi sur ce serveur, à part les éventuelles sanctions, qui appartiennent à la modération.",
-    "succes_suite": "Si tu continues à écrire ici, je recommencerai à compter ton XP — demande à un administrateur de t'exclure du système avec `/xp exclure` si tu ne veux pas."
+    "succes_suite": "Si tu continues à écrire ici, je recommencerai à compter ton XP — demande à un administrateur de te donner un rôle exclu de l'XP (`/config` → Niveaux) si tu ne veux pas."
   },
   "faq": {
     "description_commande": "Questions fréquentes du serveur",
@@ -2477,7 +2777,16 @@
     "liste_titre": "Questions fréquentes ({n})",
     "liste_ligne_consultations": "{n} consultation || {n} consultations",
     "liste_pied": "/faq afficher <numéro> pour lire une fiche",
-    "chercher_pas_trouve": "Je n'ai pas trouvé de fiche correspondante.\nRegarde `/faq liste`, ou pose ta question dans le salon d'aide."
+    "chercher_pas_trouve": "Je n'ai pas trouvé de fiche correspondante.\nRegarde `/faq liste`, ou pose ta question dans le salon d'aide.",
+    "u": {
+      "pied_auto": "Réponse automatique · fiche #{id} · /faq pour tout consulter",
+      "pied": "Fiche #{id} · consultée {n} fois",
+      "pas_ma_question": "Ce n'était pas ma question",
+      "seul_auteur": "Seule la personne qui a posé la question peut retirer cette réponse.",
+      "retiree": "Réponse retirée. Un membre de l'équipe te répondra."
+    },
+    "tester_detail": "Mots-clés : {mots} · Sens (IA) : {sens}",
+    "tester_sens_absent": "indisponible"
   },
   "giveaway": {
     "description_commande": "Organise un concours",
@@ -2840,7 +3149,36 @@
     "statut_attente": "En attente",
     "statut_encours": "En cours de réalisation",
     "statut_acceptee": "Acceptée",
-    "statut_refusee": "Refusée"
+    "statut_refusee": "Refusée",
+    "u": {
+      "aucun_vote": "aucun vote",
+      "barre_pour": "**{p} %** pour · {n} vote || **{p} %** pour · {n} votes",
+      "membre_inconnu": "Membre inconnu",
+      "titre": "Suggestion #{n} · {statut}",
+      "votes": "Votes",
+      "proposee_par": "Proposée par {auteur}",
+      "reponse_equipe": "Réponse de l'équipe",
+      "sans_raison": "*Aucune raison donnée*",
+      "par": "par {staff}",
+      "pour": "Pour · {n}",
+      "contre": "Contre · {n}",
+      "detail": "Détail des votes",
+      "n_existe_plus": "Cette suggestion n'existe plus.",
+      "votes_clos": "Les votes sont clos sur cette suggestion.",
+      "vote_retire": "Vote retiré.",
+      "vote_change_pour": "Vote changé : **pour**.",
+      "vote_change_contre": "Vote changé : **contre**.",
+      "vote_pour": "Vote enregistré : **pour**.",
+      "vote_contre": "Vote enregistré : **contre**.",
+      "votes_de": "Votes de la suggestion #{n}",
+      "liste_pour": "Pour ({n})",
+      "liste_contre": "Contre ({n})",
+      "personne": "*personne*",
+      "introuvable": "Aucune suggestion #{n} sur ce serveur.",
+      "ta_suggestion": "Ta suggestion #{n} : {statut}",
+      "marquee": "Suggestion **#{n}** marquée **{statut}**. L'auteur a été prévenu.",
+      "erreur": "Une erreur est survenue sur cette suggestion."
+    }
   },
   "ticket": {
     "description_commande": "Gère les tickets d'assistance du serveur",
@@ -3448,11 +3786,11 @@
         },
         "musique": {
           "nom": "Problème de musique",
-          "desc": "/play, radio, blind test, son qui coupe…",
+          "desc": "/jouer, radio, blind test, son qui coupe…",
           "champ": {
             "commande": {
               "label": "Commande ou lien utilisé",
-              "aide": "ex. /play one of the girls, un lien Spotify…"
+              "aide": "ex. /jouer one of the girls, un lien Spotify…"
             },
             "probleme": {
               "label": "Ce qui s'est passé",
@@ -3491,7 +3829,7 @@
         },
         "musique": {
           "label": "Aide musique",
-          "texte": "{membre}, pour la musique : rejoins d'abord un **salon vocal**, puis utilise `/play` (ou `/radio`). Vérifie que Wumi peut *Se connecter* et *Parler* dans ce salon. Si une piste précise ne passe pas, envoie-nous le lien exact."
+          "texte": "{membre}, pour la musique : rejoins d'abord un **salon vocal**, puis utilise `/jouer` (ou `/radio`). Vérifie que Wumi peut *Se connecter* et *Parler* dans ce salon. Si une piste précise ne passe pas, envoie-nous le lien exact."
         },
         "dashboard": {
           "label": "Lien du dashboard",
@@ -4115,7 +4453,7 @@
     "p_hierarchie": "**{n} rôle(s) que je distribue sont au-dessus de mon rôle** ({wumi}) : {liste}. Monte mon rôle dans Paramètres › Rôles, sinon je ne peux pas les donner.",
     "p_wumi_perms": "**Il me manque des permissions** : `{perms}`. Certaines fonctions ne marcheront pas.",
     "p_webhooks": "**{n} webhooks créés par des membres.** Les webhooks oubliés servent souvent à spammer après un vol de compte : fais le tri dans Paramètres › Intégrations.",
-    "p_logs": "**Pas de salon de logs de modération.** Configure-le avec /setup ou /config.",
+    "p_logs": "**Pas de salon de logs de modération.** Configure-le avec /demarrer ou /config.",
     "p_antiraid": "**Antiraid désactivé** : rien ne bloque une vague d'arrivées.",
     "p_automod": "**Automod désactivé** : spam, invitations et insultes passent sans filtre."
   },
@@ -4182,7 +4520,7 @@
     "direct": "en direct",
     "par": "demandé par {membre}",
     "file_finie": "File terminée",
-    "file_finie_aide": "Ajoute une musique avec /play. Je pars dans 3 minutes sans musique.",
+    "file_finie_aide": "Ajoute une musique avec /jouer. Je pars dans 3 minutes sans musique.",
     "boucle_off": "off",
     "boucle_piste": "piste",
     "boucle_file": "file",
@@ -4195,7 +4533,7 @@
     "fin_inactif": "Plus de musique depuis 3 minutes, je suis parti.",
     "fin_seul": "Tout le monde est parti, moi aussi.",
     "fin_deconnecte": "On m'a déconnecté du vocal.",
-    "fin_erreur": "Le lecteur a redémarré, relance /play.",
+    "fin_erreur": "Le lecteur a redémarré, relance /jouer.",
     "file_titre": "File d'attente",
     "maintenant": "En cours",
     "file_vide": "La file est vide.",
@@ -4229,11 +4567,12 @@
     "247_off": "Mode 24/7 désactivé.",
     "pl_titre": "Playlists du serveur",
     "pl_pistes": "{n} piste(s)",
-    "pl_vide": "Aucune playlist. Crée-en une avec /music playlist sauver.",
+    "pl_vide": "Aucune playlist. Crée-en une avec /musique playlist sauver.",
     "pl_supprimee": "Playlist **{nom}** supprimée.",
     "pl_introuvable": "Pas de playlist « {nom} ».",
     "pl_max": "25 playlists maximum par serveur.",
-    "pl_sauvee": "Playlist **{nom}** sauvée ({n} pistes)."
+    "pl_sauvee": "Playlist **{nom}** sauvée ({n} pistes).",
+    "lecteur_web": "Lecteur web"
   },
   "blindtest": {
     "description_commande": "Blind test musical dans le vocal : trouve le titre avant les autres",
@@ -4579,9 +4918,9 @@
     "bug_pied": "Garde tes MP ouverts pour être prévenu du suivi.",
     "bug_modal": "Signaler un bug",
     "bug_q_titre": "Le problème en une phrase",
-    "bug_ph_titre": "Ex. : /play ne lance pas la musique",
+    "bug_ph_titre": "Ex. : /jouer ne lance pas la musique",
     "bug_q_commande": "Commande concernée (facultatif)",
-    "bug_ph_commande": "Ex. : /play, /ticket, le bouton Ramasser…",
+    "bug_ph_commande": "Ex. : /jouer, /ticket, le bouton Ramasser…",
     "bug_q_etapes": "Comment le reproduire ?",
     "bug_ph_etapes": "1. Je tape… 2. Je clique sur… 3. …",
     "bug_q_attendu": "Ce que tu attendais / ce qui arrive",
@@ -4717,7 +5056,15 @@
     "erreur_deja": "Tu as déjà une conversation ouverte : écris simplement à Wumi en MP.",
     "erreur_bloque": "Tu ne peux pas contacter l'équipe.",
     "erreur_trop_vite": "Patiente quelques minutes avant d'ouvrir une nouvelle conversation.",
-    "erreur_mp": "Je ne peux pas t'écrire en MP : ouvre tes messages privés (Paramètres › Confidentialité) puis réessaie."
+    "erreur_mp": "Je ne peux pas t'écrire en MP : ouvre tes messages privés (Paramètres › Confidentialité) puis réessaie.",
+    "renvoi_titre": "Le modmail a son propre bot",
+    "renvoi_texte": "Pour parler à l'équipe, écris directement en message privé à {bot}. Il transmet tout à l'équipe et te répond ici même.",
+    "bouton_prendre": "Prendre en charge",
+    "bouton_pris": "Pris en charge : {nom}",
+    "pris_staff": "✋ {membre} prend en charge cette conversation.",
+    "libere": "🔓 {membre} a libéré cette conversation : quelqu'un d'autre peut la prendre.",
+    "pris_deja": "Cette conversation est déjà prise en charge par {membre}.",
+    "pris_membre": "**{nom}** de l'équipe Wumi s'occupe de ta demande. Réponds ici, il ou elle te lira."
   },
   "journal": {
     "profil": "Profil",
@@ -4889,6 +5236,443 @@
     "annonce_record": "Record du serveur ! {membre} termine le niveau {niveau} · {nom}",
     "annonce_fini": "{membre} termine le niveau {niveau} · {nom} pour la première fois",
     "annonce_pied": "Wumi Run · /wumirun jouer pour tenter de faire mieux",
-    "portail": "Wumi Run n'est pas encore ouvert : les Activités ne sont pas activées dans le Developer Portal de Wumi (Activities › Settings › Enable Activities)."
+    "portail": "Wumi Run n'est pas encore ouvert : les Activités ne sont pas activées dans le Developer Portal de Wumi (Activities › Settings › Enable Activities).",
+    "sous_defi": "Le défi de la semaine : niveau, classement et récompenses",
+    "sous_convertir": "Convertis tes pièces Wumi Run en monnaie du serveur",
+    "opt_montant": "Combien de pièces convertir (toutes par défaut)",
+    "opt_salon_defi": "Salon du défi de la semaine (classement en direct, résultats chaque lundi)",
+    "opt_sans_defi": "Arrêter de publier le défi de la semaine",
+    "opt_taux": "Monnaie du serveur par pièce Wumi Run (0 = conversion coupée)",
+    "config_defi": "Défi de la semaine",
+    "config_taux": "Conversion des pièces",
+    "config_taux_valeur": "1 {piece} = {gain}",
+    "config_taux_off": "coupée",
+    "defi_titre": "Wumi Run · Défi de la semaine",
+    "defi_niveau": "Niveau {niveau} · {nom}",
+    "defi_regle": "Fais le meilleur temps sur ce niveau cette semaine. Toutes les parties comptent, pas seulement ton record. Fin {fin}.",
+    "defi_vide": "Aucun temps cette semaine. Sois le premier !",
+    "defi_moi": "Toi : #{rang} · {temps} · {essais} partie || Toi : #{rang} · {temps} · {essais} parties",
+    "defi_moi_aucun": "Tu n'as pas encore fini ce niveau cette semaine.",
+    "defi_gains": "Récompenses",
+    "defi_pied": "{n} joueur cette semaine · Lance le jeu depuis ce serveur pour que ton temps compte || {n} joueurs cette semaine · Lance le jeu depuis ce serveur pour que ton temps compte",
+    "defi_resultats": "Résultats du défi de la semaine · Niveau {niveau} · {nom}",
+    "defi_participation": "{n} autre joueur reçoit {gain} pour sa participation || {n} autres joueurs reçoivent {gain} chacun pour leur participation",
+    "convertir_titre": "Pièces converties",
+    "convertir_ok": "**{montant}** {piece} → **{gain}** sur ce serveur. Il te reste **{reste}** {piece} dans Wumi Run.",
+    "convertir_pied": "Si le jeu est ouvert, ton nouveau total de pièces s'affichera au prochain lancement.",
+    "convertir_economie": "L'économie n'est pas activée sur ce serveur.",
+    "convertir_coupee": "La conversion des pièces est coupée sur ce serveur.",
+    "convertir_vide": "Tu n'as aucune pièce Wumi Run à convertir. Ramasses-en dans le jeu !",
+    "convertir_pas_assez": "Tu n'as que **{dispo}** {piece}."
+  },
+  "niveaux_carte": {
+    "carte_titre": "NIVEAU SUPÉRIEUR",
+    "carte_niveau": "NIVEAU",
+    "carte_xp": "{a} / {b} XP avant le niveau {n}",
+    "carte_total": "{n} XP au total",
+    "carte_bonus": "Bonus ×{n}",
+    "carte_rang": "#{n} du serveur",
+    "carte_role": "Débloqué : {r}",
+    "annonce_vocal": "{mention} passe **niveau {niveau}** grâce au vocal ! {emoji}",
+    "roles_debloques": "Tu débloques {roles} !"
+  },
+  "donnees": {
+    "themes": {
+      "Wumi": {
+        "nom": "Wumi",
+        "description": "Le plan technique du serveur. Offert à tout le monde."
+      },
+      "ocean": {
+        "nom": "Océan",
+        "description": "Le même décor, passé au bleu profond."
+      },
+      "braise": {
+        "nom": "Braise",
+        "description": "Orange chaud, comme un feu de camp."
+      },
+      "lavande": {
+        "nom": "Lavande",
+        "description": "Violet doux sur fond clair."
+      },
+      "nuit": {
+        "nom": "Nuit",
+        "description": "Le décor plonge dans le noir, texte clair."
+      },
+      "minuit": {
+        "nom": "Minuit",
+        "description": "Sans décor : un ciel étoilé."
+      },
+      "or": {
+        "nom": "Or",
+        "description": "Noir et or. Le thème le plus cher du serveur."
+      },
+      "aurore": {
+        "nom": "Aurore",
+        "description": "Ciel violet et rose, étoilé. Premium."
+      },
+      "neon": {
+        "nom": "Néon",
+        "description": "Cyan et magenta sur nuit électrique. Premium."
+      },
+      "sakura": {
+        "nom": "Sakura",
+        "description": "Rose cerisier sur prune profonde. Premium."
+      },
+      "emeraude": {
+        "nom": "Émeraude",
+        "description": "Vert émeraude et menthe. Premium."
+      }
+    },
+    "objets": {
+      "potion_xp": {
+        "nom": "Potion d'expérience",
+        "description": "Double ton XP pendant 1 heure."
+      },
+      "elixir_xp": {
+        "nom": "Élixir d'expérience",
+        "description": "Triple ton XP pendant 30 minutes."
+      },
+      "couleur": {
+        "nom": "Couleur de pseudo",
+        "description": "Choisis la couleur de ton pseudo pendant 7 jours."
+      },
+      "coupe_file": {
+        "nom": "Coupe-file",
+        "description": "Ton prochain ticket est signalé comme prioritaire."
+      },
+      "coffre_fort": {
+        "nom": "Coffre-fort",
+        "description": "Te protège des braquages pendant 24 heures."
+      }
+    },
+    "badges": {
+      "bavard_1": {
+        "nom": "Bavard",
+        "description": "100 messages envoyés"
+      },
+      "bavard_2": {
+        "nom": "Pilier du chat",
+        "description": "1 000 messages envoyés"
+      },
+      "bavard_3": {
+        "nom": "Machine à écrire",
+        "description": "10 000 messages envoyés"
+      },
+      "voix_1": {
+        "nom": "Voix familière",
+        "description": "10 heures en vocal"
+      },
+      "voix_2": {
+        "nom": "Habitué du vocal",
+        "description": "100 heures en vocal"
+      },
+      "niveau_1": {
+        "nom": "Confirmé",
+        "description": "Niveau 10 atteint"
+      },
+      "niveau_2": {
+        "nom": "Vétéran",
+        "description": "Niveau 30 atteint"
+      },
+      "niveau_3": {
+        "nom": "Légende",
+        "description": "Niveau 50 atteint"
+      },
+      "recruteur_1": {
+        "nom": "Recruteur",
+        "description": "5 membres invités"
+      },
+      "recruteur_2": {
+        "nom": "Ambassadeur",
+        "description": "25 membres invités"
+      },
+      "fidele_1": {
+        "nom": "Fidèle",
+        "description": "6 mois sur le serveur"
+      },
+      "fidele_2": {
+        "nom": "Pionnier",
+        "description": "1 an sur le serveur"
+      },
+      "etoile": {
+        "nom": "Étoilé",
+        "description": "Premier prestige atteint"
+      }
+    },
+    "niveaux_run": {
+      "1": "Premiers pas",
+      "2": "Dunes brûlantes",
+      "3": "Pics glacés",
+      "4": "Forêt de champignons",
+      "5": "La citadelle"
+    }
+  },
+  "graphique": {
+    "activite_de": "Activité de {serveur}",
+    "periode": "{n} derniers jours · du {debut} au {fin}",
+    "vs_precedente": "{p} % vs période précédente",
+    "messages": "Messages",
+    "par_jour_moyenne": "{n} par jour en moyenne",
+    "membres": "Membres",
+    "arrivees_departs": "{a} arrivées · {d} départs",
+    "vocal": "Vocal",
+    "vocal_cumule": "temps cumulé en vocal",
+    "jour_actif": "Jour le plus actif",
+    "n_messages": "{n} messages",
+    "aucune_donnee": "aucune donnée",
+    "messages_par_jour": "Messages par jour",
+    "moyenne_messages": "moyenne de {n} messages par jour",
+    "mouvements": "Arrivées et départs",
+    "mouvements_sous": "au-dessus de la ligne : arrivées · en dessous : départs",
+    "legende_arrivees": "Arrivées ({n})",
+    "legende_departs": "Départs ({n})",
+    "salons_actifs": "Salons les plus actifs",
+    "sur_jours": "sur {n} jours",
+    "aucune_donnee_encore": "Aucune donnée pour le moment",
+    "heures_pointe": "Heures de pointe",
+    "pic": "pic à {h} h · {p} % des messages · heure de Paris",
+    "heure_paris": "heure de Paris",
+    "m_quand": "Quand ce membre écrit",
+    "m_quand_sous": "messages par heure de la journée (heure de Paris)",
+    "m_ou": "Où ce membre écrit",
+    "m_ou_sous": "salons les plus utilisés",
+    "m_aucun": "Aucun message enregistré pour le moment.",
+    "m_sur": "sur {serveur}",
+    "m_niveau": "niveau {n}",
+    "m_vocal": "Temps en vocal",
+    "m_jamais": "jamais connecté",
+    "m_heures": "Heures favorites",
+    "m_part": "{p} % de ses messages",
+    "m_pas_donnees": "pas encore de données",
+    "m_salon": "Salon préféré",
+    "m_note": "{n} messages situés dans la journée · le suivi par heure a démarré après le comptage total"
+  },
+  "carte_profil": {
+    "badges": "{n} badge || {n} badges",
+    "niveau": "NIVEAU",
+    "rang": "RANG",
+    "xp_total": "{n} XP au total",
+    "progression": "{p} % du niveau {n}",
+    "messages": "Messages",
+    "en_vocal": "{v} en vocal",
+    "solde": "Solde",
+    "rang_solde": "rang #{n} au solde",
+    "invitations": "Invitations",
+    "amenes": "membres amenés",
+    "personne": "personne encore",
+    "sur_serveur": "Sur le serveur",
+    "avertissements": "{n} avertissement || {n} avertissements",
+    "aucun_avertissement": "aucun avertissement",
+    "missions": "MISSIONS DU JOUR",
+    "toutes": "toutes accomplies",
+    "sur": "{a} sur {b}",
+    "n_messages": "{v} message || {v} messages"
+  },
+  "fond": {
+    "aucune": "Aucune image fournie.",
+    "trop_lourde": "Image trop lourde ({n} Mo). Maximum 8 Mo.",
+    "format": "Format non reconnu. Envoie une image PNG, JPEG ou WebP.",
+    "illisible": "Image illisible : {erreur}",
+    "echec": "Impossible d'enregistrer l'image."
+  },
+  "transcription": {
+    "ouvert_par": "Ouvert par",
+    "ouvert_le": "Ouvert le",
+    "ferme_par": "Fermé par",
+    "ferme_le": "Fermé le",
+    "messages": "Messages",
+    "raison": "Raison de fermeture",
+    "aucune": "Aucune",
+    "sujet": "Sujet",
+    "detail": "Détail de la demande",
+    "vide": "Aucun message dans ce ticket.",
+    "pied": "Transcription générée automatiquement"
+  },
+  "traduction": {
+    "vide": "Ce message n'a pas de texte à traduire.",
+    "indisponible": "La traduction n'est pas encore disponible sur ce bot.",
+    "trop_vite": "Doucement ! Attends quelques secondes avant de traduire un autre message.",
+    "langue_inconnue": "Je n'ai pas reconnu la langue de ce message (français, anglais, espagnol, allemand, portugais et italien seulement).",
+    "deja": "Ce message est déjà en {langue}.",
+    "echec": "La traduction a échoué. Réessaie dans un instant.",
+    "titre": "Traduction",
+    "voir_message": "Voir le message",
+    "pied": "Traduit par une IA qui tourne sur le serveur de Wumi : elle peut se tromper. Seul toi vois cette traduction."
+  },
+  "ticket_faq": {
+    "titre": "La FAQ a peut-être déjà la réponse",
+    "intro": "En attendant l'équipe, voici une réponse qui correspond à ta demande.",
+    "bouton_ok": "C'est réglé, merci",
+    "bouton_non": "J'attends l'équipe",
+    "attente": "D'accord, l'équipe arrive.",
+    "resolu": "Réglé grâce à la FAQ.",
+    "raison": "Résolu par la FAQ",
+    "plus_ouvert": "Ce ticket n'est plus ouvert.",
+    "seul_auteur": "Seul l'auteur du ticket ou l'équipe peut répondre."
+  },
+  "cartes": {
+    "description_commande": "Les cartes à collectionner de Wumi : boosters, classeur, deck",
+    "sous_ouvrir": "Ouvre un booster de 5 cartes",
+    "sous_classeur": "Feuillette un classeur de cartes, famille par famille",
+    "sous_voir": "Affiche une de tes cartes en grand",
+    "sous_deck": "Montre la vitrine de 5 cartes d'un membre",
+    "sous_vitrine": "Choisis les 5 cartes de ta vitrine",
+    "sous_acheter": "Achète des boosters avec la monnaie du serveur",
+    "sous_quotidien": "Récupère ton booster gratuit du jour",
+    "sous_recycler": "Recycle tes doubles en poussière (100 = un booster)",
+    "sous_info": "Boosters, progression et collection d'un membre",
+    "sous_classement": "Les meilleurs collectionneurs du serveur",
+    "opt_membre": "Le membre (toi par défaut)",
+    "opt_famille": "La famille à ouvrir",
+    "opt_carte": "Une carte de ta collection",
+    "opt_nombre": "Combien de boosters (1 par défaut)",
+    "famille": {
+      "pixel": "Pixel",
+      "nuage": "Nuage",
+      "glitch": "Glitch",
+      "neon": "Néon",
+      "nuit": "Nuit",
+      "cosmos": "Cosmos",
+      "volcans": "Volcans",
+      "eaux": "Lacs & cascades",
+      "monuments": "Monuments",
+      "terroir": "Terroir",
+      "nature": "Nature",
+      "aventure": "Aventure"
+    },
+    "rarete": {
+      "commune": "Commune",
+      "peu_commune": "Peu commune",
+      "rare": "Rare",
+      "epique": "Épique",
+      "legendaire": "Légendaire",
+      "mythique": "Mythique"
+    },
+    "serie": "Série {n}",
+    "stat_puissance": "Puissance",
+    "stat_eclat": "Éclat",
+    "brillante": "Brillante",
+    "nouvelle": "Nouvelle !",
+    "voir_tout": "Voir le récapitulatif",
+    "suivante": "Carte suivante ({i}/{n})",
+    "carte_x": "Carte {i}/{n}",
+    "recap_titre": "Booster de {membre}",
+    "recap_pied": "Collection : {n}/{total} · boosters restants : {boosters}",
+    "aucun_booster": "Tu n'as pas de booster. Le prochain arrive dans **{reste}** messages, et `/cartes quotidien` en donne un par jour.",
+    "booster_titre": "Créatures",
+    "booster_sous": "Série {n} · 5 cartes",
+    "ouverture_titre": "{membre} ouvre un booster !",
+    "ouverture_restants": "Boosters restants : {n}",
+    "dechirer": "Ouvrir le booster",
+    "classeur_titre": "Classeur de {membre}",
+    "classeur_resume": "**{n}/{total}** cartes ({pourcent} %) · ✨ {brillantes} brillante(s)",
+    "desactive": "Les cartes à collectionner sont désactivées sur ce serveur.",
+    "pas_a_toi": "Tu n'as pas cette carte dans ta collection.",
+    "voir_pied": "Exemplaires : {n} · première obtenue le {date}",
+    "deck_vide_moi": "Ta vitrine est vide. Choisis tes 5 cartes préférées avec `/cartes vitrine`.",
+    "deck_vide": "{membre} n'a pas encore de vitrine.",
+    "deck_titre": "Vitrine de {membre}",
+    "vitrine_ok": "Vitrine enregistrée : {cartes}",
+    "economie_off": "L'économie est désactivée sur ce serveur : les boosters ne s'achètent pas ici.",
+    "stock_plein": "Tu as déjà le maximum de boosters ({max}). Ouvre-les avec `/cartes ouvrir` !",
+    "pas_assez": "Il te faut {cout}, tu as {solde}.",
+    "achat_ok": "{n} booster(s) acheté(s) pour {cout}. Tu en as maintenant **{boosters}**. Ouvre-les avec `/cartes ouvrir` !",
+    "quotidien_off": "Le booster quotidien est désactivé sur ce serveur.",
+    "quotidien_attente": "Tu as déjà pris ton booster du jour. Le prochain : {quand}.",
+    "quotidien_ok": "Booster du jour récupéré ! Tu en as **{boosters}**. Ouvre-le avec `/cartes ouvrir`.",
+    "recycler_rien": "Tu n'as aucun double à recycler.",
+    "recycler_titre": "Recycler les doubles",
+    "recycler_detail": "Tu as **{n}** double(s). Les recycler rapporte **{poussiere}** poussière ({par} = un booster). Un exemplaire de chaque carte est toujours gardé.",
+    "recycler_bouton": "Recycler",
+    "recycler_fait": "{n} double(s) recyclé(s) : +{poussiere} poussière, {boosters} booster(s) gagné(s). Poussière restante : {reste}/{par}.",
+    "info_titre": "Cartes de {membre}",
+    "info_collection": "Collection : **{n}/{total}** ({pourcent} %) · ✨ {brillantes} brillante(s)",
+    "info_boosters": "Boosters à ouvrir : **{n}** (max {max})",
+    "info_prochain": "Prochain booster : {n}/{total} messages",
+    "info_quotidien": "Booster quotidien : {quand}",
+    "maintenant": "disponible",
+    "info_prix": "Prix d'un booster : {prix}",
+    "info_poussiere": "Poussière : {n}/{par}",
+    "info_ouverts": "Boosters ouverts : {n}",
+    "classement_vide": "Personne n'a encore de carte sur ce serveur.",
+    "classement_titre": "Meilleurs collectionneurs",
+    "classement_ligne": "**{n}/{total}** cartes · ✨ {brillantes}",
+    "session_finie": "Ce booster a déjà été ouvert.",
+    "pas_ton_booster": "Ce n'est pas ton booster !",
+    "membre_absent": "Ce membre n'est plus sur le serveur.",
+    "erreur": "Un souci est survenu avec les cartes. Réessaie dans un instant."
+  },
+  "jeuxmusicaux": {
+    "description_commande": "Jeux musicaux dans le vocal : quiz, qui l'a choisie, vibe check",
+    "sous_quiz": "Quiz musical : trouve le titre parmi 4, plus tu es rapide plus tu marques",
+    "sous_qui": "Qui l'a choisie ? Chacun propose ses titres, devine qui a mis quoi",
+    "sous_vibe": "Vibe check : note chaque titre de 1 à 10, vise la moyenne",
+    "sous_arreter": "Arrête le jeu musical en cours",
+    "opt_theme": "Le thème des musiques",
+    "opt_manches": "Nombre de manches",
+    "nom_quiz": "Quiz musical",
+    "nom_qui": "Qui l'a choisie ?",
+    "nom_vibe": "Vibe check",
+    "lance": "{jeu} lancé dans {vocal} ! Regarde les messages ci-dessous.",
+    "en_cours": "Un jeu musical ou un blind test est déjà en cours sur ce serveur.",
+    "aucune": "Aucun jeu musical en cours.",
+    "arret_reserve": "Seul la personne qui a lancé la partie, le rôle DJ ou un admin peut l'arrêter.",
+    "arrete": "Jeu musical arrêté.",
+    "manche": "Manche {n}/{total}",
+    "deja_repondu": "Tu as déjà répondu à cette manche.",
+    "reponse_notee": "Réponse enregistrée ! Le résultat arrive à la fin de la manche.",
+    "vote_note": "Vote enregistré !",
+    "personne": "Personne n'a trouvé !",
+    "regles_quiz": "**{n} manches.** Wumi passe un extrait : clique sur le bon titre parmi les 4. Une seule réponse par manche : **plus tu es rapide, plus tu marques** (1000 à 300 points), et chaque bonne réponse d'affilée ajoute un bonus 🔥.",
+    "quiz_question": "🎧 C'est quoi, ce titre ?",
+    "cetait": "C'était **{lettre} · {titre}** · {artiste}",
+    "regles_qui": "Clique sur **Proposer mes titres** et ajoute jusqu'à **{max} titres** (un nom ou un lien), en secret. Ensuite chaque titre passe 30 secondes et tout le monde devine **qui l'a choisi**. Bonne réponse : +1. Si personne ne trouve, celui qui l'a mis gagne +2. Il faut au moins **{min} joueurs**.",
+    "qui_bouton": "Proposer mes titres",
+    "qui_demarrer": "Démarrer",
+    "qui_inscrits": "**Joueurs inscrits : {n}**",
+    "qui_fin": "Inscriptions fermées {quand}, ou quand le lanceur clique sur Démarrer.",
+    "qui_seul_lanceur": "Seule la personne qui a lancé la partie peut la démarrer.",
+    "qui_pas_assez": "Il faut au moins {min} joueurs pour commencer.",
+    "qui_modal_titre": "Tes titres (en secret)",
+    "qui_modal_champ": "Titre {n}",
+    "qui_modal_exemple": "Ex. : Daft Punk One More Time, ou un lien",
+    "qui_merci": "C'est noté ! {n} titre(s) enregistré(s). Tu peux les changer jusqu'au début.",
+    "qui_annulee": "Partie annulée : il fallait au moins {min} joueurs.",
+    "qui_cest_parti": "C'est parti ! **{n} joueurs**, les titres arrivent dans le vocal…",
+    "qui_menu": "Qui l'a choisie ?",
+    "qui_question": "🕵️ Qui a mis ce titre ?",
+    "qui_pas_joueur": "Seuls les joueurs inscrits peuvent voter.",
+    "qui_ton_titre": "C'est ton titre : reste discret 🤫",
+    "qui_revele": "C'était le choix de {membre} !",
+    "qui_trouve": "Bien vu : {membres} (+1)",
+    "qui_personne": "Personne n'a trouvé : {membre} gagne +2 🦊",
+    "regles_vibe": "**{n} manches.** Note chaque titre de 1 à 10, en secret. **Plus ta note est proche de la moyenne du vocal, plus tu marques** (10 points max). Ça marche aussi en solo.",
+    "vibe_menu": "Ta note sur 10",
+    "vibe_question": "🌡️ Note ce titre de 1 à 10 !",
+    "vibe_notee": "Note enregistrée : {note}/10.",
+    "vibe_moyenne": "Moyenne du vocal : {moyenne}/10",
+    "vibe_personne": "Personne n'a noté ce titre.",
+    "vibe_hot_take": "Hot take de la manche : {membre} avec {note}/10 !",
+    "virgule": ",",
+    "fin": "Partie terminée : {jeu}",
+    "gagnant": "Bravo {membre}, champion avec **{pts}** points ! 🎉",
+    "aucun_point": "Personne n'a marqué de points cette fois.",
+    "rejouer": "Rejouer : /jeu-musical",
+    "qui_complet": "La partie est complète (25 joueurs au plus)."
+  },
+  "avis": {
+    "description_commande": "⭐ Laisse un avis sur Wumi (il peut apparaître sur wumi.fr)",
+    "sous_ecrire": "Écrire ou remplacer ton avis",
+    "sous_voir": "Voir ton avis et s'il est publié",
+    "sous_supprimer": "Supprimer ton avis",
+    "opt_note": "Ta note",
+    "opt_texte": "Ton avis en quelques mots (10 à 300 caractères)",
+    "merci": "Merci pour ton avis ! {etoiles}\nIl sera relu avant d'apparaître sur **wumi.fr**, avec ton pseudo et ton avatar. Tu peux le retirer quand tu veux avec `/avis supprimer`.",
+    "aucun": "Tu n'as pas encore laissé d'avis. Écris-en un avec `/avis ecrire` !",
+    "supprime": "Ton avis est supprimé. Il n'apparaît plus nulle part.",
+    "le_tien": "**Ton avis** · {etoiles}\n>>> {texte}\n\n-# {statut}",
+    "statut_attente": "En attente de relecture",
+    "statut_publie": "Publié sur wumi.fr",
+    "statut_masque": "Non publié"
   }
 }

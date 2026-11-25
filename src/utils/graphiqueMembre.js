@@ -7,7 +7,7 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const { chargerPolices } = require('./polices');
 const { rectArrondi, cercleImage } = require('./canvasOutils');
-const { C, P, barre, bloc, tuile, borneHaute, nb } = require('./graphiqueActivite');
+const { C, P, barre, bloc, tuile, borneHaute, nb, g, definirLangue } = require('./graphiqueActivite');
 
 const L = 1200;
 const MARGE = 28;
@@ -37,7 +37,7 @@ function duree(secondes) {
  * Une seule serie, donc pas de legende ; seul le pic est etiquete.
  */
 function panneauHeures(ctx, x, y, l, h, heures) {
-  bloc(ctx, x, y, l, h, 'Quand ce membre écrit', 'messages par heure de la journée (heure de Paris)');
+  bloc(ctx, x, y, l, h, g('m_quand'), g('m_quand_sous'));
 
   const gx = x + 58;
   // 18 px de plus que le titre : l'etiquette du pic se pose au-dessus de la
@@ -110,13 +110,13 @@ function panneauHeures(ctx, x, y, l, h, heures) {
 
 /** Salons preferes : barres horizontales, une seule serie. */
 function panneauSalons(ctx, x, y, l, h, salons) {
-  bloc(ctx, x, y, l, h, 'Où ce membre écrit', 'salons les plus utilisés');
+  bloc(ctx, x, y, l, h, g('m_ou'), g('m_ou_sous'));
 
   if (!salons.length) {
     ctx.textAlign = 'left';
     ctx.fillStyle = C.texteDiscret;
     ctx.font = `14px "${P}", sans-serif`;
-    ctx.fillText('Aucun message enregistré pour le moment.', x + 20, y + 92);
+    ctx.fillText(g('m_aucun'), x + 20, y + 92);
     return;
   }
 
@@ -192,7 +192,7 @@ async function enTete(ctx, x, y, l, h, d) {
 
   ctx.fillStyle = C.texteDiscret;
   ctx.font = `14px "${P}", sans-serif`;
-  ctx.fillText(tronquer(ctx, `sur ${d.serveur}`, 520), ax + taille + 20, y + h / 2 + 22);
+  ctx.fillText(tronquer(ctx, g('m_sur', { serveur: d.serveur }), 520), ax + taille + 20, y + h / 2 + 22);
 }
 
 // ----------------------------------------------------------------- RENDU
@@ -213,6 +213,7 @@ async function enTete(ctx, x, y, l, h, d) {
  */
 async function genererGraphiqueMembre(d) {
   chargerPolices();
+  definirLangue(d.langue);
 
   const nbSalons = Math.min(d.salons.length, 5);
   const hSalons = 80 + Math.max(1, nbSalons) * 44 + 12;
@@ -232,17 +233,17 @@ async function genererGraphiqueMembre(d) {
   // Quatre chiffres-cles
   const lt = (l - 3 * 16) / 4;
   const total = d.heures.reduce((a, b) => a + b, 0);
-  tuile(ctx, MARGE, y, lt, 104, 'Messages', nb(d.messages), `niveau ${d.niveau}`);
-  tuile(ctx, MARGE + (lt + 16), y, lt, 104, 'Temps en vocal', duree(d.secondesVocal), d.secondesVocal ? null : 'jamais connecté');
+  tuile(ctx, MARGE, y, lt, 104, g('messages'), nb(d.messages), g('m_niveau', { n: d.niveau }));
+  tuile(ctx, MARGE + (lt + 16), y, lt, 104, g('m_vocal'), duree(d.secondesVocal), d.secondesVocal ? null : g('m_jamais'));
   tuile(
     ctx,
     MARGE + (lt + 16) * 2,
     y,
     lt,
     104,
-    'Heures favorites',
+    g('m_heures'),
     d.plage ? `${hh(d.plage.debut)} – ${hh(d.plage.fin)}` : '—',
-    d.plage ? `${Math.round(d.plage.part * 100)} % de ses messages` : 'pas encore de données'
+    d.plage ? g('m_part', { p: Math.round(d.plage.part * 100) }) : g('m_pas_donnees')
   );
   tuile(
     ctx,
@@ -250,9 +251,9 @@ async function genererGraphiqueMembre(d) {
     y,
     lt,
     104,
-    'Salon préféré',
+    g('m_salon'),
     d.salons[0] ? tronquerTuile(ctx, `# ${d.salons[0].nom}`) : '—',
-    d.salons[0] ? `${nb(d.salons[0].messages)} messages` : 'pas encore de données'
+    d.salons[0] ? g('n_messages', { n: nb(d.salons[0].messages) }) : g('m_pas_donnees')
   );
   y += 104 + 16;
 
@@ -267,7 +268,7 @@ async function genererGraphiqueMembre(d) {
   ctx.fillStyle = C.texteDiscret;
   ctx.font = `11px "${P}", sans-serif`;
   ctx.fillText(
-    `${nb(total)} messages situés dans la journée · le suivi par heure a démarré après le comptage total`,
+    g('m_note', { n: nb(total) }),
     MARGE + 2,
     H - MARGE + 16
   );

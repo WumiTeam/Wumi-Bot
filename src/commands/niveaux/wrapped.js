@@ -52,7 +52,7 @@ module.exports = {
       components: [C.conteneur([
         C.texte(`### 🎁 ${texte}${bascule ? `\n-# ${t('wrapped.bascule')}` : ''}`),
         C.image('attachment://wumi-wrapped.png'),
-      ], 0x62b8ff)],
+      ], 0xff9d1b)],
       files: [fichier],
       flags: MessageFlags.IsComponentsV2,
       allowedMentions: { parse: [] },

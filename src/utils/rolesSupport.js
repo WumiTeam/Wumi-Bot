@@ -133,7 +133,7 @@ function panneauBeta(t) {
       new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('srole_beta').setEmoji('🧪').setLabel(t('support.roles.beta_bouton')).setStyle(ButtonStyle.Primary),
       ),
-    ], 0x8b7cf6)],
+    ], 0xff9d1b)],
     flags: MessageFlags.IsComponentsV2,
   };
 }

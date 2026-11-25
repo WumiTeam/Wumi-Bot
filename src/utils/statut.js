@@ -55,6 +55,8 @@ async function releve(client) {
 
   return {
     version: 1,
+    // 3.0 : la version du bot, affichee sur la page de statut.
+    versionBot: require('../../package.json').version,
     enLigne: Boolean(client?.isReady?.()),
     date: Date.now(),
     serveurs,

@@ -105,12 +105,10 @@ module.exports = {
       return interaction.editReply(C.erreur(t('ban.impossible', { erreur: e.message })));
     }
 
-    return interaction.editReply(C.succes(
-      (duree
-        ? t('ban.fait_temporaire', { membre: cible.tag, duree: enDuree(duree) })
-        : t('ban.fait', { membre: cible.tag }))
-      + `\n> ${t('sanction.raison', { raison })}`
-      + `\n-# ${t('sanction.numero', { n: id })}`
-    ));
+    return interaction.editReply(require('../../utils/recuSanction').recuSanction({
+      t, type: 'ban', cible, moderateur: interaction.user, raison, id,
+      titre: duree ? t('ban.fait_temporaire', { membre: cible.tag, duree: enDuree(duree) }) : t('ban.fait', { membre: cible.tag }),
+      duree: duree ? enDuree(duree) : null,
+    }));
   },
 };

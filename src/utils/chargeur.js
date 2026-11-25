@@ -55,6 +55,8 @@ function chargerCommandes(client, rechargement = false) {
           continue;
         }
         commande.categorie = path.basename(path.dirname(chemin));
+        // 2.35 : une edition ne charge que ses modules.
+        if (!require('../edition').commandeAutorisee(commande.categorie, entree.name.replace(/\.js$/, ''), commande.data.name)) continue;
         trouvees.set(commande.data.name, commande);
       } catch (e) {
         // Une commande cassee ne doit pas emporter les autres : on la note et

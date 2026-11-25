@@ -43,6 +43,7 @@ const DOSSIER_ASTRO = path.join(__dirname, 'astro');
 
 let serveur = null;
 let cacheCommandes = null;
+let cacheVitrine = null; // la banderole du site : dix minutes de cache
 let cacheStatut = null; // la page de statut est publique : une minute de cache suffit
 
 // ------------------------------------------------------------- LIMITEUR
@@ -218,6 +219,8 @@ async function astro(req, res, url, client) {
       const uid = session();
       if (req.method === 'GET') {
         const j = A.q.joueur.get(uid);
+        // Le jeu recharge : il connait maintenant les pieces converties.
+        if (j?.a_deduire) A.q.remettreADeduire.run(uid);
         let save = null;
         try { save = j?.save ? JSON.parse(j.save) : null; } catch { save = null; }
         return envoyer(res, 200, { save });
@@ -233,6 +236,16 @@ async function astro(req, res, url, client) {
         if (j) A.q.ecrireJoueur.run({ ...j, save: null, rev: j.rev + 1, maj_le: Date.now() });
         return envoyer(res, 200, { ok: true });
       }
+    }
+
+    // Wumi 2.21 : chaque partie terminee, pour le defi de la semaine.
+    if (route === 'POST /api/run') {
+      const uid = session();
+      const corps = await lireCorps(req, 1024);
+      const r = await require('../utils/defiHebdo').enregistrer(client, uid, {
+        niveau: Number(corps?.level), temps: Number(corps?.timeMs), etoiles: Number(corps?.stars ?? 0),
+      }, contexte());
+      return envoyer(res, 200, { ok: true, challenge: r.compte, rank: r.rang ?? null });
     }
 
     const lb = chemin.match(/^\/api\/leaderboard\/(\d{1,3})$/);
@@ -354,6 +367,43 @@ function routes(client, { toutDash = false } = {}) {
           'X-Content-Type-Options': 'nosniff',
         });
         return res.end(cacheCommandes.corps);
+      }
+
+      // ------------------------------------------------------- VITRINE
+      // Lu par wumi.fr (banderole des serveurs) : seulement les serveurs qui
+      // l'ont accepte dans /config. Nom, icone, membres : rien de prive.
+      if (url.pathname === '/api/vitrine') {
+        if (req.method === 'OPTIONS') {
+          res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET' });
+          return res.end();
+        }
+        if (req.method !== 'GET') return envoyer(res, 405, { erreur: 'methode' });
+        if (!cacheVitrine || Date.now() - cacheVitrine.date > 600_000) {
+          cacheVitrine = { date: Date.now(), corps: JSON.stringify({ serveurs: await require('../utils/vitrine').liste(client) }) };
+        }
+        res.writeHead(200, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=600',
+          'X-Content-Type-Options': 'nosniff',
+        });
+        return res.end(cacheVitrine.corps);
+      }
+
+      // 2.40 : les avis publies, pour wumi.fr (publics par nature).
+      if (url.pathname === '/api/avis') {
+        if (req.method === 'OPTIONS') {
+          res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET' });
+          return res.end();
+        }
+        if (req.method !== 'GET') return envoyer(res, 405, { erreur: 'methode' });
+        res.writeHead(200, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=300',
+          'X-Content-Type-Options': 'nosniff',
+        });
+        return res.end(require('../utils/avis').publics());
       }
 
       if (req.method === 'GET' && url.pathname === '/api/config') {

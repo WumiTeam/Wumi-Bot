@@ -5,7 +5,7 @@ const { rectArrondi, cercleImage, tronquerTexte, eclaircir, assombrir } = requir
 const { dessinerFond } = require('./fondCarte');
 const themes = require('./themesRank');
 const { dessinerEtoiles } = require('./carteRank');
-const { formaterNombre, abreger } = require('./outils');
+const { formaterNombre, abreger: abregerBase } = require('./outils');
 const { dessinerPiece } = require('./pieceWumi');
 
 const L = 1000;
@@ -75,10 +75,14 @@ function statistique(ctx, x, y, l, h, theme, intitule, valeur, complement, piece
  * @param {string[]} [d.roles]        noms des roles a afficher
  * @param {string} [d.accent]         couleur du role (theme Nature seulement)
  * @param {object} [d.theme]
+ * @param {string} [d.fondPerso]     image de fond (membre, ou serveur premium)
  * @returns {Promise<Buffer>} PNG
  */
 async function genererCarteProfil(d) {
   chargerPolices();
+  // 2.24 : les libelles de la carte dans la langue du serveur.
+  const g = (cle, v) => require('./langues').t(`carte_profil.${cle}`, d.langue ?? 'fr', v);
+  const abreger = (n) => abregerBase(n, d.langue ?? 'fr');
 
   const theme = d.theme ?? themes.parCle(themes.CLE_DEFAUT);
   const role = theme.suitLeRole ? d.accent : null;
@@ -89,7 +93,7 @@ async function genererCarteProfil(d) {
   const ctx = canvas.getContext('2d');
   ctx.textBaseline = 'alphabetic';
 
-  await dessinerFond(ctx, L, H, 28, theme.voile, conf.carte.miroirRank, theme);
+  await dessinerFond(ctx, L, H, 28, theme.voile, d.fondPerso ? false : conf.carte.miroirRank, theme, d.fondPerso ?? null);
 
   rectArrondi(ctx, 1.5, 1.5, L - 3, H - 3, 27);
   ctx.strokeStyle = theme.bordure;
@@ -158,7 +162,7 @@ async function genererCarteProfil(d) {
   // Roles : petites pastilles, seulement ce qui rentre. Le nombre de badges
   // prend la premiere place : la police embarquee n'a pas d'emoji, et le
   // detail se lit dans /badges.
-  const pastilles = [...(d.badges?.length ? [`${d.badges.length} badge${d.badges.length > 1 ? 's' : ''}`] : []), ...(d.roles ?? [])];
+  const pastilles = [...(d.badges?.length ? [g('badges', { n: d.badges.length })] : []), ...(d.roles ?? [])];
   if (pastilles.length) {
     let x = xTexte;
     const y = ay + 96;
@@ -179,7 +183,7 @@ async function genererCarteProfil(d) {
   const droite = L - 44;
   ctx.textAlign = 'right';
   ctx.font = `22px "${P} Medium", sans-serif`;
-  const lNiveau = ctx.measureText('NIVEAU ').width;
+  const lNiveau = ctx.measureText(`${g('niveau')} `).width;
   ctx.font = `52px "${P} Bold", sans-serif`;
   const lValeur = ctx.measureText(String(d.niveau)).width;
 
@@ -187,7 +191,7 @@ async function genererCarteProfil(d) {
   ctx.fillText(String(d.niveau), droite, ay + 46);
   ctx.font = `22px "${P} Medium", sans-serif`;
   ctx.fillStyle = theme.texteSecondaire;
-  ctx.fillText('NIVEAU', droite - lValeur - 12, ay + 46);
+  ctx.fillText(g('niveau'), droite - lValeur - 12, ay + 46);
 
   ctx.font = `36px "${P} Bold", sans-serif`;
   ctx.fillStyle = theme.texte;
@@ -197,7 +201,7 @@ async function genererCarteProfil(d) {
   ctx.fillText(texteRang, xRang, ay + 42);
   ctx.font = `18px "${P} Medium", sans-serif`;
   ctx.fillStyle = theme.texteSecondaire;
-  ctx.fillText('RANG', xRang - lRang - 10, ay + 42);
+  ctx.fillText(g('rang'), xRang - lRang - 10, ay + 42);
   ctx.textAlign = 'left';
 
   // ============================================================ BARRE XP
@@ -209,9 +213,9 @@ async function genererCarteProfil(d) {
 
   ctx.font = `17px "${P}", sans-serif`;
   ctx.fillStyle = theme.texteSecondaire;
-  ctx.fillText(`${abreger(d.xpTotal)} XP au total`, bx, by - 12);
+  ctx.fillText(g('xp_total', { n: abreger(d.xpTotal) }), bx, by - 12);
   ctx.textAlign = 'right';
-  ctx.fillText(`${Math.floor(progression * 100)} % du niveau ${d.niveau + 1}`, bx + bl, by - 12);
+  ctx.fillText(g('progression', { p: Math.floor(progression * 100), n: d.niveau + 1 }), bx + bl, by - 12);
   ctx.textAlign = 'left';
 
   rectArrondi(ctx, bx, by, bl, bh, bh / 2);
@@ -253,7 +257,7 @@ async function genererCarteProfil(d) {
   const heures = Math.floor((d.minutesVocal ?? 0) / 60);
   const vocal = heures >= 1 ? `${formaterNombre(heures)} h` : `${d.minutesVocal ?? 0} min`;
 
-  statistique(ctx, marge, yTuile, lTuile, hTuile, theme, 'Messages', abreger(d.messages ?? 0), `${vocal} en vocal`);
+  statistique(ctx, marge, yTuile, lTuile, hTuile, theme, g('messages'), abreger(d.messages ?? 0), g('en_vocal', { v: vocal }));
   statistique(
     ctx,
     marge + lTuile + ecart,
@@ -261,9 +265,9 @@ async function genererCarteProfil(d) {
     lTuile,
     hTuile,
     theme,
-    d.monnaie || 'Solde',
+    d.monnaie || g('solde'),
     abreger(d.solde ?? 0),
-    `rang #${d.rangSolde ?? '?'} au solde`,
+    g('rang_solde', { n: d.rangSolde ?? '?' }),
     true
   );
   statistique(
@@ -273,9 +277,9 @@ async function genererCarteProfil(d) {
     lTuile,
     hTuile,
     theme,
-    'Invitations',
+    g('invitations'),
     formaterNombre(d.invitations ?? 0),
-    d.invitations ? 'membres amenes' : 'personne encore'
+    d.invitations ? g('amenes') : g('personne')
   );
   statistique(
     ctx,
@@ -284,9 +288,9 @@ async function genererCarteProfil(d) {
     lTuile,
     hTuile,
     theme,
-    'Sur le serveur',
+    g('sur_serveur'),
     d.anciennete || '—',
-    d.avertissements ? `${d.avertissements} avertissement${d.avertissements > 1 ? 's' : ''}` : 'aucun avertissement'
+    d.avertissements ? g('avertissements', { n: d.avertissements }) : g('aucun_avertissement')
   );
 
   // ============================================================ MISSIONS
@@ -298,7 +302,7 @@ async function genererCarteProfil(d) {
     const part = d.missions.faites / d.missions.total;
     ctx.font = `15px "${P} Medium", sans-serif`;
     ctx.fillStyle = theme.texteSecondaire;
-    ctx.fillText('MISSIONS DU JOUR', marge + 16, y + 26);
+    ctx.fillText(g('missions'), marge + 16, y + 26);
 
     ctx.font = `15px "${P} Bold", sans-serif`;
     ctx.fillStyle = theme.texte;
@@ -306,7 +310,7 @@ async function genererCarteProfil(d) {
     // Pas d'emoji ici : la police embarquee n'en contient pas et
     // le rendu afficherait un carre vide.
     ctx.fillText(
-      part >= 1 ? 'toutes accomplies' : `${d.missions.faites} sur ${d.missions.total}`,
+      part >= 1 ? g('toutes') : g('sur', { a: d.missions.faites, b: d.missions.total }),
       L - marge - 16,
       y + 26
     );

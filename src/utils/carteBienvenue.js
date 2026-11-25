@@ -148,14 +148,14 @@ async function carteDesign(d) {
   const L = 1000;
   const H = 400;
   const design = d.design;
-  const accent = design.couleur || '#58a6ff';
+  const accent = design.couleur || '#ff9d1b';
   const canvas = createCanvas(L, H);
   const ctx = canvas.getContext('2d');
 
   ctx.save();
   rectArrondi(ctx, 0, 0, L, H, 30);
   ctx.clip();
-  ctx.fillStyle = '#0b0e1c';
+  ctx.fillStyle = '#120d08';
   ctx.fillRect(0, 0, L, H);
   let fond = null;
   if (design.fond && fs.existsSync(design.fond)) {
@@ -166,7 +166,7 @@ async function carteDesign(d) {
   } else {
     const g = ctx.createRadialGradient(L * 0.2, H * 0.1, 10, L * 0.2, H * 0.1, 700);
     g.addColorStop(0, `${accent}aa`);
-    g.addColorStop(1, 'rgba(11,14,28,0)');
+    g.addColorStop(1, 'rgba(20,14,8,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, L, H);
   }
@@ -174,8 +174,8 @@ async function carteDesign(d) {
   const voile = design.style === 'gauche'
     ? ctx.createLinearGradient(0, 0, L, 0)
     : ctx.createLinearGradient(0, 0, 0, H);
-  voile.addColorStop(0, design.style === 'gauche' ? 'rgba(8,10,20,0.78)' : 'rgba(8,10,20,0.25)');
-  voile.addColorStop(1, design.style === 'gauche' ? 'rgba(8,10,20,0.15)' : 'rgba(8,10,20,0.75)');
+  voile.addColorStop(0, design.style === 'gauche' ? 'rgba(16,11,6,0.78)' : 'rgba(16,11,6,0.25)');
+  voile.addColorStop(1, design.style === 'gauche' ? 'rgba(16,11,6,0.15)' : 'rgba(16,11,6,0.75)');
   ctx.fillStyle = voile;
   ctx.fillRect(0, 0, L, H);
   ctx.restore();

@@ -50,10 +50,10 @@ function tirer(reserve, combien, cle) {
 /** Les deux periodes actives et leurs missions. */
 function periodes(guildId) {
   return [
-    { nom: 'jour', titre: 'Missions du jour', id: jour(), liste: tirer(M.reserveJour ?? [], M.parJour ?? 3, `${guildId}-${jour()}`) },
+    { nom: 'jour', titre: require('./langues').t('missions.periode_jour', require('./langues').langueDe(guildId)), id: jour(), liste: tirer(M.reserveJour ?? [], M.parJour ?? 3, `${guildId}-${jour()}`) },
     {
       nom: 'semaine',
-      titre: 'Missions de la semaine',
+      titre: require('./langues').t('missions.periode_semaine', require('./langues').langueDe(guildId)),
       id: semaine(),
       liste: tirer(M.reserveSemaine ?? [], M.parSemaine ?? 2, `${guildId}-${semaine()}`),
     },

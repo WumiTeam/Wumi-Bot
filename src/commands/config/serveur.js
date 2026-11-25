@@ -170,6 +170,37 @@ module.exports = {
                 .setMaxLength(90)
             )
         )
+        // 2.35 : un pack de salons statistiques tout pret, dans sa categorie.
+        .addSubcommand((s) =>
+          s
+            .setName('pack')
+            .setDescription(tr('serveur.sous_pack', DEFAUT))
+            .setDescriptionLocalizations(localisations('serveur.sous_pack'))
+            .addStringOption((o) =>
+              o
+                .setName('style')
+                .setDescription(tr('serveur.opt_style', DEFAUT))
+                .setDescriptionLocalizations(localisations('serveur.opt_style'))
+                .setRequired(true)
+                .addChoices(...['elegant', 'minimal', 'points'].map((v) => ({ name: tr(`serveur.style_${v}`, DEFAUT), name_localizations: localisations(`serveur.style_${v}`), value: v })))
+            )
+            .addStringOption((o) =>
+              o
+                .setName('link1')
+                .setNameLocalizations({ fr: 'lien1' })
+                .setDescription(tr('serveur.opt_lien', DEFAUT))
+                .setDescriptionLocalizations(localisations('serveur.opt_lien'))
+                .setMaxLength(60)
+            )
+            .addStringOption((o) =>
+              o
+                .setName('link2')
+                .setNameLocalizations({ fr: 'lien2' })
+                .setDescription(tr('serveur.opt_lien', DEFAUT))
+                .setDescriptionLocalizations(localisations('serveur.opt_lien'))
+                .setMaxLength(60)
+            )
+        )
         .addSubcommand((s) =>
           s
             .setName('remove')
@@ -207,7 +238,7 @@ module.exports = {
     const sous = interaction.options.getSubcommand();
     if (!interaction.guild) {
   return interaction.reply({
-    content: "Cette commande ne peut être utilisée que dans un serveur.",
+    content: require('../../utils/langues').t('commun.serveur_uniquement', 'en'),
     ephemeral: true,
   });
 }
@@ -296,6 +327,49 @@ const guildId = interaction.guild.id;
       return interaction.editReply(C.succes(
         t('serveur.stats_actualisees', { n }) + (n === 0 ? `\n-# ${t('serveur.stats_rien_a_faire')}` : '')
       ));
+    }
+
+    if (sous === 'pack') {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      const mots = { m: t('serveur.stats_mot_membres'), e: t('serveur.stats_mot_enligne'), b: t('serveur.stats_mot_boosts') };
+      const maj = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+      const STYLES = {
+        elegant: [`🧭 ${maj(mots.m)} : {membres}`, `🟢 ${maj(mots.e)} : {enligne}`, `💎 ${maj(mots.b)} : {boosts}`],
+        minimal: ['👥 {membres}', '🟢 {enligne}', '🚀 {boosts}'],
+        points: [`・${maj(mots.m)}・{membres}`, `・${maj(mots.e)}・{enligne}`, `・${maj(mots.b)}・{boosts}`],
+      };
+      const style = interaction.options.getString('style');
+      const liens = ['link1', 'link2'].map((x) => interaction.options.getString(x)).filter(Boolean);
+      const verrou = [{ id: interaction.guild.roles.everyone.id, deny: [PermissionFlagsBits.Connect] }];
+      const crees = [];
+      try {
+        const categorie = await interaction.guild.channels.create({
+          name: `📊 ${t('serveur.stats_pack_categorie')}`,
+          type: ChannelType.GuildCategory,
+          position: 0,
+          reason: `Pack de statistiques (${interaction.user.tag})`,
+        });
+        for (const modele of STYLES[style] ?? STYLES.elegant) {
+          const salon = await interaction.guild.channels.create({
+            name: statistiques.rendre(modele, interaction.guild), type: ChannelType.GuildVoice, parent: categorie.id, permissionOverwrites: verrou,
+          });
+          req.ajouterStatSalon.run(guildId, salon.id, modele);
+          crees.push(salon.name);
+        }
+        // Les liens ne bougent pas : de simples salons verrouilles, non suivis.
+        for (const lien of liens) {
+          const salon = await interaction.guild.channels.create({
+            name: `${style === 'points' ? '・' : '🔗 '}${lien}`.slice(0, 100), type: ChannelType.GuildVoice, parent: categorie.id, permissionOverwrites: verrou,
+          });
+          crees.push(salon.name);
+        }
+      } catch (e) {
+        return interaction.editReply(C.erreur(t('serveur.stats_creation_impossible', { erreur: e.message })));
+      }
+      return interaction.editReply(C.succes(t('serveur.stats_pack_ok', {
+        liste: crees.map((x) => `\`${x}\``).join(' · '),
+        minutes: Math.max(10, conf.statistiques.intervalleMinutes),
+      })));
     }
 
     if (sous === 'remove') {

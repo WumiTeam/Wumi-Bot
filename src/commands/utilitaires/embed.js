@@ -107,9 +107,9 @@ function contenuDe(b) {
 /** Modeles livres avec Wumi : un bon point de depart, a adapter. */
 function modelesIntegres(t) {
   return {
-    'wumi:annonce': { ...vierge(), titre: t('emb.m_annonce_titre'), description: t('emb.m_annonce_texte'), couleur: 0x66bcff, pied: t('emb.m_annonce_pied') },
+    'wumi:annonce': { ...vierge(), titre: t('emb.m_annonce_titre'), description: t('emb.m_annonce_texte'), couleur: 0xff9d1b, pied: t('emb.m_annonce_pied') },
     'wumi:regles': {
-      ...vierge(), titre: t('emb.m_regles_titre'), description: t('emb.m_regles_texte'), couleur: 0xdce3ff,
+      ...vierge(), titre: t('emb.m_regles_titre'), description: t('emb.m_regles_texte'), couleur: 0xff9d1b,
       sections: [1, 2, 3, 4].map((n) => ({ titre: t(`emb.m_regles_s${n}_titre`), texte: t(`emb.m_regles_s${n}_texte`) })),
       pied: t('emb.m_regles_pied'),
     },

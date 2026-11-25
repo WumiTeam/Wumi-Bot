@@ -124,11 +124,8 @@ module.exports = {
       }
     }
 
-    return interaction.editReply(C.succes(
-      t('warn.fait', { membre: cible.tag, n: total })
-      + `\n> ${t('sanction.raison', { raison })}`
-      + suite
-      + `\n-# ${t('sanction.numero', { n: id })}`
-    ));
+    return interaction.editReply(require('../../utils/recuSanction').recuSanction({
+      t, type: 'warn', titre: t('warn.fait', { membre: cible.tag, n: total }), cible, moderateur: interaction.user, raison, id, suite,
+    }));
   },
 };

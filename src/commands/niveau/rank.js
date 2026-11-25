@@ -58,6 +58,7 @@ module.exports = {
     const couleurRole = membre?.displayHexColor && membre.displayHexColor !== '#000000' ? membre.displayHexColor : null;
 
     const donnees = {
+      langue: require('../../utils/langues').langueDe(interaction.guild.id),
       pseudo: membre?.displayName ?? cible.username,
       tag: cible.username,
       avatarUrl: cible.displayAvatarURL({ extension: 'png', size: 256 }),

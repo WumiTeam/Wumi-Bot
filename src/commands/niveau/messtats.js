@@ -55,6 +55,7 @@ module.exports = {
     const pseudo = membre?.displayName ?? cible.username;
 
     const png = await genererGraphiqueMembre({
+      langue: require('../../utils/langues').langueDe(guildId),
       pseudo,
       serveur: interaction.guild.name,
       avatarUrl: cible.displayAvatarURL({ extension: 'png', size: 128 }),

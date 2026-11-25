@@ -97,16 +97,26 @@ function tailleBase() {
 // ------------------------------------------------- COPIE HORS DU SERVEUR
 /**
  * Les copies du dossier data/sauvegardes sont sur le MEME disque que la base :
- * si ce disque lache, tout part ensemble. Une fois par semaine, on envoie donc
- * la derniere copie, compressee, en message prive a chaque fondateur
- * (OWNER_IDS), ou dans le salon SAUVEGARDE_SALON s'il est defini.
+ * si ce disque lache, tout part ensemble. Une fois par jour (Wumi 2.21 ;
+ * c'etait une fois par semaine), on envoie donc la derniere copie en message
+ * prive a chaque fondateur (OWNER_IDS), ou dans le salon SAUVEGARDE_SALON.
+ *
+ * La copie envoyee est COMPRESSEE puis CHIFFREE (AES-256-GCM, avec la cle
+ * CHIFFREMENT_CLE du .env) : le fichier qui dort sur Discord est illisible
+ * sans la cle. Pour restaurer : node outils/restaurer-sauvegarde.js fichier.
+ *
+ * La cle n'est JAMAIS envoyee. Le message montre seulement son empreinte (les
+ * 8 premiers caracteres de son SHA-256) : elle permet de verifier que la cle
+ * rangee dans ton gestionnaire de mots de passe est bien la bonne.
  *
  * La date du dernier envoi est notee dans un petit fichier du dossier : un
  * redemarrage ne declenche pas un deuxieme envoi.
  */
-const SEMAINE_MS = 7 * 86_400_000;
+const { emballer, deballer, empreinteCle } = require('./sauvegardesFormat');
+
 const LIMITE_OCTETS = 9.5 * 1024 * 1024; // les bots ne peuvent pas envoyer plus de 10 Mo
 const fichierEnvoi = () => path.join(assurerDossier(), '.dernier-envoi');
+const intervalleEnvoi = () => (conf.sauvegardes.envoiHeures ?? 24) * 3_600_000;
 
 function dernierEnvoi() {
   try {
@@ -117,25 +127,34 @@ function dernierEnvoi() {
 }
 
 async function envoyerHorsServeur(client, { forcer = false } = {}) {
-  if (!forcer && Date.now() - dernierEnvoi() < SEMAINE_MS) return null;
+  if (!forcer && Date.now() - dernierEnvoi() < intervalleEnvoi()) return null;
   const copie = lister()[0];
   if (!copie) return null;
 
-  const zlib = require('node:zlib');
   const { AttachmentBuilder } = require('discord.js');
   const brut = fs.readFileSync(copie.chemin);
-  const gz = zlib.gzipSync(brut, { level: 9 });
+  let paquet;
+  try {
+    paquet = emballer(brut);
+  } catch (e) {
+    logger.erreur('Sauvegarde hors serveur : chiffrement impossible :', e.message);
+    return null;
+  }
   const date = new Date(copie.date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
   const taille = (n) => `${(n / 1024 / 1024).toFixed(2)} Mo`;
+  const empreinte = empreinteCle();
 
-  const texte = gz.length <= LIMITE_OCTETS
-    ? `🗄️ **Sauvegarde hebdomadaire de Wumi** · ${date}\n`
-      + `Base : ${taille(brut.length)} · compressée : ${taille(gz.length)}\n`
-      + '-# Garde ce fichier en lieu sûr. Pour restaurer : décompresse-le (7-Zip), renomme-le en zhaak.db et remplace data/zhaak.db, bot arrêté.'
-    : `⚠️ **Sauvegarde hebdomadaire de Wumi** · ${date}\n`
-      + `La copie compressée fait ${taille(gz.length)} : trop lourde pour Discord (10 Mo max). `
+  const texte = paquet.length <= LIMITE_OCTETS
+    ? `🗄️ **Sauvegarde quotidienne de Wumi** · ${date}\n`
+      + `Base : ${taille(brut.length)} · envoyée : ${taille(paquet.length)} (compressée et chiffrée)\n`
+      + `Clé de chiffrement : empreinte \`${empreinte}\`\n`
+      + '-# Ce fichier est illisible sans la clé CHIFFREMENT_CLE du .env : garde-la dans ton gestionnaire de mots de passe. '
+      + 'Pour restaurer : `node outils/restaurer-sauvegarde.js fichier.wumibak`, bot arrêté.'
+    : `⚠️ **Sauvegarde quotidienne de Wumi** · ${date}\n`
+      + `La copie chiffrée fait ${taille(paquet.length)} : trop lourde pour Discord (10 Mo max). `
       + 'Récupère-la à la main avec WinSCP dans `data/sauvegardes/`.';
-  const fichiers = gz.length <= LIMITE_OCTETS ? [new AttachmentBuilder(gz, { name: `${copie.nom}.gz` })] : [];
+  const nomFichier = copie.nom.replace(/\.db$/, '.wumibak');
+  const fichiers = paquet.length <= LIMITE_OCTETS ? [new AttachmentBuilder(paquet, { name: nomFichier })] : [];
 
   const destinations = [];
   const salonId = String(process.env.SAUVEGARDE_SALON ?? '').trim();
@@ -156,14 +175,14 @@ async function envoyerHorsServeur(client, { forcer = false } = {}) {
       await d.send({ content: texte, files: fichiers });
       ok++;
     } catch (e) {
-      logger.avertissement('Envoi de la sauvegarde hebdomadaire :', e.message);
+      logger.avertissement('Envoi de la sauvegarde quotidienne :', e.message);
     }
   }
   if (ok) {
     fs.writeFileSync(fichierEnvoi(), String(Date.now()));
-    logger.succes(`Sauvegarde hebdomadaire envoyée (${ok} destinataire(s), ${taille(gz.length)}).`);
+    logger.succes(`Sauvegarde quotidienne envoyée (${ok} destinataire(s), ${taille(paquet.length)}).`);
   }
-  return { ok, taille: gz.length, trop: gz.length > LIMITE_OCTETS };
+  return { ok, taille: paquet.length, trop: paquet.length > LIMITE_OCTETS };
 }
 
-module.exports = { creer, lister, nettoyer, derniere, sauvegardeAutomatique, tailleBase, dossier, assurerDossier, envoyerHorsServeur, dernierEnvoi };
+module.exports = { creer, lister, nettoyer, derniere, sauvegardeAutomatique, tailleBase, dossier, assurerDossier, envoyerHorsServeur, dernierEnvoi, emballer, deballer, empreinteCle };

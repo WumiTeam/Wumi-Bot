@@ -7,14 +7,48 @@ const logger = require('./logger');
 const { E } = require('./emojis');
 
 // Une fonction : l'emoji du bot n'existe qu'apres la connexion a Discord.
-const MESSAGE_DEFAUT = () =>
-  `Merci {mention} pour ton boost ! ${E('boost')}\n**{serveur}** compte maintenant **{boosts}** boost(s), niveau **{niveau}**.`;
+// 2.24 : dans la langue du serveur ; {mention} et la suite sont remplaces ensuite.
+const MESSAGE_DEFAUT = (guildId) =>
+  require('./langues').t('boost.message_defaut', require('./langues').langueDe(guildId)).replace('{emoji}', E('boost'));
 
 /** Remplace les variables du message de remerciement. */
 function texteRemerciement(modele, membre) {
-  return remplacerVariables(modele || MESSAGE_DEFAUT(), { membre, guild: membre.guild })
+  return remplacerVariables(modele || MESSAGE_DEFAUT(membre.guild.id), { membre, guild: membre.guild })
     .replaceAll('{boosts}', String(membre.guild.premiumSubscriptionCount ?? 0))
     .replaceAll('{niveau}', String(membre.guild.premiumTier ?? 0));
+}
+
+/**
+ * 2.28 : le message d'annonce d'un boost. Le texte de remerciement au-dessus
+ * (il mentionne le membre), la carte image dessous, comme une montee de
+ * niveau. Renvoie null si la carte echoue (l'appelant garde l'encadre).
+ */
+async function messageCarte(membre, cfg, role = null, extras = []) {
+  try {
+    const { t } = require('./langues').traducteur(membre.guild);
+    const png = await require('./carteBoost').genererCarteBoost({
+      pseudo: membre.displayName ?? membre.user.username,
+      avatarUrl: membre.displayAvatarURL({ extension: 'png', size: 256 }),
+      boosts: membre.guild.premiumSubscriptionCount ?? 0,
+      palier: membre.guild.premiumTier ?? 0,
+      serveur: membre.guild.name,
+      roles: role ? [role.name] : [],
+      textes: {
+        titre: t('boost.carte.titre'),
+        boosts: t('boost.carte.boosts'),
+        barre: t('boost.carte.barre'),
+        max: t('boost.carte.max'),
+        badge: t('boost.carte.badge'),
+        role: t('boost.carte.role'),
+      },
+    });
+    const texte = [texteRemerciement(cfg.boost_message, membre), ...extras.map((e) => `-# ${e}`)].join('\n');
+    const { AttachmentBuilder } = require('discord.js');
+    return { content: texte, files: [new AttachmentBuilder(png, { name: 'boost.png' })], allowedMentions: { users: [membre.id] } };
+  } catch (e) {
+    logger.avertissement('Carte de boost :', e.message);
+    return null;
+  }
 }
 
 /** Un membre vient de booster : remerciement, role et monnaie. */
@@ -56,7 +90,8 @@ async function traiterBoost(membre) {
 
   const salon = cfg.boost_salon ? membre.guild.channels.cache.get(cfg.boost_salon) : null;
   if (salon?.isTextBased()) {
-    await salon.send({ content: `${membre}`, embeds: [embed] }).catch(() => null);
+    const message = await messageCarte(membre, cfg, role, extras);
+    await salon.send(message ?? { content: `${membre}`, embeds: [embed] }).catch(() => null);
   }
 
   await envoyerLog(membre.guild, 'membres', embed);
@@ -84,4 +119,4 @@ async function traiterFinBoost(membre) {
   );
 }
 
-module.exports = { MESSAGE_DEFAUT, texteRemerciement, traiterBoost, traiterFinBoost };
+module.exports = { MESSAGE_DEFAUT, texteRemerciement, messageCarte, traiterBoost, traiterFinBoost };

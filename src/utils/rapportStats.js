@@ -83,7 +83,7 @@ async function construire(guild, apercu = false) {
 
   const options = {};
   try {
-    const png = await genererGraphique({ serveur: guild.name, serie: semaine, salons, heures, avant });
+    const png = await genererGraphique({ langue: require('./langues').langueDe(guild.id), serveur: guild.name, serie: semaine, salons, heures, avant });
     options.files = [new AttachmentBuilder(png, { name: 'semaine.png' })];
     blocs.push(C.image('attachment://semaine.png'));
   } catch (e) {

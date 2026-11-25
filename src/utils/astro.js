@@ -54,7 +54,15 @@ CREATE TABLE IF NOT EXISTS astro_recompenses (
 );
 `);
 
+// Wumi 2.21 : pieces converties en monnaie du serveur, pas encore connues du
+// jeu ouvert (voir convertir()).
+if (!db.prepare('PRAGMA table_info(astro_joueurs)').all().some((c) => c.name === 'a_deduire')) {
+  db.exec('ALTER TABLE astro_joueurs ADD COLUMN a_deduire INTEGER NOT NULL DEFAULT 0');
+}
+
 const q = {
+  majPieces: db.prepare('UPDATE astro_joueurs SET save = ?, rev = rev + 1, a_deduire = a_deduire + ?, maj_le = ? WHERE user_id = ?'),
+  remettreADeduire: db.prepare('UPDATE astro_joueurs SET a_deduire = 0 WHERE user_id = ?'),
   joueur: db.prepare('SELECT * FROM astro_joueurs WHERE user_id = ?'),
   ecrireJoueur: db.prepare(`
     INSERT INTO astro_joueurs (user_id, nom, avatar, save, rev, maj_le) VALUES (@user_id, @nom, @avatar, @save, @rev, @maj_le)
@@ -202,6 +210,9 @@ const etoiles = (n) => '★'.repeat(n) + '☆'.repeat(Math.max(0, 3 - n));
  */
 async function sauvegarder(client, uid, donnees, contexte = {}) {
   const avant = q.joueur.get(uid);
+  // Le jeu ouvert ignore les pieces converties depuis son chargement : on les
+  // retire de ce qu'il envoie (voir convertir()).
+  if (avant?.a_deduire) donnees.coins = Math.max(0, donnees.coins - avant.a_deduire);
   let ancienne = null;
   try { ancienne = avant?.save ? JSON.parse(avant.save) : null; } catch { ancienne = null; }
   q.ecrireJoueur.run({
@@ -269,7 +280,7 @@ async function annoncer(guild, membre, a) {
   if (a.recompense?.argent) gains.push(require('./economie').somme(guild.id, a.recompense.argent));
   await salon.send(C.envoi([C.conteneur([
     C.sectionVignette(
-      `### 🚀 ${t(a.recordServeur ? 'astro.annonce_record' : 'astro.annonce_fini', { membre: `${membre}`, niveau: a.niveau, nom: NIVEAUX[a.niveau] })}\n`
+      `### 🚀 ${t(a.recordServeur ? 'astro.annonce_record' : 'astro.annonce_fini', { membre: `${membre}`, niveau: a.niveau, nom: t(`donnees.niveaux_run.${a.niveau}`) })}\n`
       + `⏱️ **${formaterTemps(a.temps)}** · ${etoiles(a.etoiles)}${gains.length ? ` · 🎁 ${gains.join(' · ')}` : ''}`,
       membre.displayAvatarURL({ size: 128 })
     ),
@@ -277,7 +288,39 @@ async function annoncer(guild, membre, a) {
   ], 0xffc93c)], { allowedMentions: { parse: [] } }));
 }
 
+// ------------------------------------------------------------ CONVERSION
+/**
+ * Convertit des pieces du jeu en monnaie du serveur (Wumi 2.21).
+ * Les pieces sont retirees de la sauvegarde tout de suite. Si le jeu est
+ * ouvert a ce moment, il ne le sait pas encore : `a_deduire` note la
+ * difference, retiree de ses prochains envois jusqu'a ce qu'il recharge la
+ * sauvegarde (GET /api/save remet le compteur a zero).
+ *
+ * @returns {{ ok: true, montant, gain, reste } | { ok: false, raison }}
+ */
+function convertir(guildId, uid, demande = null) {
+  let cfg;
+  try { cfg = config(guildId); } catch { return { ok: false, raison: 'config' }; }
+  if (!cfg.eco_actif) return { ok: false, raison: 'economie' };
+  const taux = Number(cfg.astro_taux ?? 1);
+  if (!taux) return { ok: false, raison: 'coupee' };
+  const j = q.joueur.get(uid);
+  let save = null;
+  try { save = j?.save ? JSON.parse(j.save) : null; } catch { save = null; }
+  const dispo = Math.max(0, Math.floor(save?.coins ?? 0));
+  if (!dispo) return { ok: false, raison: 'vide' };
+  const montant = demande === null ? dispo : Math.floor(demande);
+  if (!(montant > 0)) return { ok: false, raison: 'montant' };
+  if (montant > dispo) return { ok: false, raison: 'pas_assez', dispo };
+  save.coins = dispo - montant;
+  q.majPieces.run(JSON.stringify(save), montant, Date.now(), uid);
+  const gain = montant * taux;
+  require('./economie').crediter(guildId, uid, gain);
+  return { ok: true, montant, gain, reste: save.coins, taux };
+}
+
 module.exports = {
+  convertir,
   q, NIVEAUX, MAX_NIVEAU, PERSONNAGES, defaut, nettoyer, valider, creerSession, lireSession,
   noterIntention, intentionSalon, sauvegarder, formaterTemps, etoiles,
 };

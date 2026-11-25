@@ -97,20 +97,22 @@ function multiplicateur(guildId, userId, membre) {
 /** Le membre peut-il passer un prestige ? */
 function peutPrestige(guildId, userId) {
   const cfg = config(guildId);
-  if (!cfg.prestige_actif) return { ok: false, raison: 'Le prestige est desactive sur ce serveur.' };
+  // 2.24 : les raisons sont dans la langue du serveur.
+  const { t } = require('./langues').traducteur(guildId);
+  if (!cfg.prestige_actif) return { ok: false, raison: t('prestige.raison_desactive') };
 
   const ligne = req.getXp.get(guildId, userId);
-  if (!ligne) return { ok: false, raison: "Tu n'as pas encore d'XP." };
+  if (!ligne) return { ok: false, raison: t('prestige.raison_sans_xp') };
 
   const etoiles = ligne.prestige ?? 0;
   if (etoiles >= (PRESTIGE.maximum ?? 10)) {
-    return { ok: false, raison: `Tu as atteint le prestige maximum (${PRESTIGE.maximum} étoiles).` };
+    return { ok: false, raison: t('prestige.raison_maximum', { n: PRESTIGE.maximum ?? 10 }) };
   }
 
   const { infosNiveau } = require('./niveaux');
   const niveau = infosNiveau(ligne.xp).niveau;
   const requis = PRESTIGE.niveauRequis ?? 50;
-  if (niveau < requis) return { ok: false, raison: `Il faut être **niveau ${requis}** pour passer un prestige (tu es niveau ${niveau}).` };
+  if (niveau < requis) return { ok: false, raison: t('prestige.raison_niveau', { requis, niveau }) };
 
   return { ok: true, niveau, etoiles };
 }
@@ -130,8 +132,9 @@ function passerPrestige(guildId, userId) {
 
 // -------------------------------------------------------------------- BADGES
 /** Catalogue complet des badges. */
-function listeBadges() {
-  return Object.entries(BADGES).map(([cle, b]) => ({ cle, ...b }));
+function listeBadges(langue = null) {
+  const { localiser } = require('./donnees');
+  return Object.entries(BADGES).map(([cle, b]) => localiser('badges', cle, { cle, ...b }, langue));
 }
 
 /**
@@ -149,7 +152,7 @@ function badgesDe(guildId, userId) {
   }
   return req.badgesDe
     .all(guildId, userId)
-    .map((l) => ({ ...BADGES[l.cle], cle: l.cle, obtenu_le: l.obtenu_le }))
+    .map((l) => require('./donnees').localiser('badges', l.cle, { ...BADGES[l.cle], cle: l.cle, obtenu_le: l.obtenu_le }, require('./donnees').langueDe(guildId)))
     .filter((b) => b.nom);
 }
 
@@ -190,7 +193,7 @@ function verifierBadges(guildId, userId, membre = null) {
     if (valeur === undefined || valeur < badge.seuil) continue;
     if (req.aLeBadge.get(guildId, userId, cle)) continue;
     req.donnerBadge.run(guildId, userId, cle, Date.now());
-    nouveaux.push({ cle, ...badge });
+    nouveaux.push(require('./donnees').localiser('badges', cle, { cle, ...badge }, require('./donnees').langueDe(guildId)));
   }
   return nouveaux;
 }

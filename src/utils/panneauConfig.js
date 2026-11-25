@@ -122,6 +122,10 @@ const CATEGORIES = [
       { cle: 'paye_actif', type: 'bool' },
       { cle: 'braquage_actif', type: 'bool' },
       { cle: 'objets_actif', type: 'bool' },
+      { cle: 'cartes_actif', type: 'bool' },
+      { cle: 'cartes_messages', type: 'nombre', min: 10, max: 5000 },
+      { cle: 'cartes_prix', type: 'nombre', min: 0, max: 1000000 },
+      { cle: 'cartes_quotidien', type: 'bool' },
     ],
   },
   {
@@ -141,6 +145,9 @@ const CATEGORIES = [
       { cle: 'automod_mots', type: 'bool' },
       { cle: 'automod_mentions', type: 'bool' },
       { cle: 'automod_majuscules', type: 'bool' },
+      { cle: 'automod_arnaques', type: 'bool' },
+      { cle: 'automod_ia', type: 'bool' },
+      { cle: 'automod_images', type: 'bool' },
     ],
   },
   {
@@ -178,6 +185,7 @@ const CATEGORIES = [
       { cle: 'ticket_max', type: 'nombre', min: 1, max: 10 },
       { cle: 'ticket_formulaire', type: 'bool' },
       { cle: 'ticket_banniere', type: 'bool' },
+      { cle: 'ticket_faq', type: 'bool' },
       { cle: 'ticket_inactif_heures', type: 'nombre', min: 0, max: 720 },
     ],
   },
@@ -194,6 +202,7 @@ const CATEGORIES = [
       { cle: 'faq_actif', type: 'bool' },
       { cle: 'signalement_salon', type: 'salon' },
       { cle: 'appel_salon', type: 'salon' },
+      { cle: 'vitrine_site', type: 'bool' },
     ],
   },
   {

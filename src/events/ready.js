@@ -32,10 +32,30 @@ module.exports = {
       .quitterLesBloques(client)
       .catch((e) => logger.avertissement('Liste noire :', e.message));
 
-    client.user.setPresence({
-      activities: [{ name: `${totalServeurs} serveurs | /aide`, type: ActivityType.Watching }],
-      status: 'online',
-    });
+    // Statut : plusieurs messages en rotation (toutes les 20 s), dont le
+    // modmail. Le total de serveurs est relu toutes les 10 min.
+    let serveursStatut = totalServeurs;
+    let tourStatut = 0;
+    const messagesStatut = () => [
+      `${serveursStatut} serveurs | /aide`,
+      '📩 MP moi pour contacter le staff',
+      '📩 DM me to contact the staff',
+      '🎮 Wumi Run · wumi.fr',
+    ];
+    const majStatut = () => {
+      const liste = messagesStatut();
+      const texte = liste[tourStatut++ % liste.length];
+      try {
+        client.user.setPresence({ activities: [{ name: 'custom', state: texte, type: ActivityType.Custom }], status: 'online' });
+      } catch (e) {
+        logger.debug('Statut :', e.message);
+      }
+    };
+    majStatut();
+    setInterval(majStatut, 20_000).unref?.();
+    setInterval(() => {
+      totaux.serveurs(client).then((n) => { serveursStatut = n; }).catch(() => {});
+    }, 10 * 60_000).unref?.();
 
     // Cree la ligne de config des serveurs deja rejoints
     for (const guild of client.guilds.cache.values()) {
@@ -80,6 +100,9 @@ module.exports = {
       ['Rôles temporaires', '../utils/rolesTemporaires'],
       ['Mode raid', '../utils/modeRaid'],
       ['Tickets inactifs', '../utils/ticketsInactifs'],
+      ['Défi Wumi Run', '../utils/defiHebdo'],
+      ['Rappels de vote', '../utils/rappelsVote'],
+      ['Essais premium', '../utils/essaiPremium'],
     ]) {
       try {
         require(module).demarrer(client);
@@ -92,7 +115,7 @@ module.exports = {
     const sauvegardes = require('../utils/sauvegardes');
     const tourSauvegarde = () => {
       sauvegardes.sauvegardeAutomatique();
-      // Une fois par semaine, une copie part hors du serveur (MP au fondateur).
+      // Une fois par jour, une copie chiffree part hors du serveur (MP au fondateur).
       sauvegardes.envoyerHorsServeur(client).catch((e) => logger.erreur('Sauvegarde hors serveur :', e.message));
     };
     tourSauvegarde();
@@ -115,6 +138,20 @@ module.exports = {
       if (n) logger.info(`XP vocal : ${n} session(s) reprise(s) au demarrage.`);
       setInterval(() => vocal.crediterEnCours(client).catch((e) => logger.erreur('XP vocal :', e.message)), 5 * 60_000).unref?.();
     }
+
+    // IA locale (Wumi 2.32) : on verifie une fois au demarrage que la
+    // bibliotheque est installee, puis on precharge les modeles des modules
+    // deja actifs, pour que le premier message ne parte pas sans verification.
+    require('../utils/ia').pret().then((ok) => {
+      if (!ok) return;
+      const { db } = require('../database/db');
+      const n = db.prepare('SELECT SUM(automod_ia) AS ia, SUM(automod_images) AS img FROM config WHERE automod_actif = 1').get();
+      if (n?.ia) require('../utils/ia').prechauffer('texte');
+      if (n?.img) require('../utils/ia').prechauffer('images');
+      // 2.33 : le modele de sens de la FAQ (telecharge une fois, rendu apres 30 min sans question).
+      const faq = db.prepare('SELECT COUNT(*) AS n FROM faq f JOIN config c ON c.guild_id = f.guild_id WHERE c.faq_actif = 1 OR c.ticket_faq = 1').get();
+      if (faq?.n) require('../utils/ia').prechauffer('sens');
+    }).catch((e) => logger.avertissement('IA :', e.message));
 
     // Evenement de Noel du support : classement et fin automatique.
     require('../utils/noel').demarrer(client);

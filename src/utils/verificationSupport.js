@@ -27,6 +27,7 @@ const {
   TextInputBuilder,
   TextInputStyle,
   PermissionFlagsBits,
+  MessageFlags,
 } = require('discord.js');
 const conf = require('../../config');
 const C = require('./composants');
@@ -71,7 +72,7 @@ function construirePanneau(guild) {
     C.texte(role ? t('support.verif.role_donne', { role: `<@&${role}>` }) : `⚠️ ${t('support.verif.role_absent')}`),
     new ActionRowBuilder().addComponents(...boutons),
     C.texte(`-# ${t(activiteActive() ? 'support.verif.pied_activite' : 'support.verif.pied_secours')}`),
-  ], 0x58a6ff);
+  ], 0xff9d1b);
 
   return C.envoi([conteneur], { files: b ? [b.fichier()] : [] });
 }
@@ -203,12 +204,19 @@ function demanderCode(interaction) {
 
 async function verifierCode(interaction) {
   const { t } = tr(interaction.guild);
+  // On repond a Discord tout de suite : donner le role peut prendre plus de
+  // 3 secondes quand beaucoup de monde arrive en meme temps (limites de
+  // l'API), et l'interaction expirerait (« Unknown interaction ») alors que
+  // le membre a bien ete verifie.
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  const repondre = (type, texte) => interaction.editReply(C[type](texte));
+
   const attendu = codes.get(interaction.user.id);
   const saisi = interaction.fields.getTextInputValue('code').replace(/\s+/g, '').toUpperCase();
 
   if (!attendu || attendu.expire < Date.now()) {
     codes.delete(interaction.user.id);
-    return interaction.reply(C.avertissementPrivee(t('support.verif.secours_expire')));
+    return repondre('avertissement', t('support.verif.secours_expire'));
   }
   attendu.essais++;
   if (saisi !== attendu.code) {
@@ -216,17 +224,17 @@ async function verifierCode(interaction) {
       codes.delete(interaction.user.id);
       refus(interaction.member, 'support.verif.trop_essais', 'secours');
     }
-    return interaction.reply(C.erreurPrivee(t('support.verif.secours_faux')));
+    return repondre('erreur', t('support.verif.secours_faux'));
   }
   codes.delete(interaction.user.id);
 
   const souci = obstacle(interaction.guild, interaction.member);
-  if (souci) return interaction.reply(C.erreurPrivee(t(souci.cle, souci.variables)));
+  if (souci) return repondre('erreur', t(souci.cle, souci.variables));
   const role = await valider(interaction.guild, interaction.member, 'secours', {
     essais: attendu.essais,
     duree: Date.now() - attendu.debut,
   });
-  return interaction.reply(C.succesPrive(t('support.verif.reussi', { role: `${role}` })));
+  return repondre('succes', t('support.verif.reussi', { role: `${role}` }));
 }
 
 // ------------------------------------------------ SESSIONS DE L'ACTIVITE
@@ -343,7 +351,8 @@ async function gererInteraction(interaction) {
   } catch (e) {
     logger.erreur(`Vérification support (${interaction.customId}) :`, e);
     const r = C.erreurPrivee(t('support.verif.erreur'));
-    if (interaction.replied || interaction.deferred) await interaction.followUp(r).catch(() => null);
+    if (interaction.deferred && !interaction.replied) await interaction.editReply(C.erreur(t('support.verif.erreur'))).catch(() => null);
+    else if (interaction.replied) await interaction.followUp(r).catch(() => null);
     else await interaction.reply(r).catch(() => null);
   }
   return null;

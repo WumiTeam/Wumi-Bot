@@ -90,10 +90,9 @@ module.exports = {
       duree,
     });
 
-    return interaction.editReply(C.succes(
-      t('mute.fait', { membre: cible.tag, duree: enDuree(duree) })
-      + `\n> ${t('sanction.raison', { raison })}`
-      + `\n-# ${t('sanction.numero', { n: id })}`
-    ));
+    return interaction.editReply(require('../../utils/recuSanction').recuSanction({
+      t, type: 'mute', titre: t('mute.fait', { membre: cible.tag, duree: enDuree(duree) }), cible, moderateur: interaction.user, raison, id,
+      duree: enDuree(duree),
+    }));
   },
 };

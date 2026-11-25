@@ -1,0 +1,324 @@
+[
+ {
+  "type": 17,
+  "accent_color": null,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 12,
+    "items": [
+     {
+      "media": {
+       "url": "attachment://faq.png"
+      },
+      "description": null,
+      "spoiler": false
+     }
+    ]
+   },
+   {
+    "type": 14,
+    "divider": true,
+    "spacing": 1
+   },
+   {
+    "type": 10,
+    "content": "## {{wumi}} Frequently asked questions\nThe answers to the questions we get the most. **Click a topic**: the answer opens just for you."
+   },
+   {
+    "type": 14,
+    "divider": true,
+    "spacing": 1
+   },
+   {
+    "type": 1,
+    "components": [
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Getting started",
+      "emoji": {
+       "name": "🚀",
+       "id": null
+      },
+      "custom_id": "page_faq_start"
+     },
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Wumi isn't working",
+      "emoji": {
+       "name": "🛠️",
+       "id": null
+      },
+      "custom_id": "page_faq_panne"
+     },
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Permissions & roles",
+      "emoji": {
+       "name": "🔒",
+       "id": null
+      },
+      "custom_id": "page_faq_perms"
+     },
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Language",
+      "emoji": {
+       "name": "🌍",
+       "id": null
+      },
+      "custom_id": "page_faq_langue"
+     },
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Moderation & automod",
+      "emoji": {
+       "name": "🛡️",
+       "id": null
+      },
+      "custom_id": "page_faq_modo"
+     }
+    ]
+   },
+   {
+    "type": 1,
+    "components": [
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Levels & rank cards",
+      "emoji": {
+       "name": "🏆",
+       "id": null
+      },
+      "custom_id": "page_faq_niveaux"
+     },
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Announcements",
+      "emoji": {
+       "name": "🔔",
+       "id": null
+      },
+      "custom_id": "page_faq_veille"
+     },
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Music",
+      "emoji": {
+       "name": "🎵",
+       "id": null
+      },
+      "custom_id": "page_faq_musique"
+     },
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Premium",
+      "emoji": {
+       "name": "💎",
+       "id": null
+      },
+      "custom_id": "page_faq_premium"
+     },
+     {
+      "type": 2,
+      "style": 2,
+      "label": "Your data",
+      "emoji": {
+       "name": "🔐",
+       "id": null
+      },
+      "custom_id": "page_faq_donnees"
+     }
+    ]
+   },
+   {
+    "type": 14,
+    "divider": false,
+    "spacing": 1
+   },
+   {
+    "type": 10,
+    "content": "-# Didn't find your answer? **Open a ticket**, the team replies quickly. 🇫🇷 La FAQ en français est juste en dessous."
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🚀 Getting started\n**1.** Add Wumi with the **Add Wumi** button in the information channel or at **wumi.fr**.\n**2.** Type `/setup` in your server: Wumi walks you through the essentials (language, logs, welcome, levels, moderation) in a few clicks.\n**3.** Fine-tune everything later with `/config`, or from the **dashboard** at **dash.wumi.fr** (log in with Discord).\n\n-# Lost? `/help` lists every command, by category."
+   },
+   {
+    "type": 14,
+    "divider": true,
+    "spacing": 1
+   },
+   {
+    "type": 1,
+    "components": [
+     {
+      "type": 2,
+      "style": 5,
+      "label": "Dashboard",
+      "url": "https://dash.wumi.fr"
+     },
+     {
+      "type": 2,
+      "style": 5,
+      "label": "Website",
+      "url": "https://wumi.fr"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🛠️ Wumi isn't working\n**Start with `/diagnostic`.** Wumi checks its own permissions, roles and settings and tells you exactly what's blocking, in red first.\n\n**Commands don't show up?** Make sure the bot was added with its commands, and that *Server Settings › Integrations › Wumi* doesn't hide them in that channel. Restarting Discord (Ctrl+R) helps too.\n\n**Wumi doesn't answer at all?** Check the **status page**: if there's an incident, we're on it.\n\n**Still stuck?** Open a ticket with a screenshot and the result of `/diagnostic`."
+   },
+   {
+    "type": 14,
+    "divider": true,
+    "spacing": 1
+   },
+   {
+    "type": 1,
+    "components": [
+     {
+      "type": 2,
+      "style": 5,
+      "label": "Status",
+      "url": "https://wumi.fr/statut/"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🔒 Permissions & roles\n**\"Missing permissions\" or a role that won't be given?** Discord only lets a bot manage roles **below its own**.\n› *Server Settings › Roles* : drag the **Wumi** role **above** the roles it gives (levels, autorole, reaction roles, verification, mute).\n\nWumi doesn't need *Administrator*. It asks only for what it uses, and `/diagnostic` lists anything missing.\n\n-# Moderation commands also need the right permission on **your** side (ban, kick, manage messages...)."
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🌍 Language\nWumi speaks **English, French, Spanish, German, Portuguese (Brazil) and Italian**.\n\n› The **server language** (messages, cards, logs) is set in `/setup` or `/config` › Server.\n› **Command names and descriptions** follow each member's own Discord language, automatically.\n› Want to read a message in another language? Right-click it › Apps › **Translate**."
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🛡️ Moderation & automod\n› `/automod` : spam, links, invites, caps, mass mentions, **scams** (on by default), and two AI modules: **toxic messages** and **NSFW images**. Turn each on with `/automod module`.\n› `/antiraid` and `/antinuke` protect you from mass joins and from a compromised admin.\n› `/audit` gives your server a security score out of 100 and fixes the risky bits in one click.\n› `/backup` saves your roles and channels, so you can restore them after an accident.\n\n-# The AI runs on Wumi's own server: no message or image is sent anywhere else."
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🏆 Levels & rank cards\n› Members earn XP by chatting and in voice. `/rank` shows their card, `/leaderboard` the top of the server.\n› Role rewards and XP bonuses: `/config` › Levels and `/xp`.\n› Each member picks a card theme with `/theme`. Premium servers can set their own card background.\n\n**No XP?** There's a short cooldown between two messages that count, and some channels may not count. Bots never earn XP."
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🔔 YouTube, Twitch, Instagram...\nWumi posts automatically when you go live or publish something.\n\n› `/watch` : add a **YouTube** channel, a **Twitch** streamer, an **Instagram** account, or any **RSS** feed, and pick the channel and the role to ping.\n› Up to 10 sources per server, 30 with Premium.\n\n-# A post can take a few minutes to show up: Wumi checks each source regularly, platforms don't warn bots by themselves."
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🎵 Music\n› `/play` a song or a link, `/radio` for live stations, and `/blindtest` to play with friends.\n› Join a voice channel first: Wumi follows you.\n\n**No sound?** Check that Wumi can *Connect* and *Speak* in that channel, and that it isn't server-muted."
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 💎 Wumi Premium\n**Premium raises limits, it never locks features.** A free server keeps everything it has.\n\n› More announcement sources, giveaways, tickets per member and structure snapshots.\n› **Your own bot on your server**: name, avatar, banner and bio with `/premium bot`.\n› A custom background for every card with `/premium card-background`.\n\n**Try it free for 7 days**, once per server: `/premium trial`.\n-# Like Wumi? A `/vote` on top.gg takes ten seconds and really helps."
+   }
+  ]
+ },
+ {
+  "type": 17,
+  "accent_color": 16751899,
+  "spoiler": false,
+  "components": [
+   {
+    "type": 10,
+    "content": "## 🔐 Your data & privacy\n› `/privacy view` shows what Wumi keeps about you, `/privacy delete` erases it.\n› Ordinary messages are read in passing and forgotten immediately. Nothing is sold, nothing is shared.\n› The AI (automod, translation) runs on Wumi's own server.\n\n-# Full details in our privacy policy."
+   },
+   {
+    "type": 14,
+    "divider": true,
+    "spacing": 1
+   },
+   {
+    "type": 1,
+    "components": [
+     {
+      "type": 2,
+      "style": 5,
+      "label": "Privacy policy",
+      "url": "https://wumi.fr/confidentialite.html"
+     },
+     {
+      "type": 2,
+      "style": 5,
+      "label": "Terms",
+      "url": "https://wumi.fr/conditions.html"
+     }
+    ]
+   }
+  ]
+ }
+]

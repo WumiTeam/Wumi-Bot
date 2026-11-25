@@ -68,10 +68,8 @@ module.exports = {
       return interaction.editReply(C.erreur(t('kick.impossible', { erreur: e.message })));
     }
 
-    return interaction.editReply(C.succes(
-      t('kick.fait', { membre: cible.tag })
-      + `\n> ${t('sanction.raison', { raison })}`
-      + `\n-# ${t('sanction.numero', { n: id })}`
-    ));
+    return interaction.editReply(require('../../utils/recuSanction').recuSanction({
+      t, type: 'kick', titre: t('kick.fait', { membre: cible.tag }), cible, moderateur: interaction.user, raison, id,
+    }));
   },
 };

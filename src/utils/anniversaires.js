@@ -93,7 +93,7 @@ async function souhaiter(client, ligne, date) {
 
   if (salon) {
     const modele = cfg.anniv_message
-      || `${E('fete')} Joyeux anniversaire {mention} ! Toute l'équipe te souhaite une excellente journée.`;
+      || `${E('fete')} ${require('./langues').t('anniversaire.message_defaut', require('./langues').langueDe(guild.id))}`;
     await salon
       .send({
         embeds: [

@@ -40,10 +40,11 @@ module.exports = {
             .setDescriptionLocalizations(localisations('veille.opt_type'))
             .setRequired(true)
             // Discord n'affiche pas les emojis d'application dans les choix
-            // d'une commande : ils s'y liraient « <:bp_twitch:123> ». Unicode.
+            // d'une commande : ils s'y liraient « <:wu_twitch:123> ». Unicode.
             .addChoices(
               { name: tr('veille.type_twitch', DEFAUT), name_localizations: localisations('veille.type_twitch'), value: 'twitch' },
-              { name: tr('veille.type_tiktok', DEFAUT), name_localizations: localisations('veille.type_tiktok'), value: 'tiktok' },
+              // TikTok : en pause depuis 2.25.4 (passerelle bloquee). Remis si TIKTOK_ACTIF est defini.
+              ...(process.env.TIKTOK_ACTIF ? [{ name: tr('veille.type_tiktok', DEFAUT), name_localizations: localisations('veille.type_tiktok'), value: 'tiktok' }] : []),
               { name: tr('veille.type_instagram', DEFAUT), name_localizations: localisations('veille.type_instagram'), value: 'instagram' },
               { name: tr('veille.type_youtube', DEFAUT), name_localizations: localisations('veille.type_youtube'), value: 'youtube' },
               { name: tr('veille.type_rss', DEFAUT), name_localizations: localisations('veille.type_rss'), value: 'rss' }
@@ -150,6 +151,14 @@ module.exports = {
       const source = interaction.options.getString('source')?.trim() ?? '';
       const role = interaction.options.getRole('role');
 
+      // 2.26 : Instagram se suit par @pseudo (Business Discovery). Sans pseudo,
+      // c'est le compte du jeton INSTAGRAM_TOKEN : reserve au serveur support,
+      // sinon un autre serveur annoncerait les posts de ce compte-la.
+      if (type === 'instagram') {
+        const support = require('../../utils/fondateur').serveurSupport();
+        if (!source && guildId !== support) return interaction.reply(C.erreurPrivee(t('veille.ajouter_source_manquante_instagram')));
+        if (source && !veille.decouverteDisponible()) return interaction.reply(C.erreurPrivee(t('veille.ajouter_instagram_indisponible')));
+      }
       if (type !== 'instagram' && !source) {
         return interaction.reply(C.erreurPrivee(
           type === 'youtube'
@@ -200,7 +209,7 @@ module.exports = {
       const info = req.ajouterVeille.run({
         guild_id: guildId,
         type,
-        source: source || 'compte du jeton',
+        source: type === 'instagram' && source ? veille.pseudoInstagram(source) : (source || 'compte du jeton'),
         nom: interaction.options.getString('name') ?? verif.nom ?? veille.TYPES[type].nom,
         salon_id: salon.id,
         role_id: role?.id ?? null,
@@ -245,7 +254,7 @@ module.exports = {
         return [
           t('veille.liste_ligne_tete', { n: s.id, emoji: meta.emoji, nom: s.nom, salon: `<#${s.salon_id}>` })
             + (s.role_id ? t('veille.liste_ligne_role', { role: `<@&${s.role_id}>` }) : ''),
-          `> ${s.type === 'instagram' ? t('veille.liste_ligne_compte_jeton') : tronquer(s.source, 90)}`,
+          `> ${s.type === 'instagram' && (!s.source || s.source === 'compte du jeton') ? t('veille.liste_ligne_compte_jeton') : tronquer(s.source, 90)}`,
           `> ${s.derniere_date ? t('veille.liste_ligne_vue', { date: ts(s.derniere_date, 'R') }) : t('veille.liste_ligne_jamais')}`,
           s.erreurs ? `> ${E('avertissement')} ${t('veille.liste_ligne_erreurs', { n: s.erreurs, erreur: tronquer(s.derniere_erreur ?? '', 120) })}` : null,
         ]

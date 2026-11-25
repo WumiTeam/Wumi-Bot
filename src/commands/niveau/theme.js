@@ -26,19 +26,17 @@ const { infosNiveau, rangDe } = require('../../utils/niveaux');
 const { genererCarteRank } = require('../../utils/carteRank');
 const { E } = require('../../utils/emojis');
 const C = require('../../utils/composants');
-const { traducteur, localisations, t: tr, DEFAUT } = require('../../utils/langues');
+const { traducteur, localisations, t: tr, DEFAUT, langueDe } = require('../../utils/langues');
 
 /**
- * Les cles disponibles, pretes pour les choix d'une option de commande.
- *
- * `name` vient de `themes.liste()`, donc de `config.js` (themesRank) : le nom
- * et la description de chaque theme sont des donnees de configuration du bot,
- * en francais en dur, sans equivalent anglais. On ne peut pas leur donner de
- * `name_localizations` sans une table de traduction separee qui risquerait de
- * partir en decalage avec config.js — signale dans le rapport plutot que
- * bricole ici.
+ * Les themes, prets pour les choix d'une option de commande. Le nom est donne
+ * dans les deux langues (voir utils/donnees.js) : Discord montre a chacun le
+ * sien.
  */
-const CHOIX = themes.liste().slice(0, 25).map((t) => ({ name: `${t.emoji ?? ''} ${t.nom}`.trim(), value: t.cle }));
+const CHOIX = themes.liste().slice(0, 25).map((th) => ({
+  ...require('../../utils/donnees').nomsChoix('themes', th.cle, th, `${th.emoji ?? ''} `),
+  value: th.cle,
+}));
 
 /** Genere un apercu de carte avec les vraies donnees du membre (ou un exemple). */
 async function apercu(interaction, theme) {
@@ -51,6 +49,7 @@ async function apercu(interaction, theme) {
   const exemple = !ligne || ligne.xp <= 0;
 
   return genererCarteRank({
+    langue: require('../../utils/langues').langueDe(guildId),
     pseudo: membre?.displayName ?? interaction.user.username,
     tag: interaction.user.username,
     avatarUrl: interaction.user.displayAvatarURL({ extension: 'png', size: 256 }),
@@ -72,10 +71,13 @@ function acheterTheme(interaction, cle) {
   const guildId = interaction.guild.id;
   const userId = interaction.user.id;
   if (!themes.existe(cle)) return { ok: false, message: t('theme.introuvable') };
-  const theme = themes.parCle(cle);
+  const theme = themes.parCle(cle, langueDe(interaction.guild?.id));
 
   if (!config(guildId).eco_actif) {
     return { ok: false, message: t('theme.eco_desactivee') };
+  }
+  if (theme.premium && !themes.possede(guildId, userId, cle)) {
+    return { ok: false, message: t('theme.premium_requis', { nom: theme.nom }) };
   }
   if (themes.possede(guildId, userId, cle)) {
     return { ok: false, message: t('theme.deja_possede', { nom: theme.nom }) };
@@ -106,7 +108,10 @@ function equiperTheme(interaction, cle) {
   const guildId = interaction.guild.id;
   const userId = interaction.user.id;
   if (!themes.existe(cle)) return { ok: false, message: t('theme.introuvable') };
-  const theme = themes.parCle(cle);
+  const theme = themes.parCle(cle, langueDe(interaction.guild?.id));
+  if (theme.premium && !themes.possede(guildId, userId, cle)) {
+    return { ok: false, message: t('theme.premium_requis', { nom: theme.nom }) };
+  }
   if (!themes.possede(guildId, userId, cle)) {
     return { ok: false, message: t('theme.pas_possede', { nom: theme.nom, somme: eco.somme(guildId, theme.prix) }) };
   }
@@ -129,25 +134,28 @@ function vueThemes(interaction) {
     C.separateur(),
   ];
 
-  for (const th of themes.liste().slice(0, 10)) {
+  for (const th of themes.liste(langueDe(guildId)).slice(0, 12)) {
     const aLui = possedes.includes(th.cle);
     const equipe = th.cle === actuel;
+    // Theme premium sur un serveur qui ne l'a pas : visible, mais ferme.
+    const ferme = th.premium && !aLui;
 
     const etat = equipe
       ? t('theme.etat_equipe')
-      : aLui
-        ? t('theme.etat_debloque')
-        : th.prix === 0
-          ? t('theme.etat_offert')
-          : `${m.emoji} ${nombre(th.prix)}`;
+      : ferme
+        ? `${E('etoile')} ${t('theme.etat_premium')}`
+        : aLui
+          ? t('theme.etat_debloque')
+          : th.prix === 0
+            ? t('theme.etat_offert')
+            : `${m.emoji} ${nombre(th.prix)}`;
 
     const bouton = new ButtonBuilder()
-      .setCustomId(equipe ? `thm_rien_${th.cle}` : aLui || th.prix === 0 ? `thm_eq_${th.cle}` : `thm_ach_${th.cle}`)
-      .setLabel(equipe ? t('theme.bouton_equipe') : aLui || th.prix === 0 ? t('theme.bouton_equiper') : t('theme.bouton_acheter'))
-      .setStyle(equipe ? ButtonStyle.Secondary : aLui || th.prix === 0 ? ButtonStyle.Primary : ButtonStyle.Success)
-      .setDisabled(equipe || (!aLui && th.prix > 0 && solde < th.prix));
+      .setCustomId(equipe ? `thm_rien_${th.cle}` : ferme ? `thm_prem_${th.cle}` : aLui || th.prix === 0 ? `thm_eq_${th.cle}` : `thm_ach_${th.cle}`)
+      .setLabel(equipe ? t('theme.bouton_equipe') : ferme ? t('theme.bouton_premium') : aLui || th.prix === 0 ? t('theme.bouton_equiper') : t('theme.bouton_acheter'))
+      .setStyle(equipe || ferme ? ButtonStyle.Secondary : aLui || th.prix === 0 ? ButtonStyle.Primary : ButtonStyle.Success)
+      .setDisabled(equipe || ferme || (!aLui && th.prix > 0 && solde < th.prix));
 
-    // th.nom / th.description : donnees de config.js, pas traduites (voir CHOIX plus haut).
     elements.push(
       C.sectionBouton(`${th.emoji ?? E('palette')} **${th.nom}** — ${etat}\n-# ${th.description}`, bouton)
     );
@@ -160,7 +168,7 @@ function vueThemes(interaction) {
         .setCustomId(`thm_try_${userId}`)
         .setPlaceholder(t('theme.select_placeholder'))
         .addOptions(
-          themes.liste().slice(0, 25).map((th) => ({
+          themes.liste(langueDe(guildId)).slice(0, 25).map((th) => ({
             label: th.nom,
             value: th.cle,
             description: th.description?.slice(0, 100),
@@ -233,7 +241,7 @@ module.exports = {
     if (!themes.existe(cle)) {
       return interaction.reply(C.erreurPrivee(t('theme.introuvable')));
     }
-    const theme = themes.parCle(cle);
+    const theme = themes.parCle(cle, langueDe(interaction.guild?.id));
 
     // ------------------------------------------------------------ APERCU
     if (sous === 'apercu') {
@@ -247,7 +255,9 @@ module.exports = {
         C.envoi([C.conteneur([
           C.texte(debloque
             ? t('theme.apercu_debloque', { nom: theme.nom })
-            : t('theme.apercu_a_acheter', { nom: theme.nom, somme: eco.somme(guildId, theme.prix) })),
+            : theme.premium
+              ? t('theme.premium_requis', { nom: theme.nom })
+              : t('theme.apercu_a_acheter', { nom: theme.nom, somme: eco.somme(guildId, theme.prix) })),
           C.image(`attachment://${nomFichier}`, t('theme.alt_apercu', { nom: theme.nom })),
         ])], { files: [new AttachmentBuilder(png, { name: nomFichier })] })
       );
@@ -297,7 +307,7 @@ module.exports = {
       }
       const cle = interaction.values?.[0];
       if (!themes.existe(cle)) return null;
-      const theme = themes.parCle(cle);
+      const theme = themes.parCle(cle, langueDe(interaction.guild?.id));
 
       await interaction.deferReply({ flags: MessageFlags.Ephemeral });
       const png = await apercu(interaction, theme);
@@ -307,7 +317,9 @@ module.exports = {
         C.envoi([C.conteneur([
           C.texte(aLui
             ? t('theme.essai_possede', { nom: theme.nom })
-            : t('theme.essai_a_acheter', { nom: theme.nom, somme: eco.somme(interaction.guild.id, theme.prix) })),
+            : theme.premium
+              ? t('theme.premium_requis', { nom: theme.nom })
+              : t('theme.essai_a_acheter', { nom: theme.nom, somme: eco.somme(interaction.guild.id, theme.prix) })),
           C.image(`attachment://${nomFichier}`, t('theme.alt_apercu', { nom: theme.nom })),
         ])], { files: [new AttachmentBuilder(png, { name: nomFichier })] })
       );
@@ -315,6 +327,7 @@ module.exports = {
 
     const cle = reste.join('_');
     if (action === 'rien') return interaction.deferUpdate();
+    if (action === 'prem') return interaction.reply(C.erreurPrivee(t('theme.premium_requis', { nom: themes.existe(cle) ? themes.parCle(cle, langueDe(interaction.guild?.id)).nom : cle })));
 
     const r = action === 'ach' ? acheterTheme(interaction, cle) : equiperTheme(interaction, cle);
     if (!r.ok) return interaction.reply(C.erreurPrivee(r.message));

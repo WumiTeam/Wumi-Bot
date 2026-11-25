@@ -12,12 +12,15 @@ const logger = require('./logger');
 const OBJETS = conf.economie?.objets ?? {};
 
 /** Catalogue complet, cle comprise. */
-function liste() {
-  return Object.entries(OBJETS).map(([cle, o]) => ({ cle, ...o }));
+// 2.24 : `langue` donne le nom et la description traduits (utils/donnees.js).
+const localiser = (cle, o, langue) => (langue ? require('./donnees').localiser('objets', cle, o, langue) : o);
+
+function liste(langue = null) {
+  return Object.entries(OBJETS).map(([cle, o]) => localiser(cle, { cle, ...o }, langue));
 }
 
-function parCle(cle) {
-  return OBJETS[cle] ? { cle, ...OBJETS[cle] } : null;
+function parCle(cle, langue = null) {
+  return OBJETS[cle] ? localiser(cle, { cle, ...OBJETS[cle] }, langue) : null;
 }
 
 function existe(cle) {
@@ -28,7 +31,7 @@ function existe(cle) {
 function inventaire(guildId, userId) {
   return req.inventaireDe
     .all(guildId, userId)
-    .map((l) => ({ ...parCle(l.objet), quantite: l.quantite }))
+    .map((l) => ({ ...parCle(l.objet, require('./donnees').langueDe(guildId)), quantite: l.quantite }))
     .filter((o) => o.cle);
 }
 

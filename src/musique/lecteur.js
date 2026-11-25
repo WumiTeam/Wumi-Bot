@@ -580,6 +580,11 @@ class Lecteur {
       b('pause', this.pause ? '▶️' : '⏸️', ButtonStyle.Primary, !p),
       b('passer', '⏭️', ButtonStyle.Secondary, !p),
       b('stop', '⏹️', ButtonStyle.Danger),
+      // 2.41 : le lecteur web, sur le tableau de bord.
+      ...(/^https?:\/\//.test(process.env.DASHBOARD_URL ?? '')
+        ? [new ButtonBuilder().setStyle(ButtonStyle.Link).setEmoji('🌐').setLabel(t('musique.lecteur_web'))
+          .setURL(`${process.env.DASHBOARD_URL.replace(/\/+$/, '')}/musique/${this.guildId}`)]
+        : []),
     ));
     blocs.push(new ActionRowBuilder().addComponents(
       b('boucle', this.boucle === 'piste' ? '🔂' : '🔁', this.boucle === 'off' ? ButtonStyle.Secondary : ButtonStyle.Success),

@@ -53,25 +53,19 @@ async function cloturerSession(client, etat, cfg) {
   if (resultat.niveauApres > resultat.niveauAvant && etat.member) {
     logger.action('montée de niveau', etat.member.displayName, null, `niveau ${resultat.niveauApres}, en vocal`);
     const roles = await appliquerRecompenses(etat.member, resultat.niveauApres).catch(() => []);
-    const destination = cfg.salon_levelup ?? 'actuel';
-    if (destination === 'off') return;
-
-    const embed = new EmbedBuilder()
-      .setColor(conf.couleurs.succes)
-      .setDescription(
-        `${E('niveaux')} <@${etat.id}> passe **niveau ${resultat.niveauApres}** grace au vocal !` +
-          (roles.length ? `\nTu debloques ${roles.map((r) => `<@&${r.id}>`).join(', ')} !` : '')
-      );
-
-    try {
-      if (destination === 'mp') await etat.member.send({ embeds: [embed] }).catch(() => null);
-      else {
-        const salon = destination === 'actuel' ? etat.channel : etat.guild.channels.cache.get(destination);
-        if (salon?.isTextBased()) await salon.send({ embeds: [embed] });
-      }
-    } catch {
-      /* ignore */
-    }
+    await require('../utils/annonceNiveau').annoncerNiveau({
+      guild: etat.guild,
+      user: etat.member.user,
+      member: etat.member,
+      cfg,
+      salonActuel: etat.channel,
+      niveauAvant: resultat.niveauAvant,
+      niveau: resultat.niveauApres,
+      xpTotal: resultat.xpApres,
+      roles,
+      bonus: multi.total > 1.01 ? multi.total : null,
+      vocal: true,
+    });
   }
 }
 

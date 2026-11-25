@@ -14,6 +14,8 @@ process.env.CLIENT_ID ??= '333333333333333333';
 process.env.SUPPORT_GUILD_ID = '111111111111111111';
 process.env.OWNER_IDS = '222222222222222222';
 process.env.DEBUG = 'false';
+// Cle de chiffrement de test (32 octets), pour ne jamais toucher au .env.
+process.env.CHIFFREMENT_CLE ??= Buffer.alloc(32, 7).toString('base64');
 // Pas de vrai salon de logs du support pendant les tests.
 for (const k of Object.keys(process.env)) if (k.startsWith('LOG_')) delete process.env[k];
 

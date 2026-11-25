@@ -13,7 +13,7 @@
  * Twitch a sa propre cadence, bien plus rapide que les autres : un direct
  * annonce dix minutes apres son debut ne sert plus a grand-chose.
  */
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const conf = require('../../config');
 const { req } = require('../database/db');
 const logger = require('./logger');
@@ -218,14 +218,13 @@ async function lireTwitch(source) {
     .replace('{height}', '720');
   const debut = Date.parse(direct.started_at) || Date.now();
 
-  const morceaux = [];
-  if (direct.game_name) morceaux.push(`**${direct.game_name}**`);
-  morceaux.push(`${direct.viewer_count} spectateur${direct.viewer_count > 1 ? 's' : ''}`);
-
+  // 2.24 : le texte du direct est ecrit a l'annonce, dans la langue du serveur.
   return [{
     id: direct.id,
-    titre: direct.title || `${nom} est en direct`,
-    texte: morceaux.join(' · '),
+    titre: direct.title || null,
+    jeu: direct.game_name || null,
+    spectateurs: direct.viewer_count ?? 0,
+    texte: null,
     lien: `https://www.twitch.tv/${pseudo}`,
     // Twitch sert toujours la vignette a la meme adresse : sans ce parametre,
     // Discord reafficherait l'image mise en cache lors du direct precedent.
@@ -324,6 +323,99 @@ function indiceJeton(jeton) {
 }
 
 /** Derniers posts du compte associe au jeton. */
+// ------------------------------------------------ INSTAGRAM PAR PSEUDO (2.26)
+/**
+ * « Business Discovery » de l'API Graph de Meta : avec UN compte Instagram
+ * professionnel (celui de Wumi, relie a une Page Facebook), on lit les posts
+ * PUBLICS de n'importe quel autre compte professionnel (Createur ou
+ * Entreprise), a partir de son @pseudo. Rien a faire pour les serveurs.
+ *
+ * .env :
+ *   INSTAGRAM_FB_TOKEN  jeton de Page Facebook (n'expire pas), droits
+ *                       instagram_basic + pages_read_engagement
+ *   INSTAGRAM_FB_ID     (facultatif) id du compte Instagram pro lie a la Page ;
+ *                       retrouve tout seul a partir du jeton sinon
+ * Voir GUIDE-INSTAGRAM.txt, partie « Suivre n'importe quel compte ».
+ */
+const GRAPH = 'https://graph.facebook.com/v21.0';
+const nettoyer = (v) => String(v ?? '').trim().replace(/^["']|["']$/g, '');
+let idDecouverte = null;
+
+function decouverteDisponible() {
+  return Boolean(nettoyer(process.env.INSTAGRAM_FB_TOKEN));
+}
+
+/** Le @pseudo d'un compte, a partir d'un pseudo ou d'une adresse instagram.com. */
+function pseudoInstagram(source) {
+  const s = String(source ?? '').trim();
+  const url = s.match(/instagram\.com\/([A-Za-z0-9._]{1,30})/i);
+  return (url ? url[1] : s.replace(/^@/, '')).toLowerCase();
+}
+
+async function graph(chemin) {
+  const jeton = nettoyer(process.env.INSTAGRAM_FB_TOKEN);
+  const sep = chemin.includes('?') ? '&' : '?';
+  const r = await fetch(`${GRAPH}${chemin}${sep}access_token=${encodeURIComponent(jeton)}`, {
+    signal: AbortSignal.timeout(DELAI_REQUETE),
+  });
+  // Meta met le detail d'une erreur dans le corps JSON, quel que soit le statut.
+  let d;
+  try {
+    d = await r.json();
+  } catch {
+    throw new Error(`Meta : reponse illisible (${r.status})`);
+  }
+  if (d.error) {
+    const err = new Error(d.error.error_user_msg || d.error.message || 'erreur Meta');
+    err.code = d.error.code;
+    err.sousCode = d.error.error_subcode;
+    throw err;
+  }
+  return d;
+}
+
+/** L'id du compte Instagram pro de Wumi (celui qui « regarde »). */
+async function compteDecouverte() {
+  if (idDecouverte) return idDecouverte;
+  const env = nettoyer(process.env.INSTAGRAM_FB_ID);
+  if (env) return (idDecouverte = env);
+  // Jeton de Page : la Page elle-meme. Jeton utilisateur : ses Pages.
+  const moi = await graph('/me?fields=instagram_business_account');
+  if (moi.instagram_business_account?.id) return (idDecouverte = moi.instagram_business_account.id);
+  const pages = await graph('/me/accounts?fields=instagram_business_account&limit=50');
+  const trouve = (pages.data ?? []).find((p) => p.instagram_business_account?.id);
+  if (!trouve) throw new Error("aucun compte Instagram professionnel relie a la Page du jeton INSTAGRAM_FB_TOKEN");
+  return (idDecouverte = trouve.instagram_business_account.id);
+}
+
+async function lireInstagramPseudo(source) {
+  const pseudo = pseudoInstagram(source);
+  if (!/^[a-z0-9._]{1,30}$/.test(pseudo)) throw new Error(`pseudo Instagram invalide : "${source}"`);
+  const id = await compteDecouverte();
+  const champs = `business_discovery.username(${pseudo}){username,name,media.limit(6){id,caption,media_type,media_url,permalink,thumbnail_url,timestamp}}`;
+  let d;
+  try {
+    d = await graph(`/${id}?fields=${encodeURIComponent(champs)}`);
+  } catch (e) {
+    // 110 / 2207013 : compte introuvable, prive, ou pas professionnel.
+    if (e.code === 110 || e.sousCode === 2207013 || /cannot be found|not.*business|invalid user/i.test(e.message)) {
+      throw new Error(`compte Instagram « ${pseudo} » introuvable ou non professionnel : seuls les comptes Createur ou Entreprise publics peuvent etre suivis`);
+    }
+    throw new Error(`Instagram : ${e.message}`);
+  }
+  const bd = d.business_discovery ?? {};
+  return (bd.media?.data ?? []).map((m) => ({
+    id: m.id,
+    titre: m.media_type === 'VIDEO' ? 'Nouvelle vidéo Instagram' : 'Nouveau post Instagram',
+    texte: sansHtml(m.caption ?? ''),
+    lien: m.permalink,
+    // Business Discovery ne donne pas toujours media_url pour les videos.
+    image: m.media_type === 'VIDEO' ? (m.thumbnail_url ?? null) : (m.media_url ?? null),
+    date: m.timestamp ? Date.parse(m.timestamp) : Date.now(),
+    auteur: bd.name || bd.username || pseudo,
+  }));
+}
+
 async function lireInstagram() {
   const actuel = jetonInstagram();
   if (!actuel) throw new Error("aucun jeton Instagram : ajoute INSTAGRAM_TOKEN dans le .env (voir GUIDE-INSTAGRAM.txt)");
@@ -462,7 +554,12 @@ async function lire(type, source) {
   let elements;
   if (type === 'twitch') elements = await lireTwitch(source);
   else if (type === 'tiktok') elements = await lireTiktok(source);
-  else if (type === 'instagram') elements = await lireInstagram();
+  else if (type === 'instagram') {
+    // Une source avec un @pseudo : Business Discovery. Sans pseudo (anciennes
+    // sources « compte du jeton ») : le compte lie a INSTAGRAM_TOKEN.
+    const pseudo = source && source !== 'compte du jeton' ? source : null;
+    elements = pseudo ? await lireInstagramPseudo(pseudo) : await lireInstagram();
+  }
   else if (type === 'youtube') elements = await lireYoutube(source);
   else if (type === 'rss') elements = await lireRss(source);
   else throw new Error(`type inconnu : ${type}`);
@@ -507,24 +604,70 @@ async function verifierSource(type, source) {
 }
 
 // ------------------------------------------------------------- ANNONCES
+// Titres par defaut des lecteurs (francais) -> cle traduite a l'annonce.
+const TITRES_DEFAUT = {
+  'Nouvelle vidéo Instagram': 'veille.u.insta_video',
+  'Nouveau post Instagram': 'veille.u.insta_post',
+  'Nouvelle vidéo TikTok': 'veille.u.tiktok_video',
+  'Nouveauté': 'veille.u.nouveaute',
+};
+
+/**
+ * 2.40 : la carte image de l'alerte (src/utils/carteAlerte.js). Renvoie
+ * { fichier, nom } ou null si le dessin echoue : l'annonce part alors avec
+ * l'embed d'avant, sans carte.
+ */
+async function construireCarte(veille, element) {
+  try {
+    const { t } = require('./langues').traducteur(veille.guild_id);
+    const meta = TYPES[veille.type] ?? TYPES.rss;
+    const nom = veille.nom || element.auteur || meta.nom;
+    let titre = element.titre;
+    if (TITRES_DEFAUT[titre]) titre = t(TITRES_DEFAUT[titre]);
+    const pastille = element.direct ? t('veille.u.pastille_direct')
+      : (veille.type === 'youtube' || veille.type === 'tiktok' || element.titre === 'Nouvelle vidéo Instagram') ? t('veille.u.pastille_video')
+        : veille.type === 'instagram' ? t('veille.u.pastille_post') : t('veille.u.pastille_nouveau');
+    let infos = null;
+    if (element.spectateurs !== undefined) {
+      infos = [element.jeu, t('veille.u.spectateurs', { n: element.spectateurs })].filter(Boolean).join(' · ');
+    }
+    const png = await require('./carteAlerte').genererCarteAlerte({
+      type: veille.type, pastille, nom, plateforme: meta.nom, titre: titre || null, infos,
+      image: element.image, avatar: element.avatar, direct: Boolean(element.direct),
+    });
+    return { fichier: new AttachmentBuilder(png, { name: 'wumi-alerte.png' }), nom: 'wumi-alerte.png' };
+  } catch (e) {
+    logger.avertissement('Carte d\'alerte impossible :', e.message);
+    return null;
+  }
+}
+
 function construireEmbed(veille, element) {
   const meta = TYPES[veille.type] ?? TYPES.rss;
   const nom = veille.nom || element.auteur || meta.nom;
+  const { t } = require('./langues').traducteur(veille.guild_id);
+  let titre = element.titre;
+  if (TITRES_DEFAUT[titre]) titre = t(TITRES_DEFAUT[titre]);
+  if (!titre && element.direct) titre = t('veille.u.en_direct', { nom });
+  let texte = element.texte;
+  if (element.spectateurs !== undefined) {
+    texte = [element.jeu ? `**${element.jeu}**` : null, t('veille.u.spectateurs', { n: element.spectateurs })].filter(Boolean).join(' · ');
+  }
 
   // Pour un direct, la ligne d'auteur porte l'information principale : c'est
   // elle qu'on lit en premier dans une notification.
-  const auteur = { name: element.direct ? `${meta.emoji} ${nom} est en direct !` : `${meta.emoji} ${nom}` };
+  const auteur = { name: element.direct ? `${meta.emoji} ${t('veille.u.en_direct_auteur', { nom })}` : `${meta.emoji} ${nom}` };
   if (element.avatar) auteur.iconURL = element.avatar;
   if (element.direct && element.lien) auteur.url = element.lien;
 
   const embed = new EmbedBuilder()
     .setColor(meta.couleur)
     .setAuthor(auteur)
-    .setTitle(couper(element.titre || meta.nom, 250))
+    .setTitle(couper(titre || meta.nom, 250))
     .setURL(element.lien)
     .setTimestamp(element.date);
 
-  if (element.texte) embed.setDescription(couper(element.texte, 600));
+  if (texte) embed.setDescription(couper(texte, 600));
   if (element.image) embed.setImage(element.image);
   return embed;
 }
@@ -588,9 +731,14 @@ async function verifierUne(client, veille) {
       .filter(Boolean)
       .join(' ');
     try {
+      const embed = construireEmbed(veille, element);
+      // La carte remplace la vignette brute ; le couleur du filet suit Wumi.
+      const carte = await construireCarte(veille, element);
+      if (carte) embed.setImage(`attachment://${carte.nom}`).setColor(conf.couleurs.principale);
       await salon.send({
         content: contenu || undefined,
-        embeds: [construireEmbed(veille, element)],
+        embeds: [embed],
+        files: carte ? [carte.fichier] : [],
         allowedMentions: { roles: veille.role_id ? [veille.role_id] : [] },
       });
     } catch (e) {
@@ -611,6 +759,11 @@ async function verifierUne(client, veille) {
  */
 async function verifierTout(client, options = {}) {
   let sources = req.veillesActives.all();
+  // 2.25.4 : TikTok est en pause (la passerelle publique bloque les bots, voir
+  // lireTiktok). Les sources TikTok deja creees restent en base, mais on ne les
+  // interroge plus : elles repartiront toutes seules si TIKTOK_PASSERELLE pointe
+  // un jour vers notre propre RSSHub.
+  if (!process.env.TIKTOK_ACTIF) sources = sources.filter((v) => v.type !== 'tiktok');
   if (options.seulement) sources = sources.filter((s) => s.type === options.seulement);
   if (options.sauf) sources = sources.filter((s) => s.type !== options.sauf);
   if (!sources.length) return;
@@ -654,6 +807,8 @@ function demarrer(client) {
 }
 
 module.exports = {
+  decouverteDisponible,
+  pseudoInstagram,
   TYPES,
   verifierFormeJeton,
   lire,
@@ -664,6 +819,7 @@ module.exports = {
   renouvelerJeton,
   identifiantYoutube,
   construireEmbed,
+  construireCarte,
   clesTwitch,
   jetonTwitch,
   pseudoTwitch,

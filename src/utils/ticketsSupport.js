@@ -47,7 +47,7 @@ const { genererTranscription } = require('./transcription');
 const MOTIFS = {
   question: {
     emoji: '❓',
-    couleur: 0x66bcff,
+    couleur: 0xff9d1b,
     champs: [
       { id: 'question', style: 'long', requis: true, min: 10, max: 1500 },
     ],
@@ -98,7 +98,7 @@ const MOTIFS = {
   },
   autre: {
     emoji: '📨',
-    couleur: 0xdce3ff,
+    couleur: 0xffcf8a,
     champs: [
       { id: 'sujet', style: 'court', requis: true, min: 3, max: 100 },
       { id: 'detail', style: 'long', requis: true, min: 10, max: 1500 },
@@ -473,6 +473,11 @@ async function ouvrir(interaction, cle) {
   } catch (e) {
     logger.erreur('Ticket support (message d\'accueil) :', e);
   }
+  // 2.33 : la FAQ du serveur support repond peut-etre deja.
+  require('./ticketFaq').suggerer({
+    guild, salon, systeme: 's',
+    texte: reponses.map((r) => r.reponse).filter(Boolean).join('\n'),
+  });
 
   journal.noter('tickets', {
     titre: `🎫 Ticket #${pad(numero)} ouvert · ${MOTIFS[cle].emoji} ${t(`support.ticket.motif.${cle}.nom`)}`,
@@ -863,7 +868,7 @@ async function diagnostic(interaction, ticket) {
     } catch { /* pas de musique sur cette instance */ }
     blocs.push(C.separateur(), C.texte(lignes.filter(Boolean).join('\n')));
   }
-  return interaction.reply(C.envoiPrive([C.conteneur(blocs, 0x58a6ff)], { allowedMentions: { parse: [] } }));
+  return interaction.reply(C.envoiPrive([C.conteneur(blocs, 0xff9d1b)], { allowedMentions: { parse: [] } }));
 }
 
 // ---------------------------------------------------------------- STATISTIQUES

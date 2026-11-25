@@ -27,7 +27,23 @@ const path = require('node:path');
 const logger = require('./logger');
 
 const DOSSIER = path.join(__dirname, '..', 'assets', 'emojis');
-const PREFIXE = 'bp_';
+// Wumi 2.20 : nouveau jeu d'emojis (outils/generer-emojis.js). Discord ne sait
+// pas remplacer l'image d'un emoji : on televerse donc les nouveaux sous un
+// autre prefixe, et les anciens « bp_ » restent sur l'application pour que les
+// vieux messages qui les citent continuent de les afficher.
+// Wumi 2.25 : nouveau jeu, dessine a partir des @icons (outils/generer-emojis-at.js),
+// sous le prefixe « wi_ ». Si un « wi_ » manque, le « wu_ » de 2.20 sert de repli.
+// Wumi 2.36 : jeu « Kubai » (icones Kubai, licence MIT, outils/generer-emojis-kubai.js),
+// sous le prefixe « ku_ ». Ordre de preference : ku_, puis wi_, puis wu_.
+const PREFIXE = 'ku_';
+const ORDRE = ['ku_', 'wi_', 'wu_'];
+// Dessins ku_ corriges apres coup : Discord ne remplace pas l'image d'un
+// emoji, le nouveau dessin prend donc le nom « ku_<nom>_<version> ».
+// 2.36.2 : « langue » (l'icone d'origine contenait un caractere sans police).
+const VERSIONS = { langue: 'v2' };
+// Le catalogue complet des @icons (705) : « at_<icone> », utilisable par I().
+const CATALOGUE = path.join(DOSSIER, 'at');
+const PREFIXE_CATALOGUE = 'at_';
 
 /**
  * Le repli Unicode de chaque emoji. C'est aussi la liste de reference : un nom
@@ -72,6 +88,7 @@ const REPLIS = {
   feu: '🔥',
 
   // Economie
+  wumi: '🔷',      // le logo « W. » (pages du serveur support, 2.27)
   wumicoin: '🪙',   // la piece de Wumi Run, monnaie par defaut (Wumi 2.17)
   piece: '💰',
   panier: '🛒',
@@ -126,8 +143,18 @@ const REPLIS = {
   langue: '🌐',
 };
 
-/** nom court -> « <:bp_nom:123> », rempli au demarrage. */
+/** nom court -> « <:wi_nom:123> », rempli au demarrage. */
 const installes = new Map();
+/** icone du catalogue -> « <:at_icone:123> ». */
+const icones = new Map();
+
+/**
+ * Une icone du catalogue @icons (ex. I('dragon')), ou `repli` si elle n'est
+ * pas (encore) televersee.
+ */
+function I(nom, repli = '') {
+  return icones.get(nom) ?? repli;
+}
 
 /**
  * L'emoji a afficher pour ce nom.
@@ -187,28 +214,35 @@ async function synchroniser(client) {
   for (const emoji of existants.values()) parNom.set(emoji.name, emoji);
 
   for (const nom of Object.keys(REPLIS)) {
-    const complet = PREFIXE + nom;
-    const deja = parNom.get(complet);
-    if (deja) {
-      installes.set(nom, deja.toString());
-      continue;
-    }
-
-    const fichier = path.join(DOSSIER, `${complet}.png`);
-    if (!fs.existsSync(fichier)) continue; // pas de fichier : on garde le repli
-
-    try {
-      const cree = await client.application.emojis.create({
-        attachment: fs.readFileSync(fichier),
-        name: complet,
-      });
-      installes.set(nom, cree.toString());
-      ajoutes++;
-    } catch (e) {
-      // Un echec ici n'est pas grave : le repli Unicode prend la suite.
-      echecs.push(`${complet} : ${e.message}`);
+    // Le jeu le plus recent qui existe deja, ou qu'on peut televerser ;
+    // sinon un plus ancien, sinon l'Unicode.
+    for (const prefixe of ORDRE) {
+      const complet = prefixe + nom + (prefixe === PREFIXE && VERSIONS[nom] ? '_' + VERSIONS[nom] : '');
+      const deja = parNom.get(complet);
+      if (deja) {
+        installes.set(nom, deja.toString());
+        break;
+      }
+      const fichier = path.join(DOSSIER, `${complet}.png`);
+      if (!fs.existsSync(fichier)) continue;
+      try {
+        const cree = await client.application.emojis.create({ attachment: fs.readFileSync(fichier), name: complet });
+        installes.set(nom, cree.toString());
+        ajoutes++;
+        break;
+      } catch (e) {
+        // Un echec ici n'est pas grave : le jeu precedent, puis l'Unicode, prennent la suite.
+        echecs.push(`${complet} : ${e.message}`);
+      }
     }
   }
+
+  // Le catalogue : on note ce qui existe, et on televerse le reste EN FOND
+  // (plusieurs centaines d'emojis : le demarrage n'attend pas).
+  for (const emoji of existants.values()) {
+    if (emoji.name?.startsWith(PREFIXE_CATALOGUE)) icones.set(emoji.name.slice(PREFIXE_CATALOGUE.length), emoji.toString());
+  }
+  televerserCatalogue(client, parNom).catch((e) => logger.avertissement('Emojis (catalogue) :', e.message));
 
   if (ajoutes) logger.succes(`Emojis : ${ajoutes} televerse(s) sur l'application.`);
   if (installes.size) logger.info(`Emojis : ${installes.size}/${Object.keys(REPLIS).length} personnalises actifs.`);
@@ -217,4 +251,69 @@ async function synchroniser(client) {
   return { installes: installes.size, ajoutes, echecs };
 }
 
-module.exports = { E, synchroniser, personnalises, etat, REPLIS, PREFIXE };
+/** Televerse, une a une, les icones du catalogue qui manquent encore. */
+async function televerserCatalogue(client, parNom) {
+  if (!fs.existsSync(CATALOGUE)) return;
+  const manquants = fs.readdirSync(CATALOGUE).filter((f) => f.endsWith('.png')).map((f) => f.slice(0, -4))
+    .filter((nom) => !parNom.has(PREFIXE_CATALOGUE + nom)).sort();
+  if (!manquants.length) return;
+  logger.info(`Emojis : ${manquants.length} icone(s) du catalogue a televerser, en fond.`);
+  let faits = 0;
+  for (const nom of manquants) {
+    try {
+      const cree = await client.application.emojis.create({
+        attachment: fs.readFileSync(path.join(CATALOGUE, `${nom}.png`)),
+        name: PREFIXE_CATALOGUE + nom,
+      });
+      icones.set(nom, cree.toString());
+      faits++;
+    } catch (e) {
+      logger.avertissement(`Emojis (catalogue) ${nom} :`, e.message);
+      // Plafond de l'application atteint : inutile d'insister.
+      if (/maximum|limit/i.test(e.message)) break;
+    }
+  }
+  logger.succes(`Emojis : ${faits} icone(s) du catalogue televersee(s).`);
+}
+
+// ------------------------------------------------- EMBEDS : AUTEUR ET PIED
+// Discord n'affiche PAS les emojis personnalises dans la ligne d'auteur ni
+// dans le pied d'un embed : on y lirait « <:wi_instagram:123…> » en clair.
+// On retire donc l'emoji du texte et, s'il n'y a pas deja d'icone, on le
+// met en icone (meme image, servie par le CDN de Discord).
+const MOTIF_EMOJI = /<a?:\w+:(\d+)>\s*/g;
+
+/** Le texte sans ses emojis personnalises. */
+function sansEmojis(texte) {
+  return typeof texte === 'string' ? texte.replace(MOTIF_EMOJI, '').trim() : texte;
+}
+
+/** L'image du premier emoji personnalise du texte, ou null. */
+function imageEmoji(texte) {
+  const m = /<(a?):\w+:(\d+)>/.exec(typeof texte === 'string' ? texte : '');
+  return m ? `https://cdn.discordapp.com/emojis/${m[2]}.${m[1] ? 'gif' : 'png'}` : null;
+}
+
+function nettoyerLigne(options, cleTexte) {
+  if (!options || typeof options !== 'object' || typeof options[cleTexte] !== 'string') return options;
+  if (!/<a?:\w+:\d+>/.test(options[cleTexte])) return options;
+  const propre = { ...options, [cleTexte]: sansEmojis(options[cleTexte]) || '​' };
+  if (!propre.iconURL && !propre.icon_url) propre.iconURL = imageEmoji(options[cleTexte]);
+  return propre;
+}
+
+try {
+  const { EmbedBuilder } = require('discord.js');
+  const proto = EmbedBuilder.prototype;
+  if (!proto.__wumiEmojis) {
+    const setAuthor = proto.setAuthor;
+    const setFooter = proto.setFooter;
+    proto.setAuthor = function (options) { return setAuthor.call(this, nettoyerLigne(options, 'name')); };
+    proto.setFooter = function (options) { return setFooter.call(this, nettoyerLigne(options, 'text')); };
+    Object.defineProperty(proto, '__wumiEmojis', { value: true });
+  }
+} catch {
+  /* discord.js absent (tests isoles) */
+}
+
+module.exports = { VERSIONS, E, I, synchroniser, personnalises, etat, REPLIS, PREFIXE, PREFIXE_CATALOGUE, sansEmojis, imageEmoji };

@@ -7,19 +7,19 @@ module.exports = {
   // ---------------------------------------------------------------- APPARENCE
   // Palette nature, accordee au decor des cartes.
   couleurs: {
-    principale: 0xDCE3FF, // violet
-    succes: 0x66BCFF,
+    principale: 0xFF9D1B, // orange Wumi (logo 2.38)
+    succes: 0x3DDC97,
     erreur: 0xFF2860,
     avertissement: 0xFFA919,
-    info: 0x66BCFF,
+    info: 0xFFB547,
     log: 0x1ED760,
-    bienvenue: 0xDCE3FF,
+    bienvenue: 0xFF9D1B,
     aurevoir: 0xFF2860,
   },
 
   // Les emojis ne sont plus ici : Blueprint a les siens, dessines dans
   // src/assets/emojis/ et televerses tout seul au demarrage. Le code les
-  // demande par leur nom court, avec E('succes'), E('piece')â€¦ et la liste
+  // demande par leur nom court, avec E('succes'), E('piece')… et la liste
   // complete (avec le repli Unicode de chacun) est dans src/utils/emojis.js.
 
   // ------------------------------------------------------------------ TOP.GG
@@ -33,7 +33,7 @@ module.exports = {
 
   // ------------------------------------------------------- LIMITES PAR SERVEUR
   // Blueprint est un bot PUBLIC : il tourne pour des serveurs qu'on ne connait
-  // pas. Sans plafond, un seul serveur peut lui faire faire n'importe quoi â€”
+  // pas. Sans plafond, un seul serveur peut lui faire faire n'importe quoi —
   // surtout la veille, ou CHAQUE source est une requete reseau toutes les
   // quelques minutes. Dix sources sur cinq cents serveurs, c'est deja cinq
   // mille requetes par tour.
@@ -83,8 +83,8 @@ module.exports = {
 
     fond: '#f7f8f5', // couleur de repli si l'image de fond est absente
     fondSecondaire: '#ffffff',
-    accent: '#66BCFF', // violet : barre d'XP, anneau
-    accentSecondaire: '#289ffa',
+    accent: '#ff9d1b', // orange Wumi : barre d'XP, anneau
+    accentSecondaire: '#ffbe5c',
     texte: '#1b2419',
     texteSecondaire: '#5f6b59',
     police: 'Poppins',
@@ -101,17 +101,18 @@ module.exports = {
   themesRank: {
     Wumi: {
       nom: 'Wumi',
-      emoji: 'ðŸ“',
+      emoji: '📐',
       prix: 0,
-      description: 'Le plan technique du serveur. Offert a tout le monde.',
-      accent: '#289ffa',
-      accent2: '#66BCFF',
+      description: 'Les couleurs de Wumi. Offert a tout le monde.',
+      accent: '#ff9d1b',
+      accent2: '#ffbe5c',
+      degrade: ['#1a1109', '#3d260d'],
       // Theme sombre : le voile est fonce, pas blanc, sinon la grille du plan
       // vire au gris sale. Il reste leger (0.42) pour que la grille se voie
       // encore sous le texte.
       sombre: true,
       voile: 0.42,
-      voileCouleur: '26, 16, 54',
+      voileCouleur: '26, 16, 8',
     },
     // CES TROIS THEMES ONT ETE RATTRAPES.
     //
@@ -123,11 +124,11 @@ module.exports = {
     //
     // Chacun teinte donc son voile de SA couleur, comme le font deja
     // Blueprint et Nuit. Ocean et Braise assument le fond sombre ; Lavande
-    // reste le theme clair du lot, mais pour de bon â€” un voile assez dense
+    // reste le theme clair du lot, mais pour de bon — un voile assez dense
     // pour que le fond soit vraiment clair, et du texte sombre dessus.
     ocean: {
       nom: 'Ocean',
-      emoji: 'ðŸŒŠ',
+      emoji: '🌊',
       prix: 1500,
       description: 'Le meme decor, passe au bleu profond.',
       accent: '#3d8ed4',
@@ -138,7 +139,7 @@ module.exports = {
     },
     braise: {
       nom: 'Braise',
-      emoji: 'ðŸ”¥',
+      emoji: '🔥',
       prix: 1500,
       description: 'Orange chaud, comme un feu de camp.',
       accent: '#e07a2c',
@@ -149,7 +150,7 @@ module.exports = {
     },
     lavande: {
       nom: 'Lavande',
-      emoji: 'ðŸ’œ',
+      emoji: '💜',
       prix: 2500,
       description: 'Violet doux sur fond clair.',
       accent: '#6b4fb0',
@@ -159,7 +160,7 @@ module.exports = {
     },
     nuit: {
       nom: 'Nuit',
-      emoji: 'ðŸŒ™',
+      emoji: '🌙',
       prix: 4000,
       description: 'Le decor plonge dans le noir, texte clair.',
       accent: '#4f9de0',
@@ -170,7 +171,7 @@ module.exports = {
     },
     minuit: {
       nom: 'Minuit',
-      emoji: 'âœ¨',
+      emoji: '✨',
       prix: 6000,
       description: 'Sans decor : un ciel etoile.',
       accent: '#8b6ee8',
@@ -182,7 +183,7 @@ module.exports = {
     },
     or: {
       nom: 'Or',
-      emoji: 'ðŸ‘‘',
+      emoji: '👑',
       prix: 12000,
       description: 'Noir et or. Le theme le plus cher du serveur.',
       accent: '#c99a2e',
@@ -190,6 +191,60 @@ module.exports = {
       sombre: true,
       voile: 0,
       degrade: ['#111110', '#262016'],
+    },
+    // ------------------------------------------------ THEMES PREMIUM (2.22)
+    // premium: true -> offerts a tous les membres d'un serveur premium,
+    // invisibles ailleurs. Si le serveur perd le premium, ses membres
+    // reviennent au theme par defaut (rien ne casse, rien n'est debite).
+    aurore: {
+      nom: 'Aurore',
+      emoji: '🌌',
+      premium: true,
+      prix: 0,
+      description: 'Ciel violet et rose, etoile. Premium.',
+      accent: '#ff7eb6',
+      accent2: '#b38cff',
+      sombre: true,
+      voile: 0,
+      degrade: ['#170c2e', '#3b1248'],
+      etoiles: true,
+    },
+    neon: {
+      nom: 'Neon',
+      emoji: '⚡',
+      premium: true,
+      prix: 0,
+      description: 'Cyan et magenta sur nuit electrique. Premium.',
+      accent: '#22d3ee',
+      accent2: '#d946ef',
+      sombre: true,
+      voile: 0,
+      degrade: ['#050916', '#14123a'],
+    },
+    sakura: {
+      nom: 'Sakura',
+      emoji: '🌸',
+      premium: true,
+      prix: 0,
+      description: 'Rose cerisier sur prune profonde. Premium.',
+      accent: '#ff9ec7',
+      accent2: '#ffd3e6',
+      sombre: true,
+      voile: 0,
+      degrade: ['#26101e', '#4a1835'],
+      etoiles: true,
+    },
+    emeraude: {
+      nom: 'Emeraude',
+      emoji: '💎',
+      premium: true,
+      prix: 0,
+      description: 'Vert emeraude et menthe. Premium.',
+      accent: '#34d399',
+      accent2: '#a7f3d0',
+      sombre: true,
+      voile: 0,
+      degrade: ['#03120d', '#0b2c21'],
     },
   },
 
@@ -248,6 +303,12 @@ module.exports = {
     fenetreAvertissementsMinutes: 10,
     // Duree du mute automatique (minutes) une fois le seuil atteint
     dureeMuteAutoMinutes: 10,
+    // 2.32 · IA : certitude minimale (0 a 1) pour supprimer un message toxique
+    // ou une image NSFW. Haut expres : mieux vaut laisser passer que punir a tort.
+    iaSeuil: 0.9,
+    imagesSeuil: 0.9,
+    // Texte minimum (sans emojis, mentions ni liens) pour lancer l'IA
+    iaLongueurMin: 6,
     // Mots interdits par defaut (ajoutables en jeu avec /motsinterdits)
     motsInterditsParDefaut: [],
   },
@@ -306,6 +367,8 @@ module.exports = {
     intervalleHeures: 24,
     // Nombre de copies conservees ; les plus anciennes sont supprimees
     aConserver: 14,
+    // Copie chiffree envoyee hors du serveur (MP aux fondateurs) toutes les X heures
+    envoiHeures: 24,
   },
 
   // ------------------------------------------------------- ECONOMIE AVANCEE
@@ -338,8 +401,8 @@ module.exports = {
     //   protection   : protege du braquage pendant `duree` minutes
     objets: {
       potion_xp: {
-        nom: 'Potion d\'expÃ©rience',
-        emoji: 'ðŸ§ª',
+        nom: 'Potion d\'expérience',
+        emoji: '🧪',
         description: 'Double ton XP pendant 1 heure.',
         prix: 800,
         effet: 'xp_multi',
@@ -347,8 +410,8 @@ module.exports = {
         duree: 60,
       },
       elixir_xp: {
-        nom: 'Ã‰lixir d\'expÃ©rience',
-        emoji: 'âš—ï¸',
+        nom: 'Élixir d\'expérience',
+        emoji: '⚗️',
         description: 'Triple ton XP pendant 30 minutes.',
         prix: 1800,
         effet: 'xp_multi',
@@ -357,7 +420,7 @@ module.exports = {
       },
       couleur: {
         nom: 'Couleur de pseudo',
-        emoji: 'ðŸŽ¨',
+        emoji: '🎨',
         description: 'Choisis la couleur de ton pseudo pendant 7 jours.',
         prix: 2500,
         effet: 'couleur',
@@ -365,7 +428,7 @@ module.exports = {
       },
       coupe_file: {
         nom: 'Coupe-file',
-        emoji: 'â©',
+        emoji: '⏩',
         description: 'Ton prochain ticket est signale comme prioritaire.',
         prix: 1200,
         effet: 'coupe_file',
@@ -373,7 +436,7 @@ module.exports = {
       },
       coffre_fort: {
         nom: 'Coffre-fort',
-        emoji: 'ðŸ”’',
+        emoji: '🔒',
         description: 'Te protege des braquages pendant 24 heures.',
         prix: 1500,
         effet: 'protection',
@@ -401,19 +464,19 @@ module.exports = {
     // Badges attribues automatiquement. `type` : messages, vocal (minutes),
     // niveau, invitations, missions, anciennete (jours), prestige
     badges: {
-      bavard_1: { nom: 'Bavard', emoji: 'ðŸ’¬', type: 'messages', seuil: 100, description: '100 messages envoyes' },
-      bavard_2: { nom: 'Pilier du chat', emoji: 'ðŸ—£ï¸', type: 'messages', seuil: 1000, description: '1 000 messages envoyes' },
-      bavard_3: { nom: 'Machine Ã  Ã©crire', emoji: 'âŒ¨ï¸', type: 'messages', seuil: 10_000, description: '10 000 messages envoyes' },
-      voix_1: { nom: 'Voix familiÃ¨re', emoji: 'ðŸŽ™ï¸', type: 'vocal', seuil: 600, description: '10 heures en vocal' },
-      voix_2: { nom: 'HabituÃ© du vocal', emoji: 'ðŸ”Š', type: 'vocal', seuil: 6000, description: '100 heures en vocal' },
-      niveau_1: { nom: 'ConfirmÃ©', emoji: 'ðŸ“ˆ', type: 'niveau', seuil: 10, description: 'Niveau 10 atteint' },
-      niveau_2: { nom: 'VÃ©tÃ©ran', emoji: 'ðŸ…', type: 'niveau', seuil: 30, description: 'Niveau 30 atteint' },
-      niveau_3: { nom: 'LÃ©gende', emoji: 'ðŸ‘‘', type: 'niveau', seuil: 50, description: 'Niveau 50 atteint' },
-      recruteur_1: { nom: 'Recruteur', emoji: 'ðŸ“¨', type: 'invitations', seuil: 5, description: '5 membres invites' },
-      recruteur_2: { nom: 'Ambassadeur', emoji: 'ðŸŒ', type: 'invitations', seuil: 25, description: '25 membres invites' },
-      fidele_1: { nom: 'FidÃ¨le', emoji: 'ðŸŒ¿', type: 'anciennete', seuil: 180, description: '6 mois sur le serveur' },
-      fidele_2: { nom: 'Pionnier', emoji: 'ðŸ—¿', type: 'anciennete', seuil: 365, description: '1 an sur le serveur' },
-      etoile: { nom: 'Ã‰toilÃ©', emoji: 'â­', type: 'prestige', seuil: 1, description: 'Premier prestige atteint' },
+      bavard_1: { nom: 'Bavard', emoji: '💬', type: 'messages', seuil: 100, description: '100 messages envoyes' },
+      bavard_2: { nom: 'Pilier du chat', emoji: '🗣️', type: 'messages', seuil: 1000, description: '1 000 messages envoyes' },
+      bavard_3: { nom: 'Machine à écrire', emoji: '⌨️', type: 'messages', seuil: 10_000, description: '10 000 messages envoyes' },
+      voix_1: { nom: 'Voix familière', emoji: '🎙️', type: 'vocal', seuil: 600, description: '10 heures en vocal' },
+      voix_2: { nom: 'Habitué du vocal', emoji: '🔊', type: 'vocal', seuil: 6000, description: '100 heures en vocal' },
+      niveau_1: { nom: 'Confirmé', emoji: '📈', type: 'niveau', seuil: 10, description: 'Niveau 10 atteint' },
+      niveau_2: { nom: 'Vétéran', emoji: '🏅', type: 'niveau', seuil: 30, description: 'Niveau 30 atteint' },
+      niveau_3: { nom: 'Légende', emoji: '👑', type: 'niveau', seuil: 50, description: 'Niveau 50 atteint' },
+      recruteur_1: { nom: 'Recruteur', emoji: '📨', type: 'invitations', seuil: 5, description: '5 membres invites' },
+      recruteur_2: { nom: 'Ambassadeur', emoji: '🌍', type: 'invitations', seuil: 25, description: '25 membres invites' },
+      fidele_1: { nom: 'Fidèle', emoji: '🌿', type: 'anciennete', seuil: 180, description: '6 mois sur le serveur' },
+      fidele_2: { nom: 'Pionnier', emoji: '🗿', type: 'anciennete', seuil: 365, description: '1 an sur le serveur' },
+      etoile: { nom: 'Étoilé', emoji: '⭐', type: 'prestige', seuil: 1, description: 'Premier prestige atteint' },
     },
   },
 
@@ -456,3 +519,16 @@ module.exports = {
   // Duree de vie des boutons de pagination (secondes)
   dureePagination: 120,
 };
+
+// 2.40 : une EDITION peut avoir sa propre DA (couleurs, theme par defaut des
+// cartes). Son theme passe en tete de liste : c'est lui que tout le monde a
+// sans rien faire. Wumi normal : rien ne change.
+{
+  const da = require('./src/edition').profil?.da;
+  if (da) {
+    Object.assign(module.exports.couleurs, da.couleurs ?? {});
+    Object.assign(module.exports.carte, da.carte ?? {});
+    if (da.theme) module.exports.themesRank = { [da.theme.cle]: da.theme, ...module.exports.themesRank };
+    if (typeof da.teinte === 'number') require('./src/utils/teinteEdition').activer(da.teinte);
+  }
+}

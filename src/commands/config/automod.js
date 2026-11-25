@@ -30,6 +30,10 @@ const MODULES = {
   mots: { colonne: 'automod_mots' },
   mentions: { colonne: 'automod_mentions' },
   majuscules: { colonne: 'automod_majuscules' },
+  // 2.32
+  arnaques: { colonne: 'automod_arnaques' },
+  ia: { colonne: 'automod_ia', ia: 'texte' },
+  images: { colonne: 'automod_images', ia: 'images' },
 };
 
 module.exports = {
@@ -267,18 +271,32 @@ module.exports = {
     }
 
     if (sous === 'module') {
+      const cfg0 = () => config(guildId);
       const nom = interaction.options.getString('name');
       const actif = interaction.options.getBoolean('enabled');
       majConfig(guildId, { [MODULES[nom].colonne]: actif ? 1 : 0 });
-      return interaction.reply(C.succes(
-        t(actif ? 'automod.module_actif' : 'automod.module_inactif', { module: t(`automod.mod.${nom}`) })
-      ));
+      let texte = t(actif ? 'automod.module_actif' : 'automod.module_inactif', { module: t(`automod.mod.${nom}`) });
+      // 2.32 : les modules IA chargent leur modele tout de suite (premier
+      // telechargement), et previennent si l'IA n'est pas installee.
+      if (actif && MODULES[nom].ia) {
+        const ia = require('../../utils/ia');
+        if (await ia.pret()) {
+          ia.prechauffer(MODULES[nom].ia);
+          texte += `\n-# ${t('automod.ia_chargement')}`;
+        } else {
+          texte += `\n-# ${t('automod.ia_indisponible')}`;
+        }
+        if (!cfg0().automod_actif) texte += `\n-# ${t('automod.ia_automod_eteint')}`;
+      }
+      return interaction.reply(C.succes(texte));
     }
 
     // --------------------------------------------------------- ETAT
     const cfg = config(guildId);
+    const iaPrete = await require('../../utils/ia').pret();
     const lignes = Object.entries(MODULES).map(([cle, m]) =>
-      `${cfg[m.colonne] ? E('succes') : E('erreur')} ${t(`automod.mod.${cle}`)}`);
+      `${cfg[m.colonne] ? E('succes') : E('erreur')} ${t(`automod.mod.${cle}`)}`
+      + (m.ia && cfg[m.colonne] && !iaPrete ? ` · ${t('automod.ia_indisponible_court')}` : ''));
 
     return interaction.reply(C.envoi([C.conteneur([
       C.texte(`## ${E('robot')} ${t('automod.etat_titre')}`),

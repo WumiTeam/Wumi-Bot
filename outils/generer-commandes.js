@@ -47,27 +47,27 @@ const page = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Wumi · Commands</title>
 <meta name="description" content="Every Wumi command, with its description in English and French.">
-<meta name="theme-color" content="#62b8ff">
+<meta name="theme-color" content="#ff9d1b">
 <link rel="icon" type="image/png" sizes="64x64" href="../favicon.png?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0c0d1c;--bg-2:#11132a;--card:#161935;--line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);--text:#eef0fc;--muted:#a3a9d1;--dim:#6f76a8;--blue:#62b8ff;--pink:#8fa0ff;--green:#3ddc97;--grad:linear-gradient(120deg,#4aa8ff,#62b8ff 35%,#a9b4f2 75%,#d9ddf7)}
+:root{--bg:#110e0a;--bg-2:#17130d;--card:#1e1912;--line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);--text:#f7f1e8;--muted:#b9ab98;--dim:#85776a;--blue:#ff9d1b;--pink:#ffb547;--green:#3ddc97;--grad:linear-gradient(120deg,#ff8a00,#ff9d1b 35%,#ffbe5c 75%,#ffe2b0)}
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--bg)}
 body{background:var(--bg);color:var(--text);font:400 16px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:1080px;margin:0 auto;padding:0 16px}
-.glow{position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(600px 400px at 15% -5%,rgba(98,184,255,.18),transparent 70%),radial-gradient(600px 400px at 90% 5%,rgba(143,160,255,.14),transparent 70%)}
-header{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(12,13,28,.78);border-bottom:1px solid var(--line)}
+.glow{position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(600px 400px at 15% -5%,rgba(255,157,27,.18),transparent 70%),radial-gradient(600px 400px at 90% 5%,rgba(255,190,92,.14),transparent 70%)}
+header{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(17,14,10,.78);border-bottom:1px solid var(--line)}
 nav{display:flex;align-items:center;gap:16px;height:64px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.02em}
 .logo img{width:30px;height:30px}
 .logo .dot{color:var(--pink)}
 .nav-fin{margin-left:auto;display:flex;gap:8px;align-items:center}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:10px;font-weight:600;font-size:14px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--text);cursor:pointer;font-family:inherit}
-.btn.on{background:var(--blue);color:#0c0d1c;border-color:transparent}
+.btn.on{background:var(--blue);color:#110e0a;border-color:transparent}
 .hero{padding:56px 0 26px}
 .eyebrow{font-size:12.5px;letter-spacing:.14em;font-weight:600;color:var(--blue);text-transform:uppercase;margin-bottom:12px}
 h1{font-size:clamp(34px,6vw,58px);line-height:1.05;letter-spacing:-.03em;font-weight:700}
@@ -76,10 +76,10 @@ h1{font-size:clamp(34px,6vw,58px);line-height:1.05;letter-spacing:-.03em;font-we
 .lead{color:var(--muted);max-width:620px;margin-top:14px;font-size:17px}
 .outils{display:flex;gap:10px;flex-wrap:wrap;margin:28px 0 8px;position:sticky;top:64px;z-index:10;background:var(--bg);padding:12px 0}
 .outils input{flex:1 1 260px;min-width:0;background:var(--card);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;color:var(--text);font:inherit}
-.outils input:focus{outline:2px solid rgba(98,184,255,.6)}
+.outils input:focus{outline:2px solid rgba(255,157,27,.6)}
 .filtres{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
 .filtre{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);border-radius:99px;padding:6px 12px;font:inherit;font-size:13.5px;cursor:pointer}
-.filtre.on{background:rgba(98,184,255,.16);color:var(--text);border-color:rgba(98,184,255,.4)}
+.filtre.on{background:rgba(255,157,27,.16);color:var(--text);border-color:rgba(255,157,27,.4)}
 h2{font-size:22px;letter-spacing:-.02em;margin:34px 0 12px;display:flex;gap:10px;align-items:center}
 h2 small{color:var(--dim);font-size:14px;font-weight:500}
 .grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
@@ -120,7 +120,7 @@ footer a{color:var(--muted)}
 <footer class="wrap" id="t-pied"></footer>
 
 <script>
-const API = 'https://ton-serveur.tailXXXX.ts.net/api/commandes';
+const API = 'https://serveurhp63114.tail284a6e.ts.net/api/commandes';
 // Copie de secours, generee le ${new Date().toISOString().slice(0, 10)} : utilisee seulement si le bot ne repond pas.
 let D = ${process.argv.includes('--sans-copie') ? '{ categories: {}, commandes: [] }' : donnees};
 const T = {

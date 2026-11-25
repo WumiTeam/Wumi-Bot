@@ -18,6 +18,7 @@
  *   LOG_VERIFICATION   les verifications du serveur support
  *   LOG_ADMIN          ce que tu fais avec /admin (blocages, premium, sorties)
  *   LOG_PREMIUM        abonnements premium (souscription, fin)
+ *   LOG_AVIS           les avis laisses avec /avis, a publier ou masquer
  *   LOG_DEFAUT         salon fourre-tout : sert a tout sujet laisse vide
  *
  * POURQUOI PAR L'API ET PAS PAR LE CACHE
@@ -44,6 +45,7 @@ const SUJETS = {
   verification: 'LOG_VERIFICATION',
   admin: 'LOG_ADMIN',
   premium: 'LOG_PREMIUM',
+  avis: 'LOG_AVIS',
 };
 
 /** Les reglages historiques en base, gardes en repli pour ne rien casser. */

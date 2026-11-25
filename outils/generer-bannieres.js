@@ -25,14 +25,16 @@ const SORTIE = path.join(__dirname, '..', 'src', 'assets', 'bannieres');
 const L = 2000;
 const H = 667;
 
+// 2.38 : DA du logo (mascotte orange #FF9D1B, brun noir #221B10).
 const COULEURS = {
-  fond: '#0b0e1c',
-  titre: '#eef0fb',
-  bleu: '#58a6ff',
-  etiquette: '#62acff',
-  etincelle: '#a9b8ec',
-  logo: '#9a9db3',
+  fond: '#120d08',
+  titre: '#f7f1e8',
+  bleu: '#ff9d1b',
+  etiquette: '#ffa733',
+  etincelle: '#ffcf8a',
+  logo: '#c9b9a2',
 };
+const { mascotte } = require('../src/utils/mascotte');
 
 // ------------------------------------------------------------------ TEXTES
 const BANNIERES = {
@@ -86,6 +88,16 @@ const BANNIERES = {
     fr: { tag: 'MODMAIL', titre: 'Écris-nous.', sous: 'l’équipe te répond en MP.' },
     en: { tag: 'MODMAIL', titre: 'Message us.', sous: 'the team replies in your DMs.' },
   },
+  informations: {
+    icone: 'info',
+    fr: { tag: 'INFORMATIONS', titre: 'Bienvenue sur Wumi.', sous: 'tout commence ici.' },
+    en: { tag: 'INFORMATIONS', titre: 'Welcome to Wumi.', sous: 'it all starts here.' },
+  },
+  faq: {
+    icone: 'bulle',
+    fr: { tag: 'FAQ', titre: 'Une question ?', sous: 'la réponse est sûrement ici.' },
+    en: { tag: 'FAQ', titre: 'Got a question?', sous: 'the answer is probably here.' },
+  },
   verification: {
     icone: 'bouclier',
     fr: { tag: 'VÉRIFICATION', titre: 'Bienvenue !', sous: 'vérifie-toi pour entrer.' },
@@ -100,16 +112,16 @@ function fond(ctx) {
 
   // Halo bleu derriere le logo
   let g = ctx.createRadialGradient(300, 380, 20, 300, 380, 720);
-  g.addColorStop(0, 'rgba(58, 120, 182, 0.95)');
-  g.addColorStop(0.35, 'rgba(42, 86, 140, 0.55)');
-  g.addColorStop(1, 'rgba(11, 14, 28, 0)');
+  g.addColorStop(0, 'rgba(255, 157, 27, 0.55)');
+  g.addColorStop(0.35, 'rgba(160, 90, 15, 0.3)');
+  g.addColorStop(1, 'rgba(18, 13, 8, 0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, L, H);
 
   // Lueur violette en bas a droite
   g = ctx.createRadialGradient(1950, 700, 10, 1950, 700, 760);
-  g.addColorStop(0, 'rgba(88, 86, 140, 0.55)');
-  g.addColorStop(1, 'rgba(11, 14, 28, 0)');
+  g.addColorStop(0, 'rgba(110, 62, 14, 0.5)');
+  g.addColorStop(1, 'rgba(18, 13, 8, 0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, L, H);
 
@@ -143,27 +155,9 @@ function etincelle(ctx, x, y, r) {
   ctx.fill();
 }
 
-/** Le grand « W. » du logo. */
+/** Le logo de Wumi tel quel : tuile orange, mascotte brun noir, yeux blancs. */
 function logo(ctx) {
-  ctx.save();
-  ctx.shadowColor = 'rgba(160, 205, 255, 0.35)';
-  ctx.shadowBlur = 40;
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 84;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-  ctx.moveTo(190, 283);
-  ctx.lineTo(232, 418);
-  ctx.lineTo(292, 372);
-  ctx.lineTo(352, 418);
-  ctx.lineTo(392, 283);
-  ctx.stroke();
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(495, 428, 35, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
+  require('../src/utils/mascotte').logo(ctx, 120, 153, 430, { halo: true });
 }
 
 // ------------------------------------------------------------------ ICONES
@@ -267,6 +261,11 @@ function icone(ctx, type, x, y) {
     ctx.globalAlpha = 1;
     ctx.beginPath(); ctx.arc(12, 10, 8, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(12, 35, 14, Math.PI, 0); ctx.fill();
+  } else if (type === 'info') {
+    ctx.beginPath(); ctx.arc(s / 2, s / 2, s / 2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = COULEURS.fond;
+    ctx.beginPath(); ctx.arc(s / 2, 9, 3.2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillRect(s / 2 - 3, 14, 6, 13);
   } else if (type === 'bouclier') {
     ctx.beginPath();
     ctx.moveTo(s / 2, 0);
@@ -305,11 +304,9 @@ function ajuster(ctx, texte, famille, taille, largeurMax) {
 function petitLogo(ctx) {
   const x = 1758;
   const y = 578;
-  ctx.fillStyle = COULEURS.logo;
+  ctx.fillStyle = '#ff9d1b';
   ctx.beginPath(); ctx.roundRect(x, y, 38, 38, 9); ctx.fill();
-  ctx.fillStyle = COULEURS.fond;
-  ctx.font = '22px WumiTitre';
-  ctx.fillText('w.', x + 6, y + 27);
+  mascotte(ctx, x + 4, y + 8, 30, '#221b10', '#ffffff');
   ctx.fillStyle = COULEURS.logo;
   ctx.font = '44px WumiGras';
   ctx.fillText('wumi', x + 52, y + 33);
@@ -351,7 +348,9 @@ function dessiner(def, langue) {
 
 (async () => {
   fs.mkdirSync(SORTIE, { recursive: true });
+  const seul = process.argv[2];
   for (const [nom, def] of Object.entries(BANNIERES)) {
+    if (seul && nom !== seul) continue;
     for (const langue of ['fr', 'en']) {
       const png = await dessiner(def, langue);
       const fichier = path.join(SORTIE, `${nom}.${langue}.png`);

@@ -12,6 +12,7 @@
  * sortiraient en carres vides. Tous les textes arrivent deja traduits.
  */
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
+const { mascotte, filigrane, nomMarque } = require('./mascotte');
 const { chargerPolices } = require('./polices');
 const { rectArrondi, cercleImage, tronquerTexte } = require('./canvasOutils');
 const { dessinerPiece } = require('./pieceWumi');
@@ -19,13 +20,13 @@ const { initiales } = require('./carteClassement');
 
 const P = 'Poppins';
 const COUL = {
-  fond: '#0a0c18',
-  carte: '#10142a',
+  fond: '#110c07',
+  carte: '#1c140b',
   encart: 'rgba(255,255,255,0.04)',
   bordure: 'rgba(255,255,255,0.08)',
-  texte: '#eef0fb',
-  doux: '#a3a9c9',
-  discret: '#6f7598',
+  texte: '#f7f1e8',
+  doux: '#bcae9a',
+  discret: '#8a7a66',
   piste: 'rgba(255,255,255,0.07)',
   or: '#f8bd2c',
   orFonce: '#e39027',
@@ -49,18 +50,17 @@ function decor(ctx, L, H) {
   ctx.fillRect(0, 0, L, H);
   let g = ctx.createRadialGradient(L - 200, 40, 10, L - 200, 40, 700);
   g.addColorStop(0, 'rgba(248,189,44,0.20)');
-  g.addColorStop(1, 'rgba(16,20,42,0)');
+  g.addColorStop(1, 'rgba(28,20,11,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, L, H);
   g = ctx.createRadialGradient(120, H, 10, 120, H, 650);
-  g.addColorStop(0, 'rgba(90,110,230,0.20)');
-  g.addColorStop(1, 'rgba(16,20,42,0)');
+  g.addColorStop(0, 'rgba(255,140,30,0.20)');
+  g.addColorStop(1, 'rgba(28,20,11,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, L, H);
   ctx.globalAlpha = 0.03;
   ctx.fillStyle = '#ffffff';
-  ctx.font = `${Math.round(H * 1.5)}px "${P} Bold", sans-serif`;
-  ctx.fillText('w.', L - H * 1.25, H - 30);
+  filigrane(ctx, L - H * 1.2, H * 0.08, H * 1.1, '#ffffff');
   ctx.globalAlpha = 1;
   ctx.restore();
   rectArrondi(ctx, 20.5, 20.5, L - 41, H - 41, 30);
@@ -85,7 +85,7 @@ function avatar(ctx, img, nom, x, y, t, anneau = COUL.or) {
   else {
     ctx.beginPath();
     ctx.arc(x + t / 2, y + t / 2, t / 2, 0, Math.PI * 2);
-    ctx.fillStyle = '#2b3266';
+    ctx.fillStyle = '#4a3216';
     ctx.fill();
     ctx.fillStyle = COUL.texte;
     ctx.font = `${Math.round(t * 0.36)}px "${P} Bold", sans-serif`;
@@ -191,7 +191,7 @@ function signature(ctx, L, y) {
   ctx.fillText('.', L - 64, y);
   const point = ctx.measureText('.').width;
   ctx.fillStyle = COUL.texte;
-  ctx.fillText('wumi', L - 64 - point - 1, y);
+  ctx.fillText(nomMarque(), L - 64 - point - 1, y);
   ctx.textAlign = 'left';
 }
 

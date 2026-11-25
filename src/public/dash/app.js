@@ -25,7 +25,7 @@
     salon_muet: "(I can't write here)", gerable_non: "(above my role)",
     err_etat: 'Login expired, please try again.', err_discord: "Discord didn't accept the login. Try again.", err_bloque: 'This account is blocked from Wumi.',
     err_acces: "You can no longer manage this server.", err_reseau: 'Network error.',
-    erreurs: { nombre_invalide: 'Invalid number', valeur_inconnue: 'Unknown value', trop_long: 'Too long', salon_invalide: 'Invalid channel (or I cannot write there)', categorie_invalide: 'Invalid category', role_invalide: 'Invalid role', role_gere: 'This role is managed by an integration', role_trop_haut_bot: 'This role is above my role', role_trop_haut_toi: 'This role is above your highest role', role_dangereux: 'This role has moderation/admin permissions', emoji_invalide: 'Invalid emoji', trop_menus: 'Too many panels (25 max)', trop_roles: 'Too many roles (25 max)', titre_requis: 'A title is required', aucun_role: 'Add at least one role', deja: 'Already in the panel', pas_dedans: 'Not in the panel', introuvable: 'Not found', envoi_impossible: 'Discord refused the message', droits_bot: 'I need Embed Links in this channel', droits_toi: "You can't write in this channel", couleur_invalide: 'Invalid color (e.g. #58a6ff)', image_invalide: 'The image must be an https link', url_invalide: 'Button links must start with https://', vide: 'Add a title or a text', droits_moderation: 'You need « Moderate Members »' },
+    erreurs: { nombre_invalide: 'Invalid number', valeur_inconnue: 'Unknown value', trop_long: 'Too long', salon_invalide: 'Invalid channel (or I cannot write there)', categorie_invalide: 'Invalid category', role_invalide: 'Invalid role', role_gere: 'This role is managed by an integration', role_trop_haut_bot: 'This role is above my role', role_trop_haut_toi: 'This role is above your highest role', role_dangereux: 'This role has moderation/admin permissions', emoji_invalide: 'Invalid emoji', trop_menus: 'Too many panels (25 max)', trop_roles: 'Too many roles (25 max)', titre_requis: 'A title is required', aucun_role: 'Add at least one role', deja: 'Already in the panel', pas_dedans: 'Not in the panel', introuvable: 'Not found', envoi_impossible: 'Discord refused the message', droits_bot: 'I need Embed Links in this channel', droits_toi: "You can't write in this channel", couleur_invalide: 'Invalid color (e.g. #ff9d1b)', image_invalide: 'The image must be an https link', url_invalide: 'Button links must start with https://', vide: 'Add a title or a text', droits_moderation: 'You need « Moderate Members »' },
     s_stats: 'Statistics', s_rr: 'Reaction roles', s_embed: 'Embed builder', s_sanctions: 'Sanctions',
     st_sous: "Your server's activity. Data is kept for 180 days.", st_jours: (n) => `${n} days`,
     st_messages: 'Messages', st_arrivees: 'Joins', st_departs: 'Leaves', st_solde: 'Net growth', st_vocal: 'Voice (hours)',
@@ -44,6 +44,17 @@
     sa_sous: 'Every sanction given on the server, newest first.', sa_tous: 'All types', sa_membre: 'Member ID (optional)', sa_filtrer: 'Filter',
     sa_type: 'Type', sa_membre_col: 'Member', sa_par: 'By', sa_raison: 'Reason', sa_retirer: 'Remove', sa_confirmer: 'Remove this sanction from the history?',
     sa_aucune: 'No sanction.', sa_page: (p, n) => `Page ${p} / ${n}`, sa_inactif: 'expired',
+    pr_titre: 'Premium', pr_sous: 'Wumi Premium on this server: free trial, card background and default card theme.',
+    pr_actif: 'This server has Wumi Premium.', pr_inactif: "This server doesn't have Premium yet.", pr_jusqu: (d) => `Until ${d}`, pr_sans_fin: 'No end date',
+    pr_source: { discord: 'Discord subscription', offert: 'Granted by the Wumi team', essai: 'Free trial' },
+    pr_essai: 'Start the 7-day free trial', pr_essai_sous: 'Once per server, no card needed. It simply stops after 7 days.', pr_essai_ok: 'Trial started ✓',
+    pr_abonner: 'Subscribe on Discord', pr_requis: 'Available with Premium (or during the free trial).',
+    pr_fond: 'Card background', pr_fond_sous: 'Used on the rank, profile and level-up cards of every member without their own background. PNG, JPEG, WebP or GIF, 8 MB max.',
+    pr_choisir: 'Choose an image', pr_retirer_fond: 'Remove the background', pr_apercu: 'Preview (your rank and level-up cards)',
+    pr_profil: 'Wumi in your image', pr_profil_sous: 'Give Wumi its own name, avatar, banner and bio on this server only. Everywhere else, Wumi stays Wumi.',
+    pr_nom: 'Name on this server', pr_bio: 'Bio (190 characters max)', pr_avatar: 'Avatar', pr_banniere: 'Banner', pr_changer: 'Change', pr_enregistrer: 'Save', pr_reinit: 'Back to the original Wumi',
+    pr_theme: 'Default card theme', pr_theme_sous: 'For members who never picked a theme in /theme. They can still choose their own.', pr_theme_aucun: 'Wumi (default)',
+    pr_erreurs: { profil_echec: "Discord refused the change (image too big or animated?).", premium_requis: 'This needs Premium.', essai_utilise: 'This server has already used its free trial.', deja_premium: 'This server already has Premium.', image_format: 'Unsupported image format.', image_taille: 'Image too large (8 MB max).', image_illisible: "Couldn't read this image." },
 
   } : {
     dashboard: 'tableau de bord', deconnexion: 'Déconnexion', titre_accueil: 'Tableau de bord Wumi',
@@ -60,7 +71,7 @@
     salon_muet: "(je ne peux pas écrire ici)", gerable_non: '(au-dessus de mon rôle)',
     err_etat: 'Connexion expirée, réessaie.', err_discord: "Discord n'a pas accepté la connexion. Réessaie.", err_bloque: 'Ce compte est bloqué sur Wumi.',
     err_acces: 'Tu ne peux plus gérer ce serveur.', err_reseau: 'Erreur réseau.',
-    erreurs: { nombre_invalide: 'Nombre invalide', valeur_inconnue: 'Valeur inconnue', trop_long: 'Trop long', salon_invalide: "Salon invalide (ou je ne peux pas y écrire)", categorie_invalide: 'Catégorie invalide', role_invalide: 'Rôle invalide', role_gere: 'Ce rôle est géré par une intégration', role_trop_haut_bot: 'Ce rôle est au-dessus de mon rôle', role_trop_haut_toi: 'Ce rôle est au-dessus de ton rôle le plus haut', role_dangereux: 'Ce rôle a des permissions de modération ou d\'admin', emoji_invalide: 'Emoji invalide', trop_menus: 'Trop de panneaux (25 max)', trop_roles: 'Trop de rôles (25 max)', titre_requis: 'Il faut un titre', aucun_role: 'Ajoute au moins un rôle', deja: 'Déjà dans le panneau', pas_dedans: "Pas dans le panneau", introuvable: 'Introuvable', envoi_impossible: 'Discord a refusé le message', droits_bot: "Il me faut « Intégrer des liens » dans ce salon", droits_toi: 'Tu ne peux pas écrire dans ce salon', couleur_invalide: 'Couleur invalide (ex. #58a6ff)', image_invalide: "L'image doit être un lien https", url_invalide: 'Les liens des boutons doivent commencer par https://', vide: 'Ajoute un titre ou un texte', droits_moderation: 'Il te faut « Modérer les membres »' },
+    erreurs: { nombre_invalide: 'Nombre invalide', valeur_inconnue: 'Valeur inconnue', trop_long: 'Trop long', salon_invalide: "Salon invalide (ou je ne peux pas y écrire)", categorie_invalide: 'Catégorie invalide', role_invalide: 'Rôle invalide', role_gere: 'Ce rôle est géré par une intégration', role_trop_haut_bot: 'Ce rôle est au-dessus de mon rôle', role_trop_haut_toi: 'Ce rôle est au-dessus de ton rôle le plus haut', role_dangereux: 'Ce rôle a des permissions de modération ou d\'admin', emoji_invalide: 'Emoji invalide', trop_menus: 'Trop de panneaux (25 max)', trop_roles: 'Trop de rôles (25 max)', titre_requis: 'Il faut un titre', aucun_role: 'Ajoute au moins un rôle', deja: 'Déjà dans le panneau', pas_dedans: "Pas dans le panneau", introuvable: 'Introuvable', envoi_impossible: 'Discord a refusé le message', droits_bot: "Il me faut « Intégrer des liens » dans ce salon", droits_toi: 'Tu ne peux pas écrire dans ce salon', couleur_invalide: 'Couleur invalide (ex. #ff9d1b)', image_invalide: "L'image doit être un lien https", url_invalide: 'Les liens des boutons doivent commencer par https://', vide: 'Ajoute un titre ou un texte', droits_moderation: 'Il te faut « Modérer les membres »' },
     s_stats: 'Statistiques', s_rr: 'Rôles-réactions', s_embed: "Créateur d'embeds", s_sanctions: 'Sanctions',
     st_sous: "L'activité de ton serveur. Les données sont gardées 180 jours.", st_jours: (n) => `${n} jours`,
     st_messages: 'Messages', st_arrivees: 'Arrivées', st_departs: 'Départs', st_solde: 'Croissance nette', st_vocal: 'Vocal (heures)',
@@ -79,11 +90,65 @@
     sa_sous: 'Toutes les sanctions données sur le serveur, les plus récentes en premier.', sa_tous: 'Tous les types', sa_membre: 'ID du membre (facultatif)', sa_filtrer: 'Filtrer',
     sa_type: 'Type', sa_membre_col: 'Membre', sa_par: 'Par', sa_raison: 'Raison', sa_retirer: 'Retirer', sa_confirmer: "Retirer cette sanction de l'historique ?",
     sa_aucune: 'Aucune sanction.', sa_page: (p, n) => `Page ${p} / ${n}`, sa_inactif: 'expirée',
+    pr_titre: 'Premium', pr_sous: "Wumi Premium sur ce serveur : essai gratuit, fond des cartes et thème par défaut.",
+    pr_actif: 'Ce serveur a Wumi Premium.', pr_inactif: "Ce serveur n'a pas encore le Premium.", pr_jusqu: (d) => `Jusqu'au ${d}`, pr_sans_fin: 'Sans date de fin',
+    pr_source: { discord: 'Abonnement Discord', offert: "Offert par l'équipe Wumi", essai: 'Essai gratuit' },
+    pr_essai: "Lancer l'essai gratuit de 7 jours", pr_essai_sous: "Une fois par serveur, sans carte bancaire. Il s'arrête tout seul au bout de 7 jours.", pr_essai_ok: 'Essai lancé ✓',
+    pr_abonner: "S'abonner sur Discord", pr_requis: "Disponible avec le Premium (ou pendant l'essai gratuit).",
+    pr_fond: 'Fond des cartes', pr_fond_sous: "Utilisé sur les cartes de rang, de profil et de niveau de tous les membres sans fond personnel. PNG, JPEG, WebP ou GIF, 8 Mo max.",
+    pr_choisir: 'Choisir une image', pr_retirer_fond: 'Retirer le fond', pr_apercu: 'Aperçu (tes cartes de rang et de niveau)',
+    pr_profil: 'Wumi à ton image', pr_profil_sous: "Donne à Wumi un nom, un avatar, une bannière et une bio rien qu'à ce serveur. Partout ailleurs, Wumi reste Wumi.",
+    pr_nom: 'Nom sur ce serveur', pr_bio: 'Bio (190 caractères max)', pr_avatar: 'Avatar', pr_banniere: 'Bannière', pr_changer: 'Changer', pr_enregistrer: 'Enregistrer', pr_reinit: "Revenir au Wumi d'origine",
+    pr_theme: 'Thème de carte par défaut', pr_theme_sous: "Pour les membres qui n'ont jamais choisi de thème dans /theme. Ils peuvent toujours choisir le leur.", pr_theme_aucun: 'Wumi (par défaut)',
+    pr_erreurs: { profil_echec: 'Discord a refusé le changement (image trop lourde ou animée ?).', premium_requis: 'Il faut le Premium.', essai_utilise: 'Ce serveur a déjà utilisé son essai gratuit.', deja_premium: 'Ce serveur a déjà le Premium.', image_format: "Format d'image non pris en charge.", image_taille: 'Image trop lourde (8 Mo max).', image_illisible: 'Image illisible.' },
 
   };
   document.documentElement.lang = EN ? 'en' : 'fr';
   document.getElementById('t-dashboard').textContent = T.dashboard;
   document.getElementById('t-deconnexion').textContent = T.deconnexion;
+
+  const G = EN
+    ? { general: 'Overview', modules: 'Modules', outils: 'Tools', changer: 'Switch server', chercher: 'Search a server…', membres_n: 'members',
+        p1: 'Every setting, without typing a command', p2: 'Live statistics for your server', p3: 'Reaction roles, embeds and sanctions' }
+    : { general: "Vue d'ensemble", modules: 'Modules', outils: 'Outils', changer: 'Changer de serveur', chercher: 'Chercher un serveur…', membres_n: 'membres',
+        p1: 'Tous les réglages, sans taper une commande', p2: 'Les statistiques de ton serveur en direct', p3: 'Rôles-réactions, embeds et sanctions' };
+
+  // Icones du menu (traits simples, 24x24). Une cle inconnue prend « point ».
+  const ICONES = {
+    stats: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
+    arrivees: 'M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3',
+    departs: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
+    niveaux: 'M12 2l3 7h7l-5.5 4.5 2 7.5L12 16.5 5.5 21l2-7.5L2 9h7z',
+    economie: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM15 9a3 3 0 0 0-3-1.5c-1.7 0-3 .9-3 2.2 0 3 6 1.6 6 4.6 0 1.3-1.3 2.2-3 2.2A3.3 3.3 0 0 1 9 15M12 6v1.5M12 16.5V18',
+    missions: 'M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',
+    moderation: 'M14 13l-8.5 8.5a2.1 2.1 0 0 1-3-3L11 10M16 16l6-6M8 8l6-6M9 7l8 8M21 11l-8-8',
+    securite: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+    logs: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h8',
+    tickets: 'M3 9a3 3 0 0 0 0 6v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3a3 3 0 0 0 0-6V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zM13 4v16',
+    communaute: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',
+    evenements: 'M3 4h18v18H3zM16 2v4M8 2v4M3 10h18',
+    votes: 'M7 10v12M15 5.9L14 10h5.8a2 2 0 0 1 2 2.3l-1.4 8A2 2 0 0 1 18.4 22H7V10l4-8a3 3 0 0 1 4 3.9z',
+    serveur: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 14H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 7a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 10h.1a2 2 0 1 1 0 4z',
+    support: 'M12 8V4H8M4 8h16v12H4zM2 14h2M20 14h2M15 13v2M9 13v2',
+    premium: 'M6 3h12l4 6-10 13L2 9z',
+    roles: 'M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8zM7 7h.01',
+    embed: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+    sanctions: 'M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z',
+    paliers: 'M3 17l6-6 4 4 8-8M14 7h7v7',
+    musique: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z',
+    journal: 'M12 8v4l3 3M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8M3 3v5h5',
+    point: 'M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 1 0-6 0',
+  };
+  function icone(cle) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', ICONES[cle] ?? ICONES.point);
+    svg.append(p);
+    return svg;
+  }
 
   const app = document.getElementById('app');
   let moi = null;
@@ -140,39 +205,33 @@
     const erreur = new URLSearchParams(location.search).get('erreur');
     const messages = { etat: T.err_etat, discord: T.err_discord, bloque: T.err_bloque };
     app.replaceChildren(el('section', { class: 'accueil' },
-      el('div', { class: 'logo' }, svgLogo(42)),
+      el('img', { class: 'logo', src: '/wumi-icone.svg', alt: '' }),
       el('h1', { text: T.titre_accueil }),
       el('p', { text: T.intro_accueil }),
+      el('ul', { class: 'points' }, el('li', { text: G.p1 }), el('li', { text: G.p2 }), el('li', { text: G.p3 })),
       erreur ? el('p', { class: 'erreur', text: messages[erreur] ?? T.err_discord }) : null,
-      el('a', { class: 'bouton', href: '/connexion', text: T.connexion })
+      el('a', { class: 'bouton', href: /^\/(serveur|musique)\/\d+$/.test(location.pathname) ? `/connexion?retour=${encodeURIComponent(location.pathname)}` : '/connexion', text: T.connexion })
     ));
-  }
-
-  function svgLogo(l) {
-    const ns = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('viewBox', '0 0 120 80');
-    svg.setAttribute('width', l);
-    svg.setAttribute('height', Math.round(l * 0.66));
-    const p = document.createElementNS(ns, 'polyline');
-    p.setAttribute('points', '14,14 26,56 44,32 62,56 74,14');
-    Object.entries({ fill: 'none', stroke: '#fff', 'stroke-width': 18, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }).forEach(([k, v]) => p.setAttribute(k, v));
-    const c = document.createElementNS(ns, 'circle');
-    Object.entries({ cx: 100, cy: 58, r: 10, fill: '#fff' }).forEach(([k, v]) => c.setAttribute(k, v));
-    svg.append(p, c);
-    return svg;
   }
 
   function ecranServeurs() {
     const cartes = moi.serveurs.map((s) => (s.present
       ? el('a', { class: 'serveur', href: `/serveur/${s.id}`, onclick: (e) => { e.preventDefault(); naviguer(`/serveur/${s.id}`); } },
-        iconeServeur(s), el('strong', { text: s.nom }), el('span', { class: 'etiquette', text: T.present }), el('span', { class: 'bouton petit', text: T.configurer }))
+        el('div', { class: 'banniere' }), iconeServeur(s), el('strong', { text: s.nom }), el('span', { class: 'etiquette', text: T.present }), el('span', { class: 'bouton petit', text: T.configurer }))
       : el('a', { class: 'serveur absent', href: s.invitation, target: '_blank', rel: 'noopener' },
-        iconeServeur(s), el('strong', { text: s.nom }), el('span', { class: 'etiquette', text: T.absent }), el('span', { class: 'bouton petit secondaire', text: T.inviter }))));
+        el('div', { class: 'banniere' }), iconeServeur(s), el('strong', { text: s.nom }), el('span', { class: 'etiquette', text: T.absent }), el('span', { class: 'bouton petit secondaire', text: T.inviter }))));
+    app.classList.remove('large');
+    const grille = el('div', { class: 'grille' }, cartes);
+    const recherche = el('input', { type: 'text', class: 'recherche', placeholder: G.chercher, 'aria-label': G.chercher,
+      oninput: () => {
+        const q = recherche.value.trim().toLowerCase();
+        cartes.forEach((c, i) => { c.hidden = q && !moi.serveurs[i].nom.toLowerCase().includes(q); });
+      } });
     app.replaceChildren(
-      el('h1', { text: T.mes_serveurs }),
-      el('p', { class: 'sous', text: T.mes_serveurs_sous }),
-      cartes.length ? el('div', { class: 'grille' }, cartes) : el('p', { class: 'vide', text: T.aucun_serveur })
+      el('div', { class: 'tete-liste' },
+        el('div', {}, el('h1', { text: T.mes_serveurs }), el('p', { class: 'sous', text: T.mes_serveurs_sous })),
+        cartes.length > 6 ? recherche : null),
+      cartes.length ? grille : el('p', { class: 'vide', text: T.aucun_serveur })
     );
   }
 
@@ -201,34 +260,47 @@
     };
 
     const bouton = (cle, nom, rendre) => {
-      const b = el('button', { type: 'button', 'data-cle': cle, text: nom, onclick: () => ouvrir(cle, rendre) });
+      const b = el('button', { type: 'button', class: 'menu-item', 'data-cle': cle, onclick: () => ouvrir(cle, rendre) },
+        icone(cle), el('span', { text: nom }), cle === 'premium' ? el('span', { class: 'pr', text: 'PRO' }) : null);
       boutons.push(b);
       return b;
     };
     const bStats = bouton('stats', T.s_stats, () => vueStats(d));
     const bCats = d.categories.map((c) => bouton(c.cle, c.nom, () => vueCategorie(d, c)));
     const bOutils = [
+      bouton('premium', T.pr_titre, () => vuePremium(d)),
       bouton('roles', T.s_rr, () => vueRoles(d)),
       bouton('embed', T.s_embed, () => vueEmbed(d)),
       bouton('sanctions', T.s_sanctions, () => vueSanctions(d)),
       bouton('paliers', T.paliers, () => vuePaliers(d)),
       bouton('journal', T.journal, () => vueJournal(d)),
-    ];
+      ];
+    // 2.41 : le lecteur web (une page a part, ouverte a tous les membres)
+    bOutils.push(el('a', { class: 'menu-item', href: `/musique/${d.serveur.id}`, onclick: (e) => { e.preventDefault(); naviguer(`/musique/${d.serveur.id}`); } },
+      icone('musique'), el('span', { text: EN ? 'Web player' : 'Lecteur web' })));
 
-    app.replaceChildren(
+    const presents = moi.serveurs.filter((s) => s.present);
+    const choix = el('select', { 'aria-label': G.changer, title: G.changer, onchange: () => naviguer(`/serveur/${choix.value}`) },
+      presents.map((s) => el('option', { value: s.id, selected: s.id === d.serveur.id, text: s.nom })));
+    const fmt = new Intl.NumberFormat(EN ? 'en-US' : 'fr-FR');
+    app.classList.add('large');
+    app.replaceChildren(el('div', { class: 'appli' },
+      el('aside', { class: 'cote' },
+        el('div', { class: 'choix-serveur' }, iconeServeur(d.serveur), choix),
+        el('nav', { class: 'groupe' }, el('span', { text: G.general }), bStats),
+        el('nav', { class: 'groupe' }, el('span', { text: G.modules }), bCats),
+        el('nav', { class: 'groupe' }, el('span', { text: G.outils }), bOutils)),
+      el('div', { class: 'principal' },
       el('div', { class: 'entete' },
         iconeServeur(d.serveur),
-        el('div', {}, el('h1', { text: d.serveur.nom })),
+        el('div', {}, el('h1', { text: d.serveur.nom }), el('p', { text: `${fmt.format(d.serveur.membres ?? 0)} ${G.membres_n}` })),
         el('a', { class: 'bouton secondaire petit retour', href: '/', onclick: (e) => { e.preventDefault(); naviguer('/'); }, text: T.retour })),
       el('div', { class: 'stats' },
-        el('div', { class: 'stat' }, el('b', { text: new Intl.NumberFormat(EN ? 'en-US' : 'fr-FR').format(d.serveur.membres ?? 0) }), el('small', { text: T.membres })),
+        el('div', { class: 'stat' }, el('b', { text: fmt.format(d.serveur.membres ?? 0) }), el('small', { text: T.membres })),
         el('div', { class: 'stat' }, el('b', { text: d.stats.sanctions30 }), el('small', { text: T.sanctions30 })),
         el('div', { class: 'stat' }, el('b', { text: d.stats.ticketsOuverts }), el('small', { text: T.tickets })),
         el('div', { class: `stat${d.stats.raid ? ' alerte' : ''}` }, el('b', { text: d.stats.raid ? T.raid_on : T.raid_off }), el('small', { text: T.raid }))),
-      el('div', { class: 'disposition' },
-        el('nav', { class: 'menu' }, bStats, el('hr'), bCats, el('hr'), bOutils),
-        contenu)
-    );
+      contenu)));
 
     const voulu = location.hash.slice(1);
     const cible = boutons.find((b) => b.dataset.cle === voulu) ?? boutons[0];
@@ -389,6 +461,129 @@
     ];
   }
 
+
+  // -------------------------------------------------------------- PREMIUM
+  function vuePremium(d) {
+    const id = d.serveur.id;
+    const corps = el('div', {}, el('div', { class: 'roue' }));
+    const DF = new Intl.DateTimeFormat(EN ? 'en-US' : 'fr-FR', { dateStyle: 'long' });
+    const erreurTexte = (e) => T.pr_erreurs[e.code] ?? T.erreurs[e.code] ?? T.erreur;
+
+    const rendre = (p) => {
+      const blocs = [];
+      // Etat
+      blocs.push(el('section', { class: `pr-etat${p.premium ? ' actif' : ''}` },
+        el('b', { text: p.premium ? T.pr_actif : T.pr_inactif }),
+        p.premium ? el('small', { text: `${T.pr_source[p.source] ?? p.source} · ${p.jusqu_a ? T.pr_jusqu(DF.format(p.jusqu_a)) : T.pr_sans_fin}` }) : null,
+        el('div', { class: 'pr-actions' },
+          p.essai === 'ok' ? el('button', { class: 'bouton', type: 'button', text: `🎁 ${T.pr_essai}`, onclick: async (ev) => {
+            ev.target.disabled = true;
+            try { await api(`/api/serveur/${id}/premium`, { action: 'essai' }); toast(T.pr_essai_ok); charger(); }
+            catch (e) { toast(erreurTexte(e), false); ev.target.disabled = false; }
+          } }) : null,
+          (!p.premium || p.source === 'essai') && p.abonnement ? el('a', { class: 'bouton secondaire', href: p.abonnement, target: '_blank', rel: 'noopener', text: T.pr_abonner }) : null),
+        p.essai === 'ok' ? el('p', { class: 'aide', text: T.pr_essai_sous }) : null));
+
+      // Fond des cartes
+      const apercu = el('img', { class: 'pr-apercu', alt: T.pr_apercu, src: `/api/serveur/${id}/apercu?t=${Date.now()}` });
+      const fichier = el('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif', hidden: true, onchange: () => {
+        const f = fichier.files[0];
+        if (!f) return;
+        if (f.size > 8 * 1024 * 1024) { toast(T.pr_erreurs.image_taille, false); return; }
+        const lecteur = new FileReader();
+        lecteur.onload = async () => {
+          try { await api(`/api/serveur/${id}/premium`, { action: 'fond', image: lecteur.result }); toast(T.enregistre); charger(); }
+          catch (e) { toast(erreurTexte(e), false); }
+        };
+        lecteur.readAsDataURL(f);
+      } });
+      blocs.push(el('section', { class: `pr-bloc${p.premium ? '' : ' verrou'}` },
+        el('h3', { text: T.pr_fond }), el('p', { class: 'sous', text: T.pr_fond_sous }),
+        p.premium ? null : el('p', { class: 'aide', text: `🔒 ${T.pr_requis}` }),
+        el('div', { class: 'pr-actions' },
+          el('button', { class: 'bouton', type: 'button', disabled: !p.premium, text: T.pr_choisir, onclick: () => fichier.click() }),
+          p.fond ? el('button', { class: 'bouton danger', type: 'button', disabled: !p.premium, text: T.pr_retirer_fond, onclick: async () => {
+            try { await api(`/api/serveur/${id}/premium`, { action: 'retirer_fond' }); toast(T.enregistre); charger(); }
+            catch (e) { toast(erreurTexte(e), false); }
+          } }) : null,
+          fichier),
+        el('p', { class: 'etiquette', text: T.pr_apercu }), apercu));
+
+      // 3.0.2 : Wumi a ton image (nom, avatar, banniere, bio sur ce serveur)
+      {
+        const pf = p.profil ?? {};
+        const choix = { avatar: undefined, banniere: undefined };
+        const nom = el('input', { type: 'text', maxlength: 32, value: pf.nom ?? '', placeholder: 'Wumi', disabled: !p.premium });
+        const bio = el('textarea', { maxlength: 190, rows: 3, disabled: !p.premium, placeholder: '…' });
+        bio.value = pf.bio ?? '';
+        const imgAvatar = el('img', { class: 'pr-profil-avatar', alt: '', src: pf.avatar ?? '/wumi-icone.svg' });
+        const banniere = el('div', { class: 'pr-profil-banniere', style: pf.banniere ? `background-image:url(${pf.banniere})` : '' });
+        const lireImage = (cle, cible) => {
+          const f = el('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif', hidden: true, onchange: () => {
+            const fi = f.files[0];
+            if (!fi) return;
+            if (fi.size > 8 * 1024 * 1024) { toast(T.pr_erreurs.image_taille, false); return; }
+            const lec = new FileReader();
+            lec.onload = () => {
+              choix[cle] = lec.result;
+              if (cle === 'avatar') cible.src = lec.result; else cible.style.backgroundImage = `url(${lec.result})`;
+            };
+            lec.readAsDataURL(fi);
+          } });
+          return f;
+        };
+        const fAvatar = lireImage('avatar', imgAvatar);
+        const fBanniere = lireImage('banniere', banniere);
+        blocs.push(el('section', { class: `pr-bloc${p.premium ? '' : ' verrou'}` },
+          el('h3', { text: T.pr_profil }), el('p', { class: 'sous', text: T.pr_profil_sous }),
+          p.premium ? null : el('p', { class: 'aide', text: `🔒 ${T.pr_requis}` }),
+          el('div', { class: 'pr-profil' },
+            banniere, imgAvatar,
+            el('div', { class: 'pr-actions' },
+              el('button', { class: 'bouton secondaire', type: 'button', disabled: !p.premium, text: `${T.pr_avatar} · ${T.pr_changer}`, onclick: () => fAvatar.click() }),
+              el('button', { class: 'bouton secondaire', type: 'button', disabled: !p.premium, text: `${T.pr_banniere} · ${T.pr_changer}`, onclick: () => fBanniere.click() }),
+              fAvatar, fBanniere)),
+          el('label', { class: 'etiquette', text: T.pr_nom }), nom,
+          el('label', { class: 'etiquette', text: T.pr_bio }), bio,
+          el('div', { class: 'pr-actions' },
+            el('button', { class: 'bouton', type: 'button', disabled: !p.premium, text: T.pr_enregistrer, onclick: async (ev) => {
+              ev.target.disabled = true;
+              const corps = { action: 'profil', nom: nom.value, bio: bio.value };
+              if (choix.avatar) corps.avatar = choix.avatar;
+              if (choix.banniere) corps.banniere = choix.banniere;
+              try { await api(`/api/serveur/${id}/premium`, corps); toast(T.enregistre); charger(); }
+              catch (e) { toast(erreurTexte(e), false); ev.target.disabled = false; }
+            } }),
+            pf.perso ? el('button', { class: 'bouton danger', type: 'button', disabled: !p.premium, text: T.pr_reinit, onclick: async () => {
+              try { await api(`/api/serveur/${id}/premium`, { action: 'profil_reinit' }); toast(T.enregistre); charger(); }
+              catch (e) { toast(erreurTexte(e), false); }
+            } }) : null)));
+      }
+
+      // Theme par defaut
+      const grille = el('div', { class: 'pr-themes' }, p.themes.map((th) => {
+        const choisi = (p.themeDefaut ?? p.cleDefaut) === th.cle;
+        const fond = th.degrade ? `linear-gradient(135deg, ${th.degrade[0]}, ${th.degrade[1]})` : (th.sombre ? '#1a1d24' : '#f1f3ee');
+        return el('button', { type: 'button', class: `pr-theme${choisi ? ' choisi' : ''}`, disabled: !p.premium,
+          style: `background:${fond};--accent:${th.accent}${th.degrade || th.sombre ? '' : ';color:#1d2416;text-shadow:none'}`, title: th.description ?? '',
+          onclick: async () => {
+            try { await api(`/api/serveur/${id}/premium`, { action: 'theme', cle: th.cle }); toast(T.enregistre); charger(); }
+            catch (e) { toast(erreurTexte(e), false); }
+          } },
+        el('span', { class: 'pr-pastille' }), el('b', { text: `${th.emoji ?? ''} ${th.nom}`.trim() }), th.premium ? el('small', { text: '✦ Premium' }) : null);
+      }));
+      blocs.push(el('section', { class: `pr-bloc${p.premium ? '' : ' verrou'}` },
+        el('h3', { text: T.pr_theme }), el('p', { class: 'sous', text: T.pr_theme_sous }),
+        p.premium ? null : el('p', { class: 'aide', text: `🔒 ${T.pr_requis}` }), grille));
+      corps.replaceChildren(...blocs);
+    };
+
+    const charger = () => api(`/api/serveur/${id}/premium`).then(rendre)
+      .catch(() => corps.replaceChildren(el('p', { class: 'erreur', text: T.err_reseau })));
+    charger();
+    return [el('h2', { text: `✦ ${T.pr_titre}` }), el('p', { class: 'sous', text: T.pr_sous }), corps];
+  }
+
   // -------------------------------------------------------------- JOURNAL
   function vueJournal(d) {
     const corps = el('div', {}, el('div', { class: 'roue' }));
@@ -413,7 +608,7 @@
   // SVG fait main, sans bibliotheque. Couleurs : palette categorielle validee
   // (daltonisme) sur la surface sombre du site. Le texte reste dans les
   // couleurs du texte, jamais celle des series.
-  const SERIE = { 1: '#3987e5', 2: '#d95926', 3: '#199e70', 4: '#c98500' };
+  const SERIE = { 1: '#ff9d1b', 2: '#e0574a', 3: '#199e70', 4: '#6a8fd8' };
   const NF = new Intl.NumberFormat(EN ? 'en-US' : 'fr-FR');
   const DFJ = new Intl.DateTimeFormat(EN ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short' });
   const jourTexte = (iso) => DFJ.format(new Date(`${iso}T12:00:00`));
@@ -673,7 +868,7 @@
   function vueEmbed(d) {
     const titre = el('input', { type: 'text', maxlength: 256 });
     const desc = el('textarea', { maxlength: 4000, style: 'min-height:150px' });
-    const couleur = el('input', { type: 'color', value: '#58a6ff' });
+    const couleur = el('input', { type: 'color', value: '#ff9d1b' });
     const image = el('input', { type: 'text', placeholder: 'https://…', maxlength: 500 });
     const pied = el('input', { type: 'text', maxlength: 2048 });
     const salon = selectSalon(d);
@@ -768,8 +963,208 @@
       el('div', { class: 'filtres' }, type, membre, filtrer), corps];
   }
 
+    // ------------------------------------------------------- LECTEUR WEB (2.41)
+  const M = EN
+    ? { titre: 'Web player', rien: 'Nothing is playing.', rien_aide: 'Join a voice channel on this server, then search for a song below.',
+        chercher: 'Search a song or paste a link (YouTube, Spotify, Deezer, SoundCloud)…', ajouter: 'Add', ensuite: 'Play next',
+        file: 'Up next', file_vide: 'The queue is empty.', par: 'added by', auditeurs: (n) => `${n} listener${n > 1 ? 's' : ''}`,
+        rejoins: (s) => `Join ${s} to control the music.`, direct: 'LIVE', boucle: { off: 'Loop off', file: 'Loop queue', piste: 'Loop track' },
+        jeu: 'A music game is running: the player is locked until it ends.', retour: '← Back',
+        e: { rejoins_vocal: 'Join a voice channel first.', droits_vocal: "Wumi can't join your voice channel.", introuvable: 'Nothing found.',
+          connexion_echec: "Couldn't join the voice channel.", meme_salon: 'You must be in the same voice channel as Wumi.', reserve_dj: 'Reserved for the DJ role.',
+          pas_de_precedent: 'No previous track.', indisponible: 'Music is unavailable right now.', rien: 'Nothing is playing.', jeu: 'A music game is running.', acces: "You're not on this server." },
+        vote: (v) => `Vote to skip: ${v.votes}/${v.besoin}`, ajoute: 'Added!' }
+    : { titre: 'Lecteur web', rien: 'Rien ne joue.', rien_aide: 'Rejoins un salon vocal de ce serveur, puis cherche un titre ci-dessous.',
+        chercher: 'Cherche un titre ou colle un lien (YouTube, Spotify, Deezer, SoundCloud)…', ajouter: 'Ajouter', ensuite: 'Ensuite',
+        file: 'À suivre', file_vide: 'La file est vide.', par: 'ajouté par', auditeurs: (n) => `${n} auditeur${n > 1 ? 's' : ''}`,
+        rejoins: (s) => `Rejoins ${s} pour piloter la musique.`, direct: 'DIRECT', boucle: { off: 'Boucle coupée', file: 'Boucle de la file', piste: 'Boucle du titre' },
+        jeu: 'Un jeu musical est en cours : le lecteur est bloqué jusqu’à la fin.', retour: '← Retour',
+        e: { rejoins_vocal: "Rejoins d'abord un salon vocal.", droits_vocal: 'Wumi ne peut pas rejoindre ton salon vocal.', introuvable: 'Rien trouvé.',
+          connexion_echec: 'Impossible de rejoindre le salon vocal.', meme_salon: 'Tu dois être dans le même salon vocal que Wumi.', reserve_dj: 'Réservé au rôle DJ.',
+          pas_de_precedent: 'Pas de titre précédent.', indisponible: 'La musique est indisponible pour le moment.', rien: 'Rien ne joue.', jeu: 'Un jeu musical est en cours.', acces: "Tu n'es pas sur ce serveur." },
+        vote: (v) => `Vote pour passer : ${v.votes}/${v.besoin}`, ajoute: 'Ajouté !' };
+
+  const ICO = {
+    prec: 'M19 20L9 12l10-8v16zM5 19V5', suiv: 'M5 4l10 8-10 8V4zM19 5v14', lecture: 'M7 4l13 8-13 8z', pause: 'M7 4h4v16H7zM13 4h4v16h-4z',
+    boucle: 'M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3', melanger: 'M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5',
+    volume: 'M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07', croix: 'M18 6L6 18M6 6l12 12', note: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z',
+  };
+  function ico(nom, plein = false) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('class', plein ? 'plein' : '');
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', ICO[nom]);
+    svg.append(p);
+    return svg;
+  }
+  const mmss = (ms) => {
+    if (ms == null) return '–:––';
+    const t = Math.floor(ms / 1000);
+    const h = Math.floor(t / 3600);
+    const m = Math.floor((t % 3600) / 60);
+    const sec = String(t % 60).padStart(2, '0');
+    return h ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`;
+  };
+
+  let arretLecteur = null;
+  async function ecranMusique(id) {
+    app.classList.remove('large');
+    let etat = null;
+    let recu = 0;
+    let occupe = false;
+
+    const zone = el('div', { class: 'lecteur-web' });
+    const message = el('p', { class: 'lw-message', hidden: true });
+    const saisie = el('input', { type: 'text', class: 'lw-recherche', placeholder: M.chercher, 'aria-label': M.chercher, maxlength: '300' });
+    const resultats = el('div', { class: 'lw-resultats' });
+    const formulaire = el('form', { class: 'lw-form', onsubmit: (e) => { e.preventDefault(); chercher(); } },
+      el('span', { class: 'lw-loupe' }, ico('note')), saisie, el('button', { type: 'submit', class: 'bouton', text: M.ajouter }));
+    app.replaceChildren(
+      el('a', { class: 'bouton secondaire petit', href: '/', onclick: (e) => { e.preventDefault(); naviguer('/'); }, text: M.retour }),
+      zone);
+
+    function dire(texte, ok = false) { toast(texte, ok); }
+
+    async function agir(corps) {
+      if (occupe) return;
+      occupe = true;
+      try {
+        const r = await api(`/api/musique/${id}/action`, corps);
+        if (r.vote && !r.vote.passe) dire(M.vote(r.vote), true);
+        if (corps.action === 'ajouter') dire(M.ajoute, true);
+        etat = r.etat; recu = Date.now(); dessiner();
+      } catch (e) {
+        dire(M.e[e.code] ?? T.err_reseau);
+        charger();
+      } finally { occupe = false; }
+    }
+
+    let minuteurRecherche = null;
+    async function chercher() {
+      const q = saisie.value.trim();
+      if (!q) return;
+      // Un lien : on l'ajoute directement.
+      if (/^https?:\/\//i.test(q)) { saisie.value = ''; resultats.replaceChildren(); return agir({ action: 'ajouter', requete: q }); }
+      resultats.replaceChildren(el('p', { class: 'sous', text: '…' }));
+      try {
+        const r = await api(`/api/musique/${id}/recherche?q=${encodeURIComponent(q)}`);
+        resultats.replaceChildren(...(r.resultats.length ? r.resultats.map((p) => el('div', { class: 'lw-ligne' },
+          p.image ? el('img', { src: p.image, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' }) : el('div', { class: 'lw-vide' }, ico('note')),
+          el('div', { class: 'lw-texte' }, el('b', { text: p.titre }), el('small', { text: `${p.auteur}${p.duree ? ` · ${mmss(p.duree)}` : ''}` })),
+          el('button', { type: 'button', class: 'bouton petit secondaire', text: M.ensuite, onclick: () => agir({ action: 'ajouter', requete: p.requete, suivant: true }) }),
+          el('button', { type: 'button', class: 'bouton petit', text: M.ajouter, onclick: () => agir({ action: 'ajouter', requete: p.requete }) })))
+          : [el('p', { class: 'sous', text: M.e.introuvable })]));
+      } catch (e) {
+        resultats.replaceChildren(el('p', { class: 'erreur', text: M.e[e.code] ?? T.err_reseau }));
+      }
+    }
+    saisie.addEventListener('input', () => {
+      clearTimeout(minuteurRecherche);
+      if (saisie.value.trim().length >= 3 && !/^https?:/i.test(saisie.value)) minuteurRecherche = setTimeout(chercher, 450);
+    });
+
+    // Morceaux qui bougent souvent : gardes pour la mise a jour fine.
+    let barre = null; let temps = null; let rempli = null;
+
+    function dessiner() {
+      if (!etat) return;
+      const L = etat.lecteur;
+      const p = L?.actuelle;
+      const enTete = el('div', { class: 'lw-entete' }, iconeServeur(etat.serveur),
+        el('div', {}, el('h1', { text: M.titre }), el('p', { class: 'sous', text: [etat.serveur.nom, L?.salon ? `🔊 ${L.salon.nom}` : null, L ? M.auditeurs(L.auditeurs) : null].filter(Boolean).join(' · ') })));
+
+      const blocs = [enTete];
+      if (L && !L.dansSalon && !etat.moi.admin) blocs.push(el('p', { class: 'lw-alerte', text: M.rejoins(L.salon ? `🔊 ${L.salon.nom}` : '') }));
+      if (L?.modeJeu) blocs.push(el('p', { class: 'lw-alerte', text: M.jeu }));
+
+      // Carte « en cours »
+      if (p) {
+        barre = el('div', { class: 'lw-barre', role: 'slider', 'aria-label': 'position', tabindex: '0' });
+        rempli = el('div', { class: 'lw-rempli' });
+        barre.append(rempli);
+        if (!p.direct) {
+          barre.addEventListener('click', (e) => {
+            const r = barre.getBoundingClientRect();
+            agir({ action: 'position', valeur: Math.round(((e.clientX - r.left) / r.width) * p.duree) });
+          });
+        }
+        temps = el('div', { class: 'lw-temps' }, el('span'), el('span', { text: p.direct ? M.direct : mmss(p.duree) }));
+        const volume = el('input', { type: 'range', min: '1', max: '150', value: String(L.volume), class: 'lw-volume', 'aria-label': 'volume',
+          onchange: () => agir({ action: 'volume', valeur: Number(volume.value) }) });
+        const boucleEtat = L.boucle;
+        blocs.push(el('section', { class: 'lw-carte' },
+          el('div', { class: 'lw-pochette' }, p.image ? el('img', { src: p.image, alt: '', referrerpolicy: 'no-referrer' }) : ico('note')),
+          el('div', { class: 'lw-infos' },
+            p.direct ? el('span', { class: 'lw-direct', text: `● ${M.direct}` }) : null,
+            el('h2', {}, p.lien ? el('a', { href: p.lien, target: '_blank', rel: 'noopener', text: p.titre }) : p.titre),
+            el('p', { class: 'sous', text: [p.auteur, p.demandeurNom ? `${M.par} ${p.demandeurNom}` : null].filter(Boolean).join(' · ') }),
+            p.direct ? null : barre, p.direct ? null : temps,
+            el('div', { class: 'lw-commandes' },
+              el('button', { type: 'button', class: `lw-btn${boucleEtat !== 'off' ? ' actif' : ''}`, title: M.boucle[boucleEtat], 'aria-label': M.boucle[boucleEtat], onclick: () => agir({ action: 'boucle' }) }, ico('boucle'), boucleEtat === 'piste' ? el('i', { text: '1' }) : null),
+              el('button', { type: 'button', class: 'lw-btn', title: '⏮', 'aria-label': 'previous', disabled: !L.historique, onclick: () => agir({ action: 'precedent' }) }, ico('prec', true)),
+              el('button', { type: 'button', class: 'lw-btn lw-principal', 'aria-label': L.pause ? 'play' : 'pause', onclick: () => agir({ action: 'pause' }) }, ico(L.pause ? 'lecture' : 'pause', true)),
+              el('button', { type: 'button', class: 'lw-btn', title: '⏭', 'aria-label': 'next', onclick: () => agir({ action: 'passer' }) }, ico('suiv', true)),
+              el('button', { type: 'button', class: 'lw-btn', title: '🔀', 'aria-label': 'shuffle', disabled: L.fileTotal < 2, onclick: () => agir({ action: 'melanger' }) }, ico('melanger')),
+              el('label', { class: 'lw-vol' }, ico('volume'), volume, el('span', { text: `${L.volume}%` }))))));
+      } else {
+        barre = null; temps = null; rempli = null;
+        blocs.push(el('section', { class: 'lw-carte lw-repos' }, el('div', { class: 'lw-pochette' }, el('img', { src: '/wumi-icone.svg', alt: '' })),
+          el('div', { class: 'lw-infos' }, el('h2', { text: M.rien }), el('p', { class: 'sous', text: etat.moi.salon ? '' : M.rien_aide }))));
+      }
+
+      blocs.push(el('section', { class: 'panneau lw-ajout' }, formulaire, resultats));
+
+      // La file
+      if (L) {
+        blocs.push(el('section', { class: 'panneau' },
+          el('h2', { text: `${M.file}${L.fileTotal ? ` · ${L.fileTotal}` : ''}` }),
+          L.file.length ? el('ol', { class: 'lw-file' }, L.file.map((f, i) => el('li', { class: 'lw-ligne' },
+            el('span', { class: 'lw-num', text: String(i + 1) }),
+            f.image ? el('img', { src: f.image, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' }) : el('div', { class: 'lw-vide' }, ico('note')),
+            el('div', { class: 'lw-texte' }, el('b', { text: f.titre }), el('small', { text: [f.auteur, f.demandeurNom ? `${M.par} ${f.demandeurNom}` : null].filter(Boolean).join(' · ') })),
+            el('span', { class: 'lw-duree', text: f.direct ? M.direct : mmss(f.duree) }),
+            el('button', { type: 'button', class: 'lw-btn petit', 'aria-label': 'play', title: '▶', onclick: () => agir({ action: 'jouer', index: i }) }, ico('lecture', true)),
+            el('button', { type: 'button', class: 'lw-btn petit', 'aria-label': 'remove', title: '✕', onclick: () => agir({ action: 'retirer', index: i }) }, ico('croix')))))
+            : el('p', { class: 'vide', text: M.file_vide })));
+      }
+      const focus = document.activeElement === saisie;
+      zone.replaceChildren(...blocs);
+      if (focus) saisie.focus();
+      tic();
+    }
+
+    function tic() {
+      const p = etat?.lecteur?.actuelle;
+      if (!p || p.direct || !rempli) return;
+      const pos = Math.min(p.duree, etat.lecteur.position + (etat.lecteur.pause ? 0 : Date.now() - recu));
+      rempli.style.width = `${Math.min(100, (pos / p.duree) * 100)}%`;
+      temps.firstChild.textContent = mmss(pos);
+    }
+
+    async function charger() {
+      try {
+        etat = await api(`/api/musique/${id}`);
+        recu = Date.now();
+        // On ne redessine pas sous les doigts de quelqu'un qui tape.
+        if (document.activeElement !== saisie || !resultats.childElementCount) dessiner();
+      } catch (e) {
+        zone.replaceChildren(el('p', { class: 'vide erreur', text: M.e[e.code] ?? T.err_reseau }));
+      }
+    }
+
+    await charger();
+    const tPoll = setInterval(() => { if (!document.hidden && !occupe) charger(); }, 4000);
+    const tTic = setInterval(tic, 500);
+    arretLecteur = () => { clearInterval(tPoll); clearInterval(tTic); arretLecteur = null; };
+    return message;
+  }
+
   // -------------------------------------------------------------- ROUTAGE
   async function route() {
+    if (arretLecteur) arretLecteur();
     if (!moi) {
       try {
         moi = await api('/api/moi');
@@ -784,6 +1179,8 @@
       const img = document.getElementById('profil-avatar');
       if (moi.utilisateur.avatar) img.src = moi.utilisateur.avatar; else img.remove();
     }
+    const mu = location.pathname.match(/^\/musique\/(\d+)$/);
+    if (mu) return ecranMusique(mu[1]);
     const m = location.pathname.match(/^\/serveur\/(\d+)$/);
     if (m) return ecranServeur(m[1]);
     return ecranServeurs();

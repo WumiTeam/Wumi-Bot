@@ -117,7 +117,7 @@ module.exports = {
 
   async execute(interaction) {
     const { t, langue } = traducteur(interaction);
-    const liste = langue === 'fr' ? mots.fr : mots.en;
+    const liste = mots[langue] ?? mots.en;
     const partie = {
       id: crypto.randomBytes(5).toString('hex'),
       mot: liste[crypto.randomInt(liste.length)],

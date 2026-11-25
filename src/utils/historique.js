@@ -67,7 +67,7 @@ function rassembler(guildId, userId, membre = null) {
   const compte = sur({ solde: 0, banque: 0 }, () => require('./banque').compte(guildId, userId));
   const economie = {
     actif: Boolean(cfg.eco_actif),
-    monnaie: sur({ nom: 'pièces', emoji: E('economie') }, () => require('./economie').monnaie(guildId)),
+    monnaie: sur({ nom: require('./langues').t('economie.monnaie_defaut', require('./langues').langueDe(guildId)), emoji: E('economie') }, () => require('./economie').monnaie(guildId)),
     solde: compte.solde ?? 0,
     banque: compte.banque ?? 0,
     rang: sur(null, () => require('./economie').rang(guildId, compte.solde ?? 0)),
@@ -129,23 +129,22 @@ function rassembler(guildId, userId, membre = null) {
  * Une phrase qui resume la fiche : ce qu'on lit en premier.
  * Elle dit ce qui merite l'attention, pas ce qui existe.
  */
-function resume(fiche) {
+function resume(fiche, t = (cle, v) => require('./langues').t(cle, 'fr', v)) {
   const points = [];
   const m = fiche.moderation;
 
-  if (m.avertissementsActifs >= 3) points.push(`${E('avertissement')} **${m.avertissementsActifs} avertissements actifs**`);
-  else if (m.avertissementsActifs) points.push(`${m.avertissementsActifs} avertissement${m.avertissementsActifs > 1 ? 's' : ''} actif${m.avertissementsActifs > 1 ? 's' : ''}`);
+  const avert = t('historique.r_avert_actifs', { n: m.avertissementsActifs });
+  if (m.avertissementsActifs >= 3) points.push(`${E('avertissement')} **${avert}**`);
+  else if (m.avertissementsActifs) points.push(avert);
 
-  if (m.compte.ban) points.push(`déjà banni ${m.compte.ban} fois`);
-  if (m.compte.kick) points.push(`expulsé ${m.compte.kick} fois`);
-  if (m.signalementsRecus >= 3) points.push(`${E('avertissement')} **${m.signalementsRecus} de ses messages signalés**`);
-  if (m.sanctionsPrononcees) points.push(`a prononcé ${m.sanctionsPrononcees} sanction${m.sanctionsPrononcees > 1 ? 's' : ''}`);
-  if (fiche.communaute.invitations.total >= 5) points.push(`${fiche.communaute.invitations.total} membres amenés`);
-  if (fiche.activite.prestige) points.push(`prestige ${fiche.activite.prestige}`);
+  if (m.compte.ban) points.push(t('historique.r_bannis', { n: m.compte.ban }));
+  if (m.compte.kick) points.push(t('historique.r_expulse', { n: m.compte.kick }));
+  if (m.signalementsRecus >= 3) points.push(`${E('avertissement')} **${t('historique.r_signales', { n: m.signalementsRecus })}**`);
+  if (m.sanctionsPrononcees) points.push(t('historique.r_prononcees', { n: m.sanctionsPrononcees }));
+  if (fiche.communaute.invitations.total >= 5) points.push(t('historique.r_amenes', { n: fiche.communaute.invitations.total }));
+  if (fiche.activite.prestige) points.push(t('historique.r_prestige', { n: fiche.activite.prestige }));
 
-  if (!points.length) {
-    return m.total ? 'Rien de particulier à signaler.' : 'Aucun antécédent : ce membre n\'a jamais été sanctionné.';
-  }
+  if (!points.length) return t(m.total ? 'historique.r_rien' : 'historique.r_vierge');
   return points.join(' · ');
 }
 

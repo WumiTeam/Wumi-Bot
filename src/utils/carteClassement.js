@@ -9,25 +9,27 @@
  * en bas meme si elle n'est pas sur la page.
  */
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
+const { mascotte, filigrane, nomMarque } = require('./mascotte');
 const { chargerPolices } = require('./polices');
 const { rectArrondi, cercleImage, tronquerTexte } = require('./canvasOutils');
 const { dessinerPiece } = require('./pieceWumi');
 
+const conf = require('../../config');
 const L = 1600;
 const P = 'Poppins';
 const COUL = {
-  fond: '#0a0c18',
-  carte: '#10142a',
+  fond: '#110c07',
+  carte: '#1c140b',
   ligne: 'rgba(255,255,255,0.035)',
-  ligneMoi: 'rgba(88,166,255,0.13)',
+  ligneMoi: 'rgba(255,157,27,0.13)',
   bordure: 'rgba(255,255,255,0.08)',
-  bordureMoi: 'rgba(120,150,255,0.55)',
-  texte: '#eef0fb',
-  doux: '#a3a9c9',
-  discret: '#6f7598',
+  bordureMoi: 'rgba(255,180,80,0.55)',
+  texte: '#f7f1e8',
+  doux: '#bcae9a',
+  discret: '#8a7a66',
   piste: 'rgba(255,255,255,0.07)',
-  bleu: '#58a6ff',
-  violet: '#8b8cff',
+  bleu: conf.carte.accent ?? '#ff9d1b',
+  violet: conf.carte.accentSecondaire ?? '#ffbe5c',
   or: '#f5c451',
   argent: '#c9d1e3',
   bronze: '#e0975a',
@@ -90,24 +92,23 @@ async function genererCarteClassement(d) {
   ctx.fillStyle = COUL.carte;
   ctx.fillRect(0, 0, L, H);
   let g = ctx.createRadialGradient(260, 40, 10, 260, 40, 900);
-  g.addColorStop(0, 'rgba(70,100,220,0.30)');
-  g.addColorStop(1, 'rgba(16,20,42,0)');
+  g.addColorStop(0, 'rgba(220,120,20,0.30)');
+  g.addColorStop(1, 'rgba(28,20,11,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, L, H);
   g = ctx.createRadialGradient(L - 120, H - 60, 10, L - 120, H - 60, 800);
-  g.addColorStop(0, 'rgba(120,90,220,0.18)');
-  g.addColorStop(1, 'rgba(16,20,42,0)');
+  g.addColorStop(0, 'rgba(200,110,30,0.18)');
+  g.addColorStop(1, 'rgba(28,20,11,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, L, H);
   // Le « W. » de Wumi en filigrane, a droite
   ctx.globalAlpha = 0.035;
   ctx.fillStyle = '#ffffff';
-  ctx.font = `760px "${P} Bold", sans-serif`;
-  ctx.fillText('w.', L - 820, H - 60);
+  filigrane(ctx, L - 820, H - 640, 780, '#ffffff');
   ctx.globalAlpha = 1;
   ctx.restore();
   rectArrondi(ctx, 24.5, 24.5, L - 49, H - 49, 34);
-  ctx.strokeStyle = 'rgba(120,140,255,0.22)';
+  ctx.strokeStyle = 'rgba(255,170,60,0.22)';
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -122,7 +123,7 @@ async function genererCarteClassement(d) {
   if (icone) ctx.drawImage(icone, xi, yi, ti, ti);
   else {
     const gi = ctx.createLinearGradient(xi, yi, xi + ti, yi + ti);
-    gi.addColorStop(0, '#5b7cfa'); gi.addColorStop(1, '#7c6cf0');
+    gi.addColorStop(0, '#ff9d1b'); gi.addColorStop(1, '#ffbe5c');
     ctx.fillStyle = gi;
     ctx.fillRect(xi, yi, ti, ti);
     ctx.fillStyle = '#fff';
@@ -149,9 +150,9 @@ async function genererCarteClassement(d) {
   const xp = L - 80 - lp;
   const yp = yi + 14;
   rectArrondi(ctx, xp, yp, lp, 64, 32);
-  ctx.fillStyle = 'rgba(88,120,255,0.10)';
+  ctx.fillStyle = 'rgba(255,170,60,0.10)';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(120,140,255,0.45)';
+  ctx.strokeStyle = 'rgba(255,170,60,0.45)';
   ctx.lineWidth = 2;
   ctx.stroke();
   if (d.piece) dessinerPiece(ctx, xp + 28, yp + 14, 36);
@@ -190,7 +191,7 @@ async function genererCarteClassement(d) {
     else {
       ctx.beginPath();
       ctx.arc(xa + ta / 2, ya + ta / 2, ta / 2, 0, Math.PI * 2);
-      ctx.fillStyle = '#2b3266';
+      ctx.fillStyle = '#4a3216';
       ctx.fill();
       ctx.fillStyle = COUL.texte;
       ctx.font = `24px "${P} Bold", sans-serif`;
@@ -247,7 +248,7 @@ async function genererCarteClassement(d) {
   ctx.fillText('.', L - 82, yPied);
   const point = ctx.measureText('.').width;
   ctx.fillStyle = COUL.texte;
-  ctx.fillText('wumi', L - 82 - point - 1, yPied);
+  ctx.fillText(nomMarque(), L - 82 - point - 1, yPied);
   ctx.textAlign = 'left';
 
   return canvas.encode('png');

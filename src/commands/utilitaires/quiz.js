@@ -63,7 +63,7 @@ function melanger(liste) {
 
 /** Une question de culture generale, reponses melangees. */
 function questionCulture(x, langue) {
-  const v = langue === 'fr' ? x.fr : x.en;
+  const v = x[langue] ?? x.en;
   const ordre = melanger([0, 1, 2, 3]);
   return { question: v.q, reponses: ordre.map((i) => v.r[i]), bonne: ordre.indexOf(v.b), cat: x.cat };
 }
@@ -71,7 +71,14 @@ function questionCulture(x, langue) {
 /** Une question de drapeau : 3 mauvaises reponses du meme continent. */
 function questionDrapeau(p, langue) {
   const { pays, image } = require('../../utils/donnees/pays');
-  const nom = (x) => (langue === 'fr' ? x.fr : x.en);
+  // 2.31 : le nom du pays dans la langue du serveur (Intl), repli anglais.
+  let regions = null;
+  try { regions = new Intl.DisplayNames([require('../../utils/langues').intl(langue)], { type: 'region' }); } catch { /* repli */ }
+  const nom = (x) => {
+    if (langue === 'fr') return x.fr;
+    if (langue === 'en' || !regions) return x.en;
+    try { const n = regions.of(x.code.toUpperCase()); return n && n !== x.code.toUpperCase() ? n : x.en; } catch { return x.en; }
+  };
   let autres = melanger(pays.filter((x) => x.continent === p.continent && x.code !== p.code)).slice(0, 3);
   if (autres.length < 3) autres = [...autres, ...melanger(pays.filter((x) => x.code !== p.code && !autres.includes(x))).slice(0, 3 - autres.length)];
   const reponses = melanger([p, ...autres]);

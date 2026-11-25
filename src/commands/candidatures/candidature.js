@@ -52,7 +52,7 @@ module.exports = {
         .setNameLocalizations({ fr: 'langue' })
         .setDescription(tr('candidature.opt_langue', DEFAUT))
         .setDescriptionLocalizations(localisations('candidature.opt_langue'))
-        .addChoices({ name: 'English', value: 'en' }, { name: 'Français', value: 'fr' })))
+        .addChoices(...Object.entries(require('../../utils/langues').LANGUES).map(([value, l]) => ({ name: l.nom, value })))))
     .addSubcommand((s) => s
       .setName('view')
       .setNameLocalizations({ fr: 'voir' })

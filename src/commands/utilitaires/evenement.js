@@ -25,10 +25,10 @@ module.exports = {
       .addRoleOption((o) => d(o.setName('role'), 'evenement.opt_role'))
       .addStringOption((o) => d(o.setName('timezone').setNameLocalizations({ fr: 'fuseau' }), 'evenement.opt_fuseau').setMaxLength(40))
       .addStringOption((o) => d(o.setName('repeat').setNameLocalizations({ fr: 'repeter' }), 'evenement.opt_repeter').addChoices(
-        { name: 'Chaque jour · Daily', value: 'quotidien' },
-        { name: 'Chaque semaine · Weekly', value: 'hebdo' },
-        { name: 'Toutes les 2 semaines · Every 2 weeks', value: 'bimensuel' },
-        { name: 'Chaque mois · Monthly', value: 'mensuel' },
+        { name: 'Chaque jour', name_localizations: { 'en-US': 'Daily', 'en-GB': 'Daily' }, value: 'quotidien' },
+        { name: 'Chaque semaine', name_localizations: { 'en-US': 'Weekly', 'en-GB': 'Weekly' }, value: 'hebdo' },
+        { name: 'Toutes les 2 semaines', name_localizations: { 'en-US': 'Every 2 weeks', 'en-GB': 'Every 2 weeks' }, value: 'bimensuel' },
+        { name: 'Chaque mois', name_localizations: { 'en-US': 'Monthly', 'en-GB': 'Monthly' }, value: 'mensuel' },
       ))
       .addIntegerOption((o) => d(o.setName('duration').setNameLocalizations({ fr: 'duree' }), 'evenement.opt_duree').setMinValue(15).setMaxValue(1440))
       .addBooleanOption((o) => d(o.setName('discord-event').setNameLocalizations({ fr: 'evenement-discord' }), 'evenement.opt_natif')))

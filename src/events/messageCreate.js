@@ -19,6 +19,8 @@ module.exports = {
 
     // Modmail : la reponse du staff dans un fil part en MP au membre.
     if (message.channel.isThread?.()) require('../utils/modmail').surMessageStaff(message).catch((e) => logger.debug('Modmail :', e.message));
+    // 2.40 : l'edition Modmail ne fait rien d'autre.
+    if (require('../edition').profil?.modmailSeul) return;
 
     let cfg;
     try {
@@ -115,6 +117,15 @@ module.exports = {
       }
     }
 
+    // 2.34 : cartes a collectionner, un booster tous les N messages comptes.
+    try {
+      if (require('../utils/cartes').noterMessage(message.guild.id, message.author.id)) {
+        message.react('🎴').catch(() => null);
+      }
+    } catch (e) {
+      logger.erreur('Cartes (message) :', e.message);
+    }
+
     // Badges : verifies apres chaque gain, ils s'annoncent avec la montee de niveau
     const nouveauxBadges = progression.verifierBadges(message.guild.id, message.author.id, message.member);
     if (nouveauxBadges.length && cfg.salon_levelup !== 'off') {
@@ -128,7 +139,7 @@ module.exports = {
             new EmbedBuilder()
               .setColor(conf.couleurs.succes)
               .setDescription(
-                `${E('badge')} <@${message.author.id}> débloque ${nouveauxBadges.map((b) => `${b.emoji} **${b.nom}**`).join(', ')} !`
+                `${E('badge')} ${require('../utils/langues').traducteur(message.guild).t('badges.annonce_debloque', { membre: `<@${message.author.id}>`, badges: nouveauxBadges.map((b) => `${b.emoji} **${b.nom}**`).join(', ') })}`
               ),
           ],
         })
@@ -143,39 +154,18 @@ module.exports = {
     const niveau = resultat.niveauApres;
     const roles = await appliquerRecompenses(message.member, niveau).catch(() => []);
 
-    const destination = cfg.salon_levelup ?? 'actuel';
-    if (destination === 'off') return;
-
-    const texte =
-      (cfg.message_levelup || '{mention} passe **niveau {niveau}** ! {emoji}')
-        .replaceAll('{mention}', `<@${message.author.id}>`)
-        .replaceAll('{pseudo}', message.author.username)
-        .replaceAll('{niveau}', String(niveau))
-        .replaceAll('{emoji}', E('niveaux')) +
-      (roles.length ? `\nTu debloques ${roles.map((r) => `<@&${r.id}>`).join(', ')} !` : '');
-
-    const embed = new EmbedBuilder()
-      .setColor(conf.couleurs.succes)
-      .setDescription(texte)
-      .setThumbnail(message.author.displayAvatarURL({ size: 128 }))
-      .setFooter({
-        text:
-          `${infosNiveau(resultat.xpApres).xpTotal} XP au total` +
-          (multi.total > 1.01 ? ` · bonus actuel ×${multi.total.toFixed(2).replace(/\.?0+$/, '')}` : ''),
-      });
-
-    try {
-      if (destination === 'mp') {
-        await message.author.send({ embeds: [embed] }).catch(() => null);
-      } else if (destination === 'actuel') {
-        await message.channel.send({ embeds: [embed] });
-      } else {
-        const salon = message.guild.channels.cache.get(destination);
-        if (salon?.isTextBased()) await salon.send({ embeds: [embed] });
-        else await message.channel.send({ embeds: [embed] });
-      }
-    } catch (e) {
-      logger.avertissement('Annonce de niveau non envoyee :', e.message);
-    }
+    // Wumi 2.19 : texte + carte image (src/utils/annonceNiveau.js).
+    await require('../utils/annonceNiveau').annoncerNiveau({
+      guild: message.guild,
+      user: message.author,
+      member: message.member,
+      cfg,
+      salonActuel: message.channel,
+      niveauAvant: resultat.niveauAvant,
+      niveau,
+      xpTotal: resultat.xpApres,
+      roles,
+      bonus: multi.total > 1.01 ? multi.total : null,
+    });
   },
 };

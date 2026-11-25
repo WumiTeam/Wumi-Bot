@@ -44,10 +44,10 @@ const COMPOSANTS = {
   app_: () => require('../utils/appels').gererInteraction,
   aide_: () => require('../commands/utilitaires/aide').gererInteraction,
   dem_: () => require('../commands/config/demarrer').gererInteraction,
+  prm_: () => require('../commands/utilitaires/premium').gererInteraction,
   cfg_: () => require('../commands/config/config').gererInteraction,
   conf_: () => require('../commands/utilitaires/confidentialite').gererInteraction,
   vote_: () => require('../commands/utilitaires/voter').gererInteraction,
-  bl_: () => require('../utils/blocklist').gererInteraction,
   bout_: () => require('../commands/economie/boutique').gererInteraction,
   obj_: () => require('../commands/economie/objet').gererInteraction,
   thm_: () => require('../commands/niveau/theme').gererInteraction,
@@ -56,7 +56,11 @@ const COMPOSANTS = {
   glb_: () => require('../commands/niveau/global').gererInteraction,
   // Serveur support : tickets et verification par Activite
   stk_: () => require('../utils/ticketsSupport').gererInteraction,
+  avis_: () => require('../utils/avis').gererInteraction,
   svf_: () => require('../utils/verificationSupport').gererInteraction,
+  page_: () => require('../utils/pagesSupport').gererInteraction,
+  tfaq_: () => require('../utils/ticketFaq').gererInteraction,
+  crt_: () => require('../commands/economie/cartes').gererInteraction,
   sanc_: () => require('../commands/moderation/sanctions').gererInteraction,
   // Wumi 2.2 : roles-reactions, morpion, createur d'embeds
   rr_: () => require('../utils/rolesReactions').gererInteraction,
@@ -159,7 +163,11 @@ module.exports = {
         tracer();
       } catch (erreur) {
         tracer('échec');
-        logger.erreur(`Composant ${interaction.customId} :`, erreur);
+        // 10062 (interaction expiree : reponse apres 3 s) et 40060 (deja
+        // repondu, double clic) : Discord a jete le clic, personne n'attend
+        // plus de reponse. Ce n'est pas un bug a signaler en alerte.
+        if (erreur?.code === 10062 || erreur?.code === 40060) logger.avertissement(`Composant ${interaction.customId} : interaction expirée (${erreur.code})`);
+        else logger.erreur(`Composant ${interaction.customId} :`, erreur);
       }
       return;
     }

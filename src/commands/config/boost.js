@@ -10,6 +10,7 @@ const {
   PermissionFlagsBits,
   InteractionContextType,
   ChannelType,
+  MessageFlags,
 } = require('discord.js');
 const C = require('../../utils/composants');
 const { config, majConfig } = require('../../database/db');
@@ -106,6 +107,12 @@ module.exports = {
         .setNameLocalizations({ fr: 'voir' })
         .setDescription(tr('boost.sous_voir', DEFAUT))
         .setDescriptionLocalizations(localisations('boost.sous_voir'))
+    )
+    .addSubcommand((s) =>
+      s
+        .setName('test')
+        .setDescription(tr('boost.sous_test', DEFAUT))
+        .setDescriptionLocalizations(localisations('boost.sous_test'))
     ),
 
   async execute(interaction) {
@@ -115,6 +122,16 @@ module.exports = {
     const cfg = config(guildId);
 
     switch (sous) {
+      case 'test': {
+        // L'annonce telle qu'un vrai boost la posterait, en prive et sans
+        // recompense : pour voir la carte sans attendre un boost.
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        const role = cfg.boost_role ? interaction.guild.roles.cache.get(cfg.boost_role) : null;
+        const message = await boosts.messageCarte(interaction.member, cfg, role);
+        if (!message) return interaction.editReply({ content: t('boost.test_echec') });
+        return interaction.editReply({ content: message.content, files: message.files, allowedMentions: { parse: [] } });
+      }
+
       case 'channel': {
         const salon = interaction.options.getChannel('channel');
         majConfig(guildId, { boost_salon: salon?.id ?? null });

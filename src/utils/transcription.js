@@ -26,8 +26,11 @@ function formater(texte = '') {
     .replace(/\n/g, '<br>');
 }
 
+// 2.24 : la transcription est ecrite dans la langue du serveur.
+let langue = 'fr';
+const tx = (cle) => require('./langues').t(`transcription.${cle}`, langue);
 const dateFr = (ms) =>
-  new Date(ms).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
+  new Date(ms).toLocaleString(langue === 'en' ? 'en-GB' : require('./langues').intl(langue), { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
 
 /**
  * Construit une transcription HTML autonome d'un salon de ticket.
@@ -37,6 +40,7 @@ const dateFr = (ms) =>
  * @returns {Promise<{html: Buffer, nombre: number}>}
  */
 async function genererTranscription(salon, ticket, infos = {}) {
+  langue = require('./langues').langueDe(salon.guild?.id);
   // Recupere l'historique par paquets de 100, du plus ancien au plus recent
   const messages = [];
   let avant;
@@ -49,6 +53,8 @@ async function genererTranscription(salon, ticket, infos = {}) {
   }
   messages.reverse();
 
+  // Relu apres les attentes : une autre transcription a pu changer la langue.
+  langue = require('./langues').langueDe(salon.guild?.id);
   const lignes = messages
     .map((m) => {
       const pieces = m.attachments.size
@@ -86,7 +92,7 @@ async function genererTranscription(salon, ticket, infos = {}) {
     .join('\n');
 
   const html = `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${langue}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -135,23 +141,23 @@ async function genererTranscription(salon, ticket, infos = {}) {
     <h1>Ticket #${ticket.numero}${ticket.type ? ` — ${echapper(ticket.type)}` : ''}</h1>
     <div class="sous">${echapper(salon.guild.name)} · #${echapper(salon.name)}</div>
     <div class="meta">
-      <div><span>Ouvert par</span>${echapper(infos.auteur ?? ticket.user_id)}</div>
-      <div><span>Ouvert le</span>${dateFr(ticket.cree_le)}</div>
-      <div><span>Fermé par</span>${echapper(infos.fermePar ?? '—')}</div>
-      <div><span>Fermé le</span>${dateFr(Date.now())}</div>
-      <div><span>Messages</span>${messages.length}</div>
-      <div><span>Raison de fermeture</span>${echapper(infos.raison ?? 'Aucune')}</div>
+      <div><span>${tx('ouvert_par')}</span>${echapper(infos.auteur ?? ticket.user_id)}</div>
+      <div><span>${tx('ouvert_le')}</span>${dateFr(ticket.cree_le)}</div>
+      <div><span>${tx('ferme_par')}</span>${echapper(infos.fermePar ?? '—')}</div>
+      <div><span>${tx('ferme_le')}</span>${dateFr(Date.now())}</div>
+      <div><span>${tx('messages')}</span>${messages.length}</div>
+      <div><span>${tx('raison')}</span>${echapper(infos.raison ?? tx('aucune'))}</div>
     </div>
     ${
       ticket.sujet || ticket.description
-        ? `<div class="demande">${ticket.sujet ? `<div class="ds"><span>Sujet</span>${echapper(ticket.sujet)}</div>` : ''}${
-            ticket.description ? `<div class="dd"><span>Détail de la demande</span>${formater(ticket.description)}</div>` : ''
+        ? `<div class="demande">${ticket.sujet ? `<div class="ds"><span>${tx('sujet')}</span>${echapper(ticket.sujet)}</div>` : ''}${
+            ticket.description ? `<div class="dd"><span>${tx('detail')}</span>${formater(ticket.description)}</div>` : ''
           }</div>`
         : ''
     }
   </header>
-  ${lignes || '<p style="text-align:center;color:#7d8878">Aucun message dans ce ticket.</p>'}
-  <footer>Transcription générée automatiquement · ${dateFr(Date.now())}</footer>
+  ${lignes || `<p style="text-align:center;color:#7d8878">${tx('vide')}</p>`}
+  <footer>${tx('pied')} · ${dateFr(Date.now())}</footer>
 </div>
 </body>
 </html>`;

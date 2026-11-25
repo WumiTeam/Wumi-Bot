@@ -42,10 +42,34 @@ const DEFAUT = 'fr';          // la langue de repli, celle qui est toujours comp
 const NEUVE = 'en';           // la langue d'un serveur qui vient d'ajouter le bot
 
 /** Les langues proposees. `nom` est affiche dans les reglages. */
+// 2.31 : espagnol, allemand, portugais (Bresil) et italien. `discord` liste
+// les codes de Discord ou poser la traduction des commandes ; `pluriel` dit
+// quand passer au pluriel (le francais et le portugais gardent 0 et 1 au
+// singulier ; l'espagnol, l'allemand et l'italien seulement 1).
 const LANGUES = {
-  fr: { nom: 'Français', drapeau: '🇫🇷', intl: 'fr-FR', discord: 'fr' },
-  en: { nom: 'English', drapeau: '🇬🇧', intl: 'en-US', discord: 'en-US' },
+  fr: { nom: 'Français', drapeau: '🇫🇷', intl: 'fr-FR', discord: 'fr', pluriel: (n) => Math.abs(n) >= 2 },
+  en: { nom: 'English', drapeau: '🇬🇧', intl: 'en-US', discord: 'en-US', pluriel: (n) => Math.abs(n) >= 2 },
+  es: { nom: 'Español', drapeau: '🇪🇸', intl: 'es-ES', discord: ['es-ES', 'es-419'], pluriel: (n) => Math.abs(n) !== 1 },
+  de: { nom: 'Deutsch', drapeau: '🇩🇪', intl: 'de-DE', discord: 'de', pluriel: (n) => Math.abs(n) !== 1 },
+  pt: { nom: 'Português (Brasil)', drapeau: '🇧🇷', intl: 'pt-BR', discord: 'pt-BR', pluriel: (n) => Math.abs(n) >= 2 },
+  it: { nom: 'Italiano', drapeau: '🇮🇹', intl: 'it-IT', discord: 'it', pluriel: (n) => Math.abs(n) !== 1 },
 };
+
+/** Ou chercher un texte absent : la langue, puis l'anglais, puis le francais. */
+const chaine = (langue) => [...new Set([langue, NEUVE, DEFAUT])];
+
+/** Le format Intl d'une langue (dates, nombres). */
+const intl = (langue) => LANGUES[langue]?.intl ?? 'fr-FR';
+
+/** La langue du bot qui correspond a une langue Discord (« es-419 » -> « es »). */
+function depuisDiscord(locale) {
+  const fixe = require('../edition').profil?.langue;
+  if (fixe) return fixe;
+  const l = String(locale ?? '').toLowerCase();
+  if (l.startsWith('pt')) return 'pt';
+  const court = l.slice(0, 2);
+  return LANGUES[court] ? court : null;
+}
 
 const textes = new Map();     // langue -> { cle: phrase }
 const signalees = new Set();  // cles deja signalees, pour ne le dire qu'une fois
@@ -78,13 +102,13 @@ function charger() {
 charger();
 
 /** Remplace {nom} par sa valeur, et tranche le pluriel. */
-function appliquer(phrase, variables) {
+function appliquer(phrase, variables, langue = DEFAUT) {
   let sortie = phrase;
 
   if (sortie.includes('||')) {
     const [un, plusieurs] = sortie.split('||');
     const n = Number(variables.n ?? 0);
-    sortie = Math.abs(n) >= 2 ? plusieurs : un;
+    sortie = (LANGUES[langue]?.pluriel ?? LANGUES.fr.pluriel)(n) ? plusieurs : un;
   }
 
   return sortie.trim().replace(/\{(\w+)\}/g, (entier, nom) =>
@@ -99,7 +123,12 @@ function appliquer(phrase, variables) {
  */
 function t(cle, langue = DEFAUT, variables = {}) {
   const dans = textes.get(langue) ?? textes.get(DEFAUT) ?? {};
-  const phrase = dans[cle] ?? textes.get(DEFAUT)?.[cle];
+  let phrase;
+  let trouvee = langue;
+  for (const l of chaine(langue)) {
+    phrase = textes.get(l)?.[cle];
+    if (phrase !== undefined) { trouvee = l; break; }
+  }
 
   if (phrase === undefined) {
     if (!signalees.has(cle)) {
@@ -114,7 +143,10 @@ function t(cle, langue = DEFAUT, variables = {}) {
     logger.debug(`Texte non traduit en ${langue} : ${cle}`);
   }
 
-  return appliquer(phrase, variables);
+  const sortie = appliquer(phrase, variables, trouvee);
+  // 2.35 : dans une edition, le bot porte son propre nom.
+  const marque = require('../edition').profil?.marque;
+  return marque && typeof sortie === 'string' ? sortie.replace(/\bWumi\b/g, marque) : sortie;
 }
 
 /**
@@ -127,11 +159,14 @@ function t(cle, langue = DEFAUT, variables = {}) {
  * c'est un choix.
  */
 function existe(cle, langue = DEFAUT) {
-  return (textes.get(langue)?.[cle] ?? textes.get(DEFAUT)?.[cle]) !== undefined;
+  return chaine(langue).some((l) => textes.get(l)?.[cle] !== undefined);
 }
 
 /** La langue d'un serveur. Jamais d'exception : au pire, la langue de repli. */
 function langueDe(guildId) {
+  // 2.35 : une edition a une langue fixe (ex. tout en francais).
+  const edition = require('../edition');
+  if (edition.profil?.langue) return edition.profil.langue;
   if (!guildId) return DEFAUT;
   try {
     const { config } = require('../database/db');
@@ -144,7 +179,7 @@ function langueDe(guildId) {
 
 /** Un nombre ecrit comme on l'ecrit dans cette langue (1 234 / 1,234). */
 function nombre(valeur, langue = DEFAUT) {
-  return new Intl.NumberFormat(LANGUES[langue]?.intl ?? 'fr-FR').format(valeur ?? 0);
+  return new Intl.NumberFormat(intl(langue)).format(valeur ?? 0);
 }
 
 /**
@@ -194,7 +229,7 @@ function localisations(cle) {
   const sortie = {};
   for (const [code, info] of Object.entries(LANGUES)) {
     const phrase = textes.get(code)?.[cle];
-    if (phrase) sortie[info.discord] = phrase.slice(0, 100);
+    if (phrase) for (const d of [].concat(info.discord)) sortie[d] = phrase.slice(0, 100);
   }
   return Object.keys(sortie).length ? sortie : null;
 }
@@ -253,4 +288,6 @@ module.exports = {
   LANGUES,
   DEFAUT,
   NEUVE,
+  intl,
+  depuisDiscord,
 };

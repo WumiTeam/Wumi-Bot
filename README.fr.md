@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/banner.png" alt="Wumi, le bot Discord tout-en-un le plus mignon" width="100%">
+<img src="docs/assets/v3-hero.fr.jpg" alt="Wumi, le bot Discord tout-en-un le plus mignon" width="100%">
 
 <br>
 
@@ -8,14 +8,14 @@
 
 <br>
 
-[![Ajouter à Discord](https://img.shields.io/badge/Ajouter%20%C3%A0%20Discord-62b8ff?style=for-the-badge&logo=discord&logoColor=0c0d1c)](https://discord.com/oauth2/authorize?client_id=1545770920185045084&scope=bot%20applications.commands&permissions=1426362592470)
-[![Site](https://img.shields.io/badge/wumi.fr-161935?style=for-the-badge&logo=googlechrome&logoColor=62b8ff)](https://wumi.fr/fr/)
-[![Support](https://img.shields.io/badge/Serveur%20support-161935?style=for-the-badge&logo=discord&logoColor=a9b4f2)](https://discord.gg/VaGrXgnAHS)
+[![Ajouter à Discord](https://img.shields.io/badge/Ajouter%20%C3%A0%20Discord-ff9d1b?style=for-the-badge&logo=discord&logoColor=221b10)](https://discord.com/oauth2/authorize?client_id=1545770920185045084&scope=bot%20applications.commands&permissions=1426362592470)
+[![Site](https://img.shields.io/badge/wumi.fr-221b10?style=for-the-badge&logo=googlechrome&logoColor=ff9d1b)](https://wumi.fr/fr/)
+[![Support](https://img.shields.io/badge/Serveur%20support-221b10?style=for-the-badge&logo=discord&logoColor=ffcf8a)](https://discord.gg/VaGrXgnAHS)
 
-![Version](https://img.shields.io/badge/version-2.17-62b8ff?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.0-ff9d1b?style=flat-square)
 ![discord.js](https://img.shields.io/badge/discord.js-v14-5865f2?style=flat-square&logo=discord&logoColor=white)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522.5-3ddc97?style=flat-square&logo=nodedotjs&logoColor=white)
-![Commandes](https://img.shields.io/badge/commandes-90%2B-a9b4f2?style=flat-square)
+![Commandes](https://img.shields.io/badge/commandes-90%2B-ffcf8a?style=flat-square)
 ![Langues](https://img.shields.io/badge/langues-FR%20%C2%B7%20EN-f8bd2c?style=flat-square)
 ![Licence](https://img.shields.io/badge/licence-MIT-eef0fc?style=flat-square)
 
@@ -70,22 +70,36 @@ Clic droit sur un membre › **Sanctionner**, avertissements avec paliers automa
 
 </td>
 </tr>
+<tr>
+<td valign="top">
+
+### 🎵 Musique et jeux musicaux
+Musique et radios 24h/24 avec un **lecteur web** ouvert à tous les membres, et des jeux musicaux en vocal : quiz musical, *Qui l'a choisie ?* et *Vibe check*.
+
+</td>
+<td valign="top">
+
+### 📣 Alertes en direct
+Twitch, YouTube, TikTok, Instagram et RSS : chaque live ou nouvelle vidéo arrive avec sa propre carte image.
+
+</td>
+</tr>
 </table>
 
 ## 🖼️ Un aperçu
 
 <div align="center">
+<img src="docs/assets/v3-niveaux.fr.jpg" alt="Cartes de niveau" width="100%">
+<sub>Cartes de montée de niveau et <code>/rank</code>, avec thèmes.</sub>
+<br><br>
+<img src="docs/assets/v3-bienvenue.fr.jpg" alt="Cartes de bienvenue" width="49%"> <img src="docs/assets/v3-classement.fr.jpg" alt="Classement" width="49%">
+<sub>Cartes d'arrivée et de départ · <code>/classement</code> avec ta ligne mise en avant.</sub>
+<br><br>
+<img src="docs/assets/v3-alertes.fr.jpg" alt="Alertes" width="49%"> <img src="docs/assets/v3-economie.fr.jpg" alt="Cartes d'économie" width="49%">
+<sub>Cartes d'alerte Twitch et YouTube · <code>/economie solde</code> et <code>/economie daily</code>.</sub>
+<br><br>
 <img src="docs/assets/wumirun.png" alt="Wumi Run" width="100%">
 <sub><b>Wumi Run</b> : le jeu de plateforme qui s'ouvre directement dans ton salon.</sub>
-<br><br>
-<img src="docs/assets/leaderboard.png" alt="Classement en image" width="100%">
-<sub><code>/classement</code> : deux colonnes, des barres de progression, ta ligne mise en avant.</sub>
-<br><br>
-<img src="docs/assets/wallet.png" alt="Carte portefeuille" width="49%"> <img src="docs/assets/daily.png" alt="Carte récompense quotidienne" width="49%">
-<sub><code>/economie solde</code> et <code>/economie daily</code>, avec la pièce d'or de Wumi Run.</sub>
-<br><br>
-<img src="docs/assets/serverinfo.png" alt="Fiche serveur" width="49%"> <img src="docs/assets/welcome.png" alt="Carte de bienvenue" width="49%">
-<sub><code>/serverinfo</code> et une carte de bienvenue (jusqu'à 5 designs personnalisés par serveur).</sub>
 </div>
 
 ## 📚 Tout ce que Wumi sait faire
@@ -99,8 +113,8 @@ Clic droit sur un membre › **Sanctionner**, avertissements avec paliers automa
 | 🛡️ **Sécurité** | `/antinuke`, bouton panique `/raid`, anti-raid, automod, anti-phishing, `/audit` (note sur 100), photos de structure et réparation |
 | 🎫 **Support** | Tickets avec panneaux, prise en charge et transcriptions, modmail, suggestions avec votes, candidatures du staff |
 | 👋 **Communauté** | Cartes de bienvenue et d'au revoir, rôles automatiques, rôles-réactions, starboard, anniversaires, concours avec chances bonus, événements récurrents |
-| 🎵 **Musique** | `/play` (YouTube, Spotify, SoundCloud), radios, filtres, rôle DJ, playlists, 24/7 |
-| 🧰 **Utilitaires** | Créateur d'`/embed` avec modèles, fiches serveur et membre, `/stats` avec rapport du lundi, suivi des invitations, vocaux temporaires, alertes Twitch / YouTube / RSS |
+| 🎵 **Musique** | `/play` (YouTube, Spotify, SoundCloud), radios, filtres, rôle DJ, playlists, 24/7, lecteur web, jeux musicaux (`/jeu-musical` : quiz, qui l'a choisie, vibe check) |
+| 🧰 **Utilitaires** | Créateur d'`/embed` avec modèles, fiches serveur et membre, `/stats` avec rapport du lundi, suivi des invitations, vocaux temporaires, alertes Twitch / YouTube / TikTok / Instagram / RSS avec carte image, `/avis` |
 
 > La liste complète, toujours à jour, est sur **[wumi.fr/commandes](https://wumi.fr/commandes/?lang=fr)** : elle est générée à partir du bot lui-même.
 
@@ -109,8 +123,8 @@ Clic droit sur un membre › **Sanctionner**, avertissements avec paliers automa
 **Il te faut :** Node.js **22.5 ou plus** (24 conseillé) et une application Discord créée sur le [Developer Portal](https://discord.com/developers/applications).
 
 ```bash
-git clone https://github.com/Zhaak63/Wumi-bot.git
-cd Wumi-bot
+git clone https://github.com/WumiTeam/Wumi-Bot.git
+cd Wumi-Bot
 npm install
 cp .env.example .env      # puis remplis DISCORD_TOKEN, CLIENT_ID, OWNER_IDS...
 npm run deploy            # enregistre les commandes slash
@@ -146,7 +160,7 @@ docs/              guides et images du README
 
 [discord.js v14](https://discord.js.org) et les Components V2 · `node:sqlite` · [@napi-rs/canvas](https://github.com/Brooooooklyn/canvas) pour toutes les cartes en image · le SDK Embedded App de Discord pour Wumi Run · [Poppins](https://fonts.google.com/specimen/Poppins) · graphismes du jeu par [Kenney](https://kenney.nl) (CC0).
 
-## 💙 Liens
+## 🧡 Liens
 
 - 🌐 Site : [wumi.fr](https://wumi.fr/fr/) · [Nouveautés](https://wumi.fr/nouveautes/?lang=fr) · [Statut](https://wumi.fr/statut/)
 - 💬 Serveur support : [discord.gg/VaGrXgnAHS](https://discord.gg/VaGrXgnAHS)
@@ -155,5 +169,5 @@ docs/              guides et images du README
 
 <div align="center">
 <br>
-<sub>Fait avec 💙 par <b>Zhaak</b> · sous <a href="LICENSE">licence MIT</a></sub>
+<sub>Fait avec 🧡 par <b>Zhaak</b> · sous <a href="LICENSE">licence MIT</a></sub>
 </div>

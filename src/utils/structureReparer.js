@@ -27,16 +27,18 @@ const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
  * coup que la moitie du travail n'a pas pu etre faite.
  */
 function verifier(photo, guild) {
+  // 2.24 : les phrases sont dans la langue du serveur.
+  const { t } = require('./langues').traducteur(guild);
   const bloquants = [];
   const avertissements = [];
 
   const moi = guild.members.me;
-  if (!moi) return { bloquants: ['Je ne me trouve pas sur ce serveur.'], avertissements };
+  if (!moi) return { bloquants: [t('structure.u.absent')], avertissements };
 
-  if (!moi.permissions.has(PermissionFlagsBits.ManageRoles)) bloquants.push('il me manque la permission **Gérer les rôles**');
-  if (!moi.permissions.has(PermissionFlagsBits.ManageChannels)) bloquants.push('il me manque la permission **Gérer les salons**');
+  if (!moi.permissions.has(PermissionFlagsBits.ManageRoles)) bloquants.push(t('structure.u.manque_roles'));
+  if (!moi.permissions.has(PermissionFlagsBits.ManageChannels)) bloquants.push(t('structure.u.manque_salons'));
   if (!moi.permissions.has(PermissionFlagsBits.ManageGuild)) {
-    avertissements.push("il me manque **Gérer le serveur** : je ne pourrai pas remettre le nom, le niveau de vérification ni le salon AFK");
+    avertissements.push(t('structure.u.manque_serveur'));
   }
 
   // Un role place au-dessus du mien est hors de ma portee : Discord refuse.
@@ -45,15 +47,14 @@ function verifier(photo, guild) {
     (r) => r.id !== guild.id && !r.managed && r.position >= plafond
   );
   if (horsPortee.length) {
-    avertissements.push(
-      `${horsPortee.length} rôle(s) sont au-dessus du mien et je ne peux pas y toucher : ` +
-        `${horsPortee.slice(0, 5).map((r) => r.name).join(', ')}${horsPortee.length > 5 ? '…' : ''}. ` +
-        'Monte mon rôle au-dessus dans les paramètres du serveur pour que je puisse les réparer.'
-    );
+    avertissements.push(t('structure.u.hors_portee', {
+      n: horsPortee.length,
+      liste: `${horsPortee.slice(0, 5).map((r) => r.name).join(', ')}${horsPortee.length > 5 ? '…' : ''}`,
+    }));
   }
 
   const geres = (photo.roles ?? []).filter((r) => r.gere).length;
-  if (geres) avertissements.push(`${geres} rôle(s) appartiennent à des bots ou au boost : Discord interdit de les recréer.`);
+  if (geres) avertissements.push(t('structure.u.geres', { n: geres }));
 
   return { bloquants, avertissements, plafond, horsPortee: new Set(horsPortee.map((r) => r.id)) };
 }
@@ -67,6 +68,7 @@ function verifier(photo, guild) {
  * @param {Function} [avancement] appelee avec (fait, total, etape)
  */
 async function reparer(photo, guild, quoi, avancement = null) {
+  const { t } = require('./langues').traducteur(guild);
   const moi = guild.members.me;
   const plafond = moi.roles.highest.position;
   const rapport = {
@@ -120,7 +122,7 @@ async function reparer(photo, guild, quoi, avancement = null) {
         correspondance.set(r.id, nouveau.id);
         rapport.rolesCrees.push(r.nom);
       } catch (e) {
-        echec(`création du rôle ${r.nom}`, e);
+        echec(t('structure.u.creation_role', { nom: r.nom }), e);
       }
       await noter(`rôle ${r.nom}`);
     }
@@ -133,7 +135,7 @@ async function reparer(photo, guild, quoi, avancement = null) {
       if (!actuel || rapport.rolesCrees.includes(r.nom)) continue;
 
       if (actuel.position >= plafond) {
-        rapport.ignores.push(`rôle ${actuel.name} (au-dessus du mien)`);
+        rapport.ignores.push(t('structure.u.role_hors_portee', { nom: actuel.name }));
         continue;
       }
       const changements = {};
@@ -150,7 +152,7 @@ async function reparer(photo, guild, quoi, avancement = null) {
         await actuel.edit({ ...changements, reason: RAISON });
         rapport.rolesModifies.push(r.nom);
       } catch (e) {
-        echec(`rôle ${r.nom}`, e);
+        echec(t('structure.u.role', { nom: r.nom }), e);
       }
       await noter(`rôle ${r.nom}`);
     }
@@ -203,7 +205,7 @@ async function reparer(photo, guild, quoi, avancement = null) {
         correspondance.set(c.id, nouveau.id);
         rapport.salonsCrees.push(c.nom);
       } catch (e) {
-        echec(`création du salon ${c.nom}`, e);
+        echec(t('structure.u.creation_salon', { nom: c.nom }), e);
       }
       await noter(`salon ${c.nom}`);
     }
@@ -230,7 +232,7 @@ async function reparer(photo, guild, quoi, avancement = null) {
         await actuel.edit({ ...changements, reason: RAISON });
         rapport.salonsModifies.push(c.nom);
       } catch (e) {
-        echec(`salon ${c.nom}`, e);
+        echec(t('structure.u.salon', { nom: c.nom }), e);
       }
       await noter(`salon ${c.nom}`);
     }
@@ -258,7 +260,7 @@ async function reparer(photo, guild, quoi, avancement = null) {
         await actuel.permissionOverwrites.set(voulues, RAISON);
         rapport.permissionsRemises.push(c.nom);
       } catch (e) {
-        echec(`permissions de ${c.nom}`, e);
+        echec(t('structure.u.permissions_de', { nom: c.nom }), e);
       }
       await noter(`permissions de ${c.nom}`);
     }
@@ -281,26 +283,26 @@ async function reparer(photo, guild, quoi, avancement = null) {
     // on ne touche qu'a ce qu'elle dit vraiment.
     const defini = (v) => v !== null && v !== undefined;
     if (defini(s.everyone) && guild.roles.everyone && guild.roles.everyone.permissions.bitfield.toString() !== s.everyone) {
-      await essayer('permissions de @everyone', () =>
+      await essayer(t('structure.reglage_everyone'), () =>
         guild.roles.everyone.setPermissions(new PermissionsBitField(BigInt(s.everyone)), RAISON)
       );
     }
-    if (defini(s.nom) && guild.name !== s.nom) await essayer('nom du serveur', () => guild.setName(s.nom, RAISON));
+    if (defini(s.nom) && guild.name !== s.nom) await essayer(t('structure.reglage_nom'), () => guild.setName(s.nom, RAISON));
     if (defini(s.verification) && guild.verificationLevel !== s.verification) {
-      await essayer('niveau de vérification', () => guild.setVerificationLevel(s.verification, RAISON));
+      await essayer(t('structure.reglage_verification'), () => guild.setVerificationLevel(s.verification, RAISON));
     }
     if (defini(s.filtreMedias) && guild.explicitContentFilter !== s.filtreMedias) {
-      await essayer('filtre des médias', () => guild.setExplicitContentFilter(s.filtreMedias, RAISON));
+      await essayer(t('structure.reglage_filtre_medias'), () => guild.setExplicitContentFilter(s.filtreMedias, RAISON));
     }
     // Les salons AFK et systeme sont compares APRES traduction des
     // identifiants (une photo importee porte ceux de l'autre serveur).
     const afk = s.salonAfk ? (correspondance.get(s.salonAfk) ?? null) : null;
     if ((guild.afkChannelId ?? null) !== afk && (afk || !photo.importe)) {
-      await essayer('salon AFK', () => guild.setAFKChannel(afk, RAISON));
+      await essayer(t('structure.reglage_salon_afk'), () => guild.setAFKChannel(afk, RAISON));
     }
     const systeme = s.salonSysteme ? (correspondance.get(s.salonSysteme) ?? null) : null;
     if ((guild.systemChannelId ?? null) !== systeme && (systeme || !photo.importe)) {
-      await essayer('salon système', () => guild.setSystemChannel(systeme, RAISON));
+      await essayer(t('structure.reglage_salon_systeme'), () => guild.setSystemChannel(systeme, RAISON));
     }
   }
 

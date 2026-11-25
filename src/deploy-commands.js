@@ -1,4 +1,5 @@
-require('dotenv').config();
+require('dotenv').config({ path: process.env.WUMI_ENV || undefined, quiet: true });
+const edition = require('./edition');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -32,6 +33,9 @@ const logger = require('./utils/logger');
 // ------------------------------------------------------------------------
 const commandes = [];
 const commandesFondateur = [];
+// 2.30.3 : les commandes propres au serveur support (ex. /noel) restent la ;
+// celles du fondateur vont sur le serveur staff s'il est renseigne.
+const commandesSupport = [];
 
 function parcourir(dossier) {
   for (const entree of fs.readdirSync(dossier, { withFileTypes: true })) {
@@ -40,18 +44,40 @@ function parcourir(dossier) {
     else if (entree.name.endsWith('.js')) {
       const commande = require(chemin);
       if (!commande?.data) continue;
+      // 2.35 : une edition ne publie que ses commandes, et jamais celles du fondateur.
+      if (edition.actif && (commande.fondateur || commande.beta || commande.support
+        || !edition.commandeAutorisee(path.basename(dossier), entree.name.replace(/\.js$/, ''), commande.data.name))) continue;
       // Les commandes en beta vivent, comme celles du fondateur, sur le seul
       // serveur support.
-      (commande.fondateur || commande.beta || commande.support ? commandesFondateur : commandes).push(commande.data.toJSON());
+      if (commande.fondateur || commande.beta) commandesFondateur.push(commande.data.toJSON());
+      else if (commande.support) commandesSupport.push(commande.data.toJSON());
+      else commandes.push(commande.data.toJSON());
     }
   }
 }
 
 parcourir(path.join(__dirname, 'commands'));
+// 2.24 : anglais britannique et descriptions en anglais par defaut (voir le module).
+require('./utils/commandesI18n').preparer(commandes);
+require('./utils/commandesI18n').preparer(commandesFondateur);
+require('./utils/commandesI18n').preparer(commandesSupport);
 
 const CLIENT_ID = String(process.env.CLIENT_ID ?? '').trim();
 const SUPPORT = String(process.env.SUPPORT_GUILD_ID ?? '').trim();
+const STAFF = String(process.env.STAFF_GUILD_ID ?? '').trim();
 const estUnId = (v) => /^\d{17,20}$/.test(v);
+
+/** Serveur -> commandes qu'il recoit EN PLUS des publiques. */
+const EXTRAS = new Map();
+{
+  const ajouter = (g, liste) => { if (estUnId(g) && liste.length) EXTRAS.set(g, [...(EXTRAS.get(g) ?? []), ...liste]); };
+  ajouter(SUPPORT, commandesSupport);
+  ajouter(estUnId(STAFF) ? STAFF : SUPPORT, commandesFondateur);
+  // Le support garde une liste (meme vide) : c'est ce qui en retire /admin
+  // quand il passe sur le serveur staff.
+  if (estUnId(SUPPORT) && !EXTRAS.has(SUPPORT)) EXTRAS.set(SUPPORT, []);
+}
+const extras = (g) => EXTRAS.get(g) ?? [];
 
 /**
  * Ce qu'un serveur donne doit avoir : les commandes publiques, plus celles du
@@ -59,15 +85,13 @@ const estUnId = (v) => /^\d{17,20}$/.test(v);
  * seul envoi.
  */
 function listePour(guildId) {
-  return guildId === SUPPORT ? [...commandes, ...commandesFondateur] : [...commandes];
+  return [...commandes, ...extras(guildId)];
 }
 
 async function deployerServeur(rest, guildId, corps) {
   try {
     const d = await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), { body: corps });
-    const dont = guildId === SUPPORT && commandesFondateur.length
-      ? ` (dont ${commandesFondateur.length} de fondateur)`
-      : '';
+    const dont = extras(guildId).length ? ` (dont ${extras(guildId).length} propre(s) a ce serveur)` : '';
     logger.succes(`${d.length} commande(s) deployee(s) sur le serveur ${guildId}${dont}.`);
     return true;
   } catch (e) {
@@ -153,19 +177,19 @@ async function deployerGlobal() {
 
 /** Les commandes de fondateur seules, quand le support n'est pas deja traite. */
 async function deployerFondateurSeul() {
-  if (!commandesFondateur.length) return;
-  if (!estUnId(SUPPORT)) {
+  if (!estUnId(SUPPORT) && !estUnId(STAFF)) {
     logger.avertissement(
       `${commandesFondateur.length} commande(s) de fondateur NON deployee(s) : `
-      + 'renseigne SUPPORT_GUILD_ID dans le .env pour les installer sur ton serveur support.'
+      + 'renseigne STAFF_GUILD_ID (ou SUPPORT_GUILD_ID) dans le .env.'
     );
     return;
   }
-  // Le serveur support recoit les commandes de fondateur EN PLUS des
-  // publiques s'il en a une copie locale ; sinon les publiques lui viennent du
-  // global, et sa liste locale ne contient que les commandes de fondateur.
-  const corps = serveurs.includes(SUPPORT) ? listePour(SUPPORT) : commandesFondateur;
-  await deployerServeur(rest, SUPPORT, corps);
+  // Chaque serveur recoit ses commandes propres EN PLUS des publiques s'il en
+  // a une copie locale ; sinon les publiques lui viennent du global.
+  for (const [g, liste] of EXTRAS) {
+    if (serveurs.includes(g)) continue; // deja servi avec sa copie locale
+    await deployerServeur(rest, g, liste);
+  }
 }
 
 (async () => {
@@ -183,12 +207,12 @@ async function deployerFondateurSeul() {
       for (const serveur of serveurs) {
         // Le serveur support garde ses commandes de fondateur : elles
         // n'existent qu'en local, les vider les ferait disparaitre pour de bon.
-        const corps = serveur === SUPPORT ? commandesFondateur : [];
+        const corps = extras(serveur);
         try {
           await rest.put(Routes.applicationGuildCommands(CLIENT_ID, serveur), { body: corps });
           logger.succes(
-            serveur === SUPPORT
-              ? `Serveur support ${serveur} : copies locales effacees, ${corps.length} commande(s) de fondateur conservee(s).`
+            corps.length
+              ? `Serveur ${serveur} : copies locales effacees, ${corps.length} commande(s) propre(s) conservee(s).`
               : `Copies locales effacees sur le serveur ${serveur}.`
           );
         } catch (e) {
@@ -223,9 +247,9 @@ async function deployerFondateurSeul() {
       if (!ok) echecs++;
     }
 
-    // Le serveur support n'etait pas dans la liste : il lui faut quand meme
-    // ses commandes de fondateur, qui n'existent nulle part ailleurs.
-    if (!serveurs.includes(SUPPORT)) await deployerFondateurSeul();
+    // Les serveurs support et staff hors de la liste : il leur faut quand
+    // meme leurs commandes propres, qui n'existent nulle part ailleurs.
+    await deployerFondateurSeul();
 
     logger.avertissement(
       "Deploiement local : ces commandes s'ajoutent aux globales, donc elles apparaissent en double "

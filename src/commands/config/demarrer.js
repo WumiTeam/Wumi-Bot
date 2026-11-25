@@ -21,6 +21,7 @@ const {
   PermissionFlagsBits,
   InteractionContextType,
   ChannelSelectMenuBuilder,
+  RoleSelectMenuBuilder,
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
@@ -42,12 +43,24 @@ const { traducteur, localisations, t: tr, DEFAUT } = require('../../utils/langue
  * parle la langue du serveur.
  */
 const ETAPES = [
+  // 2.23 : la langue d'abord, pour que la suite parle celle du serveur.
+  { cle: 'langue', emoji: 'langue', colonne: 'langue', type: 'langue' },
   { cle: 'bienvenue', emoji: 'salut', colonne: 'salon_bienvenue', type: 'salon' },
+  { cle: 'role', emoji: 'role', colonne: 'role_auto', type: 'role' },
   { cle: 'logs', emoji: 'moderation', colonne: 'log_moderation', type: 'salon' },
-  { cle: 'xp', emoji: 'niveaux', colonne: 'xp_actif', type: 'oui-non' },
-  { cle: 'economie', emoji: 'economie', colonne: 'eco_actif', type: 'oui-non' },
   { cle: 'automod', emoji: 'robot', colonne: 'automod_actif', type: 'oui-non' },
+  { cle: 'antiraid', emoji: 'bouclier', colonne: 'antiraid_actif', type: 'oui-non' },
+  { cle: 'xp', emoji: 'niveaux', colonne: 'xp_actif', type: 'oui-non' },
+  { cle: 'levelup', emoji: 'xp', colonne: 'salon_levelup', type: 'salon' },
+  { cle: 'economie', emoji: 'economie', colonne: 'eco_actif', type: 'oui-non' },
 ];
+// 2.31 : toutes les langues du bot, anglais en premier.
+const LANGUES = Object.entries(require('../../utils/langues').LANGUES)
+  .sort(([a], [b]) => (a === 'en' ? -1 : b === 'en' ? 1 : 0))
+  .map(([code, l]) => [code, l.nom, l.drapeau]);
+
+/** Une barre de progression ▰▰▰▱▱. */
+const progression = (n, total) => '▰'.repeat(n) + '▱'.repeat(Math.max(0, total - n));
 
 /** L'etape suivante, ou null si on est au bout. */
 function etapeSuivante(index) {
@@ -62,13 +75,18 @@ function vueEtape(interaction, index) {
   const actuel = cfg[etape.colonne];
 
   const elements = [
-    C.texte(`-# ${t('demarrer.entete', { n: index + 1, total: ETAPES.length })}`),
+    C.texte(`-# ${progression(index + 1, ETAPES.length)} ${t('demarrer.entete', { n: index + 1, total: ETAPES.length })}`),
     C.texte(`## ${E(etape.emoji)} ${t(`demarrer.etape.${etape.cle}.titre`)}`),
     C.texte(t(`demarrer.etape.${etape.cle}.explication`)),
   ];
 
-  if (etape.type === 'salon' && actuel) {
+  if (etape.type === 'salon' && actuel && /^\d+$/.test(String(actuel))) {
     elements.push(C.texte(`${t('config.actuellement')} <#${actuel}>`));
+  } else if (etape.type === 'role' && actuel) {
+    elements.push(C.texte(`${t('config.actuellement')} <@&${actuel}>`));
+  } else if (etape.type === 'langue') {
+    const l = LANGUES.find(([c]) => c === actuel);
+    elements.push(C.texte(`${t('config.actuellement')} ${l ? `${l[2]} ${l[1]}` : actuel}`));
   } else if (etape.type === 'oui-non') {
     elements.push(C.texte(
       `${t('config.actuellement')} ${actuel ? `${E('succes')} ${t('commun.actif')}` : `${E('erreur')} ${t('commun.inactif')}`}`
@@ -79,7 +97,23 @@ function vueEtape(interaction, index) {
 
   // Les identifiants « dem_… » sont dans la table de routage de
   // interactionCreate : ils ne changent pas.
-  if (etape.type === 'salon') {
+  if (etape.type === 'langue') {
+    // Trois boutons par rangee : six langues tiennent sur deux lignes.
+    const boutons = LANGUES.map(([code, nom, drapeau]) => new ButtonBuilder()
+      .setCustomId(`dem_lang_${index}_${code}`)
+      .setLabel(nom)
+      .setEmoji(drapeau)
+      .setStyle(actuel === code ? ButtonStyle.Primary : ButtonStyle.Secondary));
+    for (let i = 0; i < boutons.length; i += 3) elements.push(new ActionRowBuilder().addComponents(boutons.slice(i, i + 3)));
+  } else if (etape.type === 'role') {
+    elements.push(new ActionRowBuilder().addComponents(
+      new RoleSelectMenuBuilder()
+        .setCustomId(`dem_role_${index}`)
+        .setPlaceholder(t('demarrer.choisir_role'))
+        .setMinValues(1)
+        .setMaxValues(1)
+    ));
+  } else if (etape.type === 'salon') {
     elements.push(new ActionRowBuilder().addComponents(
       new ChannelSelectMenuBuilder()
         .setCustomId(`dem_salon_${index}`)
@@ -121,8 +155,17 @@ function vueFin(interaction) {
   const lignes = ETAPES.map((etape) => {
     const titre = t(`demarrer.etape.${etape.cle}.titre`);
     const valeur = cfg[etape.colonne];
-    if (etape.type === 'salon') {
+    if (etape.type === 'langue') {
+      const l = LANGUES.find(([c]) => c === valeur);
+      return `${E('succes')} **${titre}** — ${l ? `${l[2]} ${l[1]}` : valeur}`;
+    }
+    if (etape.type === 'role') {
       return valeur
+        ? `${E('succes')} **${titre}** — <@&${valeur}>`
+        : `${E('horsligne')} **${titre}** — ${t('demarrer.non_regle')}`;
+    }
+    if (etape.type === 'salon') {
+      return valeur && /^\d+$/.test(String(valeur))
         ? `${E('succes')} **${titre}** — <#${valeur}>`
         : `${E('horsligne')} **${titre}** — ${t('demarrer.non_regle')}`;
     }
@@ -137,6 +180,14 @@ function vueFin(interaction) {
     C.separateur(),
     C.texte(`**${E('info')} ${t('demarrer.suite_titre')}**\n${t('demarrer.suite_valeur')}`),
   ];
+  // Raccourcis vers la suite : tableau de bord, premium, support.
+  const liens = require('../../utils/liens');
+  const rangee = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setLabel(t('demarrer.bouton_dashboard')).setStyle(ButtonStyle.Link).setURL('https://wumi.fr/dashboard'),
+    new ButtonBuilder().setLabel('Wumi Premium').setStyle(ButtonStyle.Link).setURL('https://wumi.fr/premium/'),
+  );
+  if (liens.support()) rangee.addComponents(new ButtonBuilder().setLabel(t('invite.bouton_support')).setStyle(ButtonStyle.Link).setURL(liens.support()));
+  elements.push(rangee);
 
   // permissionsManquantes accepte un traducteur : sans lui, les noms de
   // permissions reviendraient dans la langue de repli.
@@ -177,13 +228,27 @@ module.exports = {
       return interaction.reply(C.erreurPrivee(t('demarrer.permission_requise')));
     }
 
-    const [, action, brut] = interaction.customId.split('_');
+    const [, action, brut, valeurBouton] = interaction.customId.split('_');
     const index = Number(brut);
     if (!Number.isInteger(index) || !ETAPES[index]) return null;
+    // 2.24 : bouton « Configurer Wumi » du message d'arrivee (public) : on
+    // ouvre l'assistant dans un nouveau message, visible du seul admin.
+    if (action === 'go') return interaction.reply(vueEtape(interaction, 0));
     const etape = ETAPES[index];
 
     // On enregistre tout de suite : rien n'est garde en memoire.
-    if (action === 'salon') {
+    if (action === 'lang') {
+      if (LANGUES.some(([c]) => c === valeurBouton)) majConfig(interaction.guild.id, { langue: valeurBouton });
+    } else if (action === 'role') {
+      const role = interaction.guild.roles.cache.get(interaction.values?.[0]);
+      // Un role gere (bot, boost) ou au-dessus du bot ne peut pas etre donne.
+      const moi = interaction.guild.members.me;
+      if (!role || role.managed || role.id === interaction.guild.id || (moi && role.position >= moi.roles.highest.position)) {
+        const { t } = traducteur(interaction);
+        return interaction.reply(C.erreurPrivee(t('demarrer.role_impossible')));
+      }
+      majConfig(interaction.guild.id, { role_auto: role.id });
+    } else if (action === 'salon') {
       majConfig(interaction.guild.id, { [etape.colonne]: interaction.values?.[0] ?? null });
     } else if (action === 'oui') {
       majConfig(interaction.guild.id, { [etape.colonne]: 1 });

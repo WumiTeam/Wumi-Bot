@@ -4,7 +4,7 @@ const { chargerPolices } = require('./polices');
 const { rectArrondi, cercleImage, tronquerTexte, eclaircir, assombrir } = require('./canvasOutils');
 const { dessinerFond } = require('./fondCarte');
 const themes = require('./themesRank');
-const { formaterNombre, abreger } = require('./outils');
+const { formaterNombre, abreger: abregerBase } = require('./outils');
 
 /**
  * Genere la carte de rank d'un membre.
@@ -54,6 +54,9 @@ function dessinerEtoiles(ctx, x, y, combien, couleur, theme) {
 
 async function genererCarteRank(donnees) {
   chargerPolices();
+  // 2.24 : libelles dans la langue du serveur (cles carte_profil.*).
+  const g = (cle, v) => require('./langues').t(`carte_profil.${cle}`, donnees.langue ?? 'fr', v);
+  const abreger = (n) => abregerBase(n, donnees.langue ?? 'fr');
 
   const L = conf.carte.largeur;
   const H = conf.carte.hauteur;
@@ -143,7 +146,7 @@ async function genererCarteRank(donnees) {
   ctx.textAlign = 'right';
 
   ctx.font = '22px "Poppins Medium", sans-serif';
-  const largeurNiveau = ctx.measureText('NIVEAU ').width;
+  const largeurNiveau = ctx.measureText(`${g('niveau')} `).width;
   ctx.font = '52px "Poppins Bold", sans-serif';
   const largeurValeurNiveau = ctx.measureText(String(donnees.niveau)).width;
 
@@ -151,7 +154,7 @@ async function genererCarteRank(donnees) {
   ctx.fillText(String(donnees.niveau), droite, 78);
   ctx.font = '22px "Poppins Medium", sans-serif';
   ctx.fillStyle = theme.texteSecondaire;
-  ctx.fillText('NIVEAU', droite - largeurValeurNiveau - 12, 78);
+  ctx.fillText(g('niveau'), droite - largeurValeurNiveau - 12, 78);
 
   ctx.font = '40px "Poppins Bold", sans-serif';
   ctx.fillStyle = theme.texte;
@@ -161,7 +164,7 @@ async function genererCarteRank(donnees) {
   ctx.fillText(texteRang, xRang, 74);
   ctx.font = '20px "Poppins Medium", sans-serif';
   ctx.fillStyle = theme.texteSecondaire;
-  ctx.fillText('RANG', xRang - largeurRang - 10, 74);
+  ctx.fillText(g('rang'), xRang - largeurRang - 10, 74);
 
   ctx.textAlign = 'left';
 
@@ -203,10 +206,10 @@ async function genererCarteRank(donnees) {
   // Le detail se lit dans /badges.
   const nbBadges = (donnees.badges ?? []).length;
   const infos = [
-    `${abreger(donnees.xpTotal)} XP au total`,
-    donnees.messages ? `${abreger(donnees.messages)} message${donnees.messages > 1 ? 's' : ''}` : null,
-    nbBadges ? `${nbBadges} badge${nbBadges > 1 ? 's' : ''}` : null,
-    `${Math.floor(progression * 100)} % du niveau ${donnees.niveau + 1}`,
+    g('xp_total', { n: abreger(donnees.xpTotal) }),
+    donnees.messages ? g('n_messages', { n: donnees.messages, v: abreger(donnees.messages) }) : null,
+    nbBadges ? g('badges', { n: nbBadges }) : null,
+    g('progression', { p: Math.floor(progression * 100), n: donnees.niveau + 1 }),
   ]
     .filter(Boolean)
     .join('   •   ');

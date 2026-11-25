@@ -32,7 +32,7 @@ function resoudreEmoji(guild, brut) {
 /** Nom et emoji de la monnaie du serveur (piece de Wumi Run par defaut). */
 function monnaie(guildId) {
   const cfg = config(guildId);
-  return { nom: cfg.eco_nom || 'pièces', emoji: emojiValide(cfg.eco_emoji) ? cfg.eco_emoji : E('economie') };
+  return { nom: cfg.eco_nom || require('./langues').t('economie.monnaie_defaut', require('./langues').langueDe(guildId)), emoji: emojiValide(cfg.eco_emoji) ? cfg.eco_emoji : E('economie') };
 }
 
 /** Formate un montant avec l'emoji et le nom de la monnaie. */

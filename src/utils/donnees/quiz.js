@@ -80,4 +80,15 @@ const Q = [
 
 // La bonne reponse est toujours la premiere dans la source : plus simple a
 // relire et a verifier. L'affichage melange.
-module.exports = Q.map(([cat, fr, en]) => ({ cat, fr: { ...fr, b: 0 }, en: { ...en, b: 0 } }));
+// 2.31 : es, de, pt, it viennent de quizTrad.js (meme ordre).
+const TRAD = require('./quizTrad');
+const versQ = (l) => (l ? { q: l[0], r: l.slice(1, 5), b: 0 } : undefined);
+module.exports = Q.map(([cat, fr, en], i) => ({
+  cat,
+  fr: { ...fr, b: 0 },
+  en: { ...en, b: 0 },
+  es: versQ(TRAD[i]?.es),
+  de: versQ(TRAD[i]?.de),
+  pt: versQ(TRAD[i]?.pt),
+  it: versQ(TRAD[i]?.it),
+}));

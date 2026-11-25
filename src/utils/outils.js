@@ -76,11 +76,12 @@ function formaterNombre(n) {
   return Number(n).toLocaleString('fr-FR').replace(/ | /g, ' ');
 }
 
-/** Abrege un grand nombre (1 250 -> 1,25k). */
-function abreger(n) {
+/** Abrege un grand nombre (1 250 -> 1,25k ; en anglais 1.25k). */
+function abreger(n, langue = 'fr') {
+  const virgule = (x) => (langue === 'en' ? x : x.replace('.', ','));
   if (n < 1000) return String(n);
-  if (n < 1_000_000) return `${(n / 1000).toFixed(n < 10_000 ? 2 : 1).replace('.', ',')}k`;
-  return `${(n / 1_000_000).toFixed(2).replace('.', ',')}M`;
+  if (n < 1_000_000) return `${virgule((n / 1000).toFixed(n < 10_000 ? 2 : 1))}k`;
+  return `${virgule((n / 1_000_000).toFixed(2))}M`;
 }
 
 /** Remplace les variables d'un message personnalise. */

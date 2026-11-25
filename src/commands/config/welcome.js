@@ -30,9 +30,9 @@ function optionsDesign(s, creation) {
     .addStringOption((o) => d(o.setName('name').setNameLocalizations({ fr: 'nom' }), 'bienvenue.d_opt_nom').setRequired(true).setMaxLength(30).setAutocomplete(!creation))
     .addAttachmentOption((o) => d(o.setName('background').setNameLocalizations({ fr: 'fond' }), 'bienvenue.d_opt_fond'))
     .addStringOption((o) => d(o.setName('style'), 'bienvenue.d_opt_style').addChoices(
-      { name: 'Centré · Centered', value: 'centre' },
-      { name: 'Avatar à gauche · Left', value: 'gauche' },
-      { name: 'Minimal · Big name', value: 'minimal' },
+      { name: 'Centré', name_localizations: { 'en-US': 'Centered', 'en-GB': 'Centred' }, value: 'centre' },
+      { name: 'Avatar à gauche', name_localizations: { 'en-US': 'Avatar on the left', 'en-GB': 'Avatar on the left' }, value: 'gauche' },
+      { name: 'Minimal · grand pseudo', name_localizations: { 'en-US': 'Minimal · big name', 'en-GB': 'Minimal · big name' }, value: 'minimal' },
     ))
     .addStringOption((o) => d(o.setName('color').setNameLocalizations({ fr: 'couleur' }), 'bienvenue.d_opt_couleur').setMaxLength(7))
     .addStringOption((o) => d(o.setName('title').setNameLocalizations({ fr: 'titre' }), 'bienvenue.d_opt_titre').setMaxLength(40))

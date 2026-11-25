@@ -95,7 +95,7 @@ async function enregistrer({ guild, cible, moderateur, type, raison, duree = nul
       const appels = require('./appels');
       if (appels.actif(guild.id) && appels.CONTESTABLES.includes(type)) {
         mp.setFooter({ text: t('sanction.mp_footer_contestable', { id }) });
-        message.components = [appels.boutonContester(id)];
+        message.components = [appels.boutonContester(id, guild.id)];
       }
     } catch (e) {
       logger.avertissement('Bouton de contestation :', e.message);

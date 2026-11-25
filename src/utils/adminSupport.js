@@ -305,7 +305,7 @@ async function executer(interaction, client, { groupe, sous, tracer }) {
       return interaction.reply(C.envoiPrive([C.conteneur([
         C.texte(`## 📋 ${t('admin.incident_liste')}`),
         C.texte(liste.length ? liste.map((i) => `**#${i.id}** ${inc.EMOJI[i.statut]} ${i.titre} · ${t(`incident.etat_${i.statut}`)} · <t:${Math.floor(i.maj_le / 1000)}:R>`).join('\n') : t('admin.incident_aucun')),
-      ], 0x58a6ff)]));
+      ], 0xff9d1b)]));
     }
   }
 
@@ -462,7 +462,7 @@ async function executer(interaction, client, { groupe, sous, tracer }) {
       `**${t('admin.verif_stat_semaine')}** · ${s.semaine}`,
       `**${t('admin.verif_stat_sessions')}** · ${s.sessions}`,
     ].join('\n')),
-  ], 0x58a6ff)]));
+  ], 0xff9d1b)]));
 }
 
 // ------------------------------------------------------------------- LOGS

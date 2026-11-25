@@ -33,6 +33,30 @@ const logger = require('../utils/logger');
 
 const DOSSIER = path.join(__dirname, 'dash');
 const SESSION_MS = 7 * 86_400_000;
+
+/**
+ * 2.25.2 : la liste des serveurs vient de Discord A LA CONNEXION et ne bouge
+ * plus pendant 7 jours. Un serveur rejoint par Wumi ou ou l'on est devenu
+ * admin depuis n'apparaissait donc pas. On complete avec ce que le bot voit
+ * lui-meme : les serveurs ou il est et ou ce membre peut gerer le serveur.
+ * Gardé 2 minutes par membre (une requete par serveur, sinon).
+ */
+const enPlus = new Map(); // user_id -> { quand, liste }
+async function serveursEnPlus(client, s) {
+  const cache = enPlus.get(s.user_id);
+  if (cache && Date.now() - cache.quand < 120_000) return cache.liste;
+  const connus = new Set(s.serveurs.map((g) => g.id));
+  const liste = [];
+  await Promise.all([...client.guilds.cache.values()].filter((g) => !connus.has(g.id)).map(async (g) => {
+    const m = g.members.cache.get(s.user_id) ?? (await g.members.fetch(s.user_id).catch(() => null));
+    if (!m) return;
+    if (g.ownerId === s.user_id || m.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      liste.push({ id: g.id, nom: g.name, icone: g.iconURL({ size: 128, extension: 'png' }) });
+    }
+  }));
+  enPlus.set(s.user_id, { quand: Date.now(), liste });
+  return liste;
+}
 const COOKIE = 'wumi_session';
 const COOKIE_ETAT = 'wumi_etat';
 
@@ -249,7 +273,7 @@ async function traiter(req, res, url, { client, envoyer, lireCorps, fichierStati
   const chemin = url.pathname;
 
   // ------------------------------------------------- PAGES ET FICHIERS
-  if (req.method === 'GET' && (chemin === '/' || /^\/serveur\/\d+$/.test(chemin))) {
+  if (req.method === 'GET' && (chemin === '/' || /^\/(serveur|musique)\/\d+$/.test(chemin))) {
     fichierStatique(res, 'index.html', DOSSIER);
     return true;
   }
@@ -261,6 +285,10 @@ async function traiter(req, res, url, { client, envoyer, lireCorps, fichierStati
   // -------------------------------------------------------- CONNEXION
   if (req.method === 'GET' && chemin === '/connexion') {
     const etat = crypto.randomBytes(18).toString('base64url');
+    // 2.41 : revenir a la page demandee (lecteur web) apres la connexion.
+    const retour = String(url.searchParams.get('retour') ?? '');
+    const cookies = [cookie(COOKIE_ETAT, etat, 600)];
+    if (/^\/(serveur|musique)\/\d{17,20}$/.test(retour)) cookies.push(cookie('wumi_retour', retour, 600));
     const params = new URLSearchParams({
       client_id: String(process.env.CLIENT_ID).trim(),
       response_type: 'code',
@@ -269,7 +297,7 @@ async function traiter(req, res, url, { client, envoyer, lireCorps, fichierStati
       state: etat,
       prompt: 'none',
     });
-    res.writeHead(302, { Location: `https://discord.com/oauth2/authorize?${params}`, 'Set-Cookie': cookie(COOKIE_ETAT, etat, 600) });
+    res.writeHead(302, { Location: `https://discord.com/oauth2/authorize?${params}`, 'Set-Cookie': cookies });
     res.end();
     return true;
   }
@@ -334,9 +362,10 @@ async function traiter(req, res, url, { client, envoyer, lireCorps, fichierStati
       }).catch(() => null);
 
       logger.action('connexion au tableau de bord', user.username);
+      const retour = lireCookies(req).wumi_retour;
       res.writeHead(302, {
-        Location: '/',
-        'Set-Cookie': [cookie(COOKIE, brut, SESSION_MS / 1000), cookie(COOKIE_ETAT, '', 0)],
+        Location: /^\/(serveur|musique)\/\d{17,20}$/.test(retour ?? '') ? retour : '/',
+        'Set-Cookie': [cookie(COOKIE, brut, SESSION_MS / 1000), cookie(COOKIE_ETAT, '', 0), cookie('wumi_retour', '', 0)],
       });
       res.end();
     } catch (e) {
@@ -374,18 +403,25 @@ async function traiter(req, res, url, { client, envoyer, lireCorps, fichierStati
 
   if (req.method === 'GET' && chemin === '/api/moi') {
     const clientId = String(process.env.CLIENT_ID).trim();
+    const bits = require('../utils/liens').bits();
     envoyer(res, 200, {
       utilisateur: s.profil,
       csrf: s.csrf,
-      serveurs: s.serveurs
+      serveurs: [...s.serveurs, ...(await serveursEnPlus(client, s))]
         .map((g) => ({
           ...g,
           present: client.guilds.cache.has(g.id),
-          invitation: `https://discord.com/oauth2/authorize?client_id=${clientId}&scope=bot+applications.commands&permissions=8&guild_id=${g.id}&disable_guild_select=true`,
+          // Les permissions dont Wumi a besoin, pas « Administrateur ».
+          invitation: `https://discord.com/oauth2/authorize?client_id=${clientId}&scope=bot+applications.commands&permissions=${bits}&guild_id=${g.id}&disable_guild_select=true`,
         }))
         .sort((a, b) => Number(b.present) - Number(a.present) || a.nom.localeCompare(b.nom)),
     });
     return true;
+  }
+
+  // 2.41 : le lecteur web (tout membre, pas seulement les gerants).
+  if (chemin.startsWith('/api/musique/')) {
+    if (await require('./musiqueWeb').route(req, res, url, s, client, { envoyer, lireCorps })) return true;
   }
 
   const m = chemin.match(/^\/api\/serveur\/(\d{17,20})(\/[a-z]+)?$/);
@@ -470,6 +506,37 @@ async function traiter(req, res, url, { client, envoyer, lireCorps, fichierStati
       type: url.searchParams.get('type') ?? '',
       membre: url.searchParams.get('membre') ?? '',
     }));
+    return true;
+  }
+
+  // ------------------------------------------------------- PREMIUM (2.24)
+  if (req.method === 'GET' && action === '/premium') {
+    envoyer(res, 200, plus.premiumEtat(guild));
+    return true;
+  }
+  if (req.method === 'GET' && action === '/apercu') {
+    try {
+      const membre = await guild.members.fetch(s.user_id).catch(() => null);
+      envoyer(res, 200, await plus.premiumApercu(guild, membre), 'image/png');
+    } catch (e) {
+      logger.avertissement('Dashboard apercu :', e.message);
+      envoyer(res, 500, { erreur: 'erreur_interne' });
+    }
+    return true;
+  }
+  if (req.method === 'POST' && action === '/premium') {
+    const membre = await guild.members.fetch(s.user_id).catch(() => null);
+    if (!membre) {
+      envoyer(res, 403, { erreur: 'acces' });
+      return true;
+    }
+    try {
+      // Une image de 8 Mo fait environ 11 Mo en base64.
+      repondre(await plus.premiumAction(guild, membre, await lireCorps(req, 12 * 1024 * 1024)));
+    } catch (e) {
+      logger.avertissement('Dashboard premium :', e.message);
+      if (!res.headersSent) envoyer(res, e.message === 'corps trop gros' ? 413 : 500, { erreur: e.message === 'corps trop gros' ? 'image_taille' : 'erreur_interne' });
+    }
     return true;
   }
 

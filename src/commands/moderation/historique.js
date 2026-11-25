@@ -110,7 +110,7 @@ function vueFiche(interaction, cible, membre, section = 'resume') {
   const elements = [
     C.texte(`## ${E('loupe')} ${t('historique.titre', { pseudo: membre?.displayName ?? cible.username })}`),
     C.texte(`<@${cible.id}> · \`${cible.id}\``),
-    C.texte(`-# ${historique.resume(fiche)}`),
+    C.texte(`-# ${historique.resume(fiche, t)}`),
     C.separateur(),
   ];
 

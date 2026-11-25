@@ -40,6 +40,7 @@ module.exports = {
 
   data: new SlashCommandBuilder()
     .setName('profil')
+    .setNameLocalizations({ 'en-US': 'profile' })
     .setDescription(tr('profil.description_commande', DEFAUT))
     .setDescriptionLocalizations(localisations('profil.description_commande'))
     .addUserOption((o) => o
@@ -83,6 +84,7 @@ module.exports = {
       : [];
 
     const png = await genererCarteProfil({
+      langue: require('../../utils/langues').langueDe(guildId),
       pseudo: membre?.displayName ?? cible.username,
       tag: cible.username,
       avatarUrl: cible.displayAvatarURL({ extension: 'png', size: 256 }),
@@ -104,6 +106,7 @@ module.exports = {
       roles,
       accent: membre?.displayHexColor && membre.displayHexColor !== '#000000' ? membre.displayHexColor : null,
       theme: themes.themeDe(guildId, cible.id),
+      fondPerso: require('../../utils/fondsPerso').fondDe(guildId, cible.id),
       prestige: ligne?.prestige ?? 0,
       badges: require('../../utils/progression').badgesDe(guildId, cible.id),
     });

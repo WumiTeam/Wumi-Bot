@@ -19,11 +19,12 @@
     "suivant": "Next",
     "fermer": "Close",
     "page": "page {n} of {total}",
-    "annule_court": "Cancelled."
+    "annule_court": "Cancelled.",
+    "serveur_uniquement": "This command can only be used in a server."
   },
   "erreur": {
     "generique": "Something went wrong while running that command.",
-    "commande_inconnue": "This command no longer exists. Run `npm run deploy` again.",
+    "commande_inconnue": "This command no longer exists. It will disappear from the list within a few minutes.",
     "bloque": "You can no longer use this bot.",
     "bloque_raison": "Reason: {raison}",
     "serveur_seulement": "This command only works inside a server.",
@@ -44,15 +45,19 @@
     "titre": "Thanks for adding me!",
     "presentation": "I'm **{bot}**. I handle levels, economy, moderation, tickets, suggestions and automatic announcements — and every part of it is configured server by server.",
     "demarrer_titre": "Getting started",
-    "demarrer_valeur": "`/demarrer` — guided setup, a few menus and you're done. Start here.\n`/aide` — every command, sorted by category.\n`/config` — the settings panel, category by category.",
+    "demarrer_valeur": "Click **Set up Wumi** below (or type `/setup`): 9 quick steps — language, welcome, join role, logs, automod, anti-raid, XP, levels, economy. Two minutes, and everything can be fine-tuned later in `/config`.",
     "savoir_titre": "Good to know",
     "savoir_valeur": "Only **levels** are on out of the box — that's what a bot like me is usually added for.\nLogs, economy and automatic moderation wait until you turn them on.\nModeration and configuration commands stay hidden from anyone without the permissions.",
     "permissions_titre": "Missing permissions",
     "permissions_valeur": "I don't have: **{liste}**.\nAnything that depends on them won't work until my role gets them.",
-    "pied": "{n} commands · /aide for the list",
+    "pied": "{n} commands · /help for the list",
     "langue_titre": "Language",
-    "langue_valeur": "The bot writes in English by default. `/config` → **Server** → **Bot language** to switch to French.",
-    "prive": "I've just been added to **{serveur}**, but I'm not allowed to post in any channel."
+    "langue_valeur": "Wumi speaks **English** here, based on your server's language. To switch to French: first step of `/setup`, or `/config` → **Server**.",
+    "prive": "I've just been added to **{serveur}**, but I'm not allowed to post in any channel.",
+    "bouton_configurer": "Set up Wumi",
+    "bouton_dashboard": "Dashboard",
+    "premium_ligne": "🎁 **7 days of Wumi Premium, free**: exclusive themes, card backgrounds, a bot in your server's style. Once per server, no card needed.",
+    "prive_suite": "Run `/setup` in your server to set everything up in two minutes."
   },
   "permissions": {
     "ManageRoles": "Manage Roles",
@@ -96,7 +101,7 @@
       "titre": "Vote for {bot}",
       "intro": "Voting takes ten seconds, costs nothing and pushes the bot up on top.gg. You can vote **every 12 hours**.",
       "recompense_titre": "Your reward here",
-      "recompense": "**XP ×{multi}** for **{heures} h** on this server.",
+      "recompense": "**XP ×{multi}** for **{heures}h** on this server.",
       "total_titre": "Your votes",
       "total": "**{n}** vote in total. Thanks! || **{n}** votes in total. Thanks!",
       "deja_titre": "Already claimed",
@@ -108,7 +113,7 @@
       "injoignable": "top.gg isn't responding right now. Your vote isn't lost: try again in a few minutes.",
       "pas_encore": "top.gg doesn't see your vote yet.\n-# The site sometimes takes a few seconds. Vote with the button first, then come back.",
       "merci": "Thanks for voting! It really helps the bot grow.",
-      "merci_recompense": "Thanks for voting! You get **XP ×{multi}** for **{heures} h** on this server.",
+      "merci_recompense": "Thanks for voting! You get **XP ×{multi}** for **{heures}h** on this server.",
       "annonce": "{membre} just voted for the bot. Thanks!"
     },
     "v3": {
@@ -116,7 +121,7 @@
       "pourquoi": "Why vote?",
       "raison_classement": "The bot climbs the top.gg rankings.",
       "raison_decouvrir": "More servers discover {bot}.",
-      "raison_recompense": "Your reward here: **XP ×{multi}** for **{heures} h**.",
+      "raison_recompense": "Your reward here: **XP ×{multi}** for **{heures}h**.",
       "raison_merci": "And it's the best way to say thanks to the developer.",
       "statut": "Your status",
       "pret": "**You can vote now!** Vote on top.gg, then click \"I voted\".",
@@ -127,6 +132,18 @@
       "merci_titre": "Thanks for voting!",
       "compteur": "You're at **{n}** vote(s). Thanks for supporting the bot!",
       "prochain": "Next vote available {quand}."
+    },
+    "rappel": {
+      "bouton_activer": "Remind me",
+      "bouton_arreter": "Stop reminders",
+      "titre": "You can vote for Wumi again!",
+      "texte": "It's been 12 hours: your vote is available again on top.gg. Once you've voted, type `/vote` in your server and press “I voted” to claim your reward.",
+      "serie": "Your streak: **{n} votes** in a row. Vote again within 24 hours to keep it!",
+      "serie_statut": "**{n}-vote** streak · your next vote gives **+{bonus}h** of bonus",
+      "serie_merci": "**{n}-vote** streak: **+{bonus}h** of extra bonus!",
+      "pied": "You get this message because you asked for a reminder in /vote.",
+      "active": "Reminder on: I'll DM you as soon as you can vote again.",
+      "coupe": "Vote reminders stopped."
     }
   },
   "ping": {
@@ -202,13 +219,53 @@
       },
       "langue": {
         "fr": "Français",
-        "en": "English"
+        "en": "English",
+        "es": "Español",
+        "de": "Deutsch",
+        "pt": "Português (Brasil)",
+        "it": "Italiano"
       },
       "antiphishing_action": {
         "supprimer": "Delete the message",
         "avertir": "Delete and warn",
         "exclure": "Kick the member",
         "bannir": "Ban the member"
+      },
+      "automod_arnaques": {
+        "nom": "Scams",
+        "aide": "Fake Nitro, fake Steam gifts, \"reported by mistake\", crypto"
+      },
+      "automod_ia": {
+        "nom": "AI · toxic messages",
+        "aide": "Insults and hate caught even when disguised, in every language"
+      },
+      "automod_images": {
+        "nom": "AI · NSFW images",
+        "aide": "Removes shocking images outside NSFW channels"
+      },
+      "ticket_faq": {
+        "nom": "FAQ on open",
+        "aide": "Suggests a FAQ entry when a ticket is opened"
+      },
+      "cartes_actif": {
+        "nom": "Collectible cards",
+        "aide": "Turns boosters and cards on"
+      },
+      "cartes_messages": {
+        "nom": "Messages per booster",
+        "aide": "Counted messages needed to earn a booster"
+      },
+      "cartes_prix": {
+        "nom": "Booster price",
+        "aide": "Price in the server currency (0 = not for sale)"
+      },
+      "cartes_quotidien": {
+        "nom": "Daily booster",
+        "aide": "One free booster a day with /cards daily"
+      },
+      "vitrine_site": {
+        "nom": "Show on wumi.fr",
+        "aide": "Shows the server's name, icon and member count in the website banner"
       }
     },
     "r": {
@@ -291,7 +348,7 @@
       },
       "eco_daily": {
         "nom": "Daily reward",
-        "aide": "What /daily pays out"
+        "aide": "What /economy daily pays out"
       },
       "banque_actif": {
         "nom": "Bank",
@@ -575,7 +632,16 @@
     "invite_par": "Invited by",
     "tickets_recents": "Recent tickets",
     "arrive": "Joined",
-    "compte_cree": "Account created"
+    "compte_cree": "Account created",
+    "r_avert_actifs": "{n} active warning || {n} active warnings",
+    "r_bannis": "banned once before || banned {n} times before",
+    "r_expulse": "kicked once || kicked {n} times",
+    "r_signales": "{n} of their messages reported",
+    "r_prononcees": "issued {n} sanction || issued {n} sanctions",
+    "r_amenes": "{n} members brought in",
+    "r_prestige": "prestige {n}",
+    "r_rien": "Nothing worth flagging.",
+    "r_vierge": "Clean record: this member has never been sanctioned."
   },
   "botinfo": {
     "description_commande": "Bot status: servers, members, uptime, latency",
@@ -587,15 +653,16 @@
     "latence": "Latency"
   },
   "premium": {
-    "description_commande": "Premium status on this server",
-    "titre": "Blueprint Premium",
+    "description_commande": "Wumi Premium: perks, custom bot, card background",
+    "titre": "Wumi Premium",
     "actif": "**{serveur}** has premium.",
-    "inactif": "This server doesn't have premium. Everything still works: premium **raises ceilings**, it doesn't unlock anything.",
+    "inactif": "This server doesn't have premium. Everything free stays free: premium **adds** exclusives and **raises the limits**.",
     "jusqu_a": "Until",
     "sans_limite": "No end date.",
     "source": {
       "discord": "Discord subscription",
-      "offert": "Granted by the bot team"
+      "offert": "Granted by the bot team",
+      "essai": "Free trial"
     },
     "ce_que_ca_change": "**What it changes**",
     "limite": {
@@ -604,8 +671,62 @@
       "giveaways": "Concurrent giveaways",
       "tickets": "Tickets per member"
     },
-    "jamais_retire": "No feature is premium-only. What works today will keep working.",
-    "bientot": "Subscriptions aren't open yet. Go through the support server in the meantime."
+    "jamais_retire": "Nothing that's free today will ever become paid. Premium funds Wumi and adds extras.",
+    "bientot": "Subscriptions aren't open yet. Go through the support server in the meantime.",
+    "sous_info": "What premium adds, and its status on this server",
+    "sous_bot": "Premium: change Wumi's name, avatar, banner and bio on this server",
+    "opt_nom": "Wumi's nickname on this server",
+    "opt_avatar": "Wumi's avatar on this server (PNG, JPEG, WebP or GIF)",
+    "opt_banniere": "Wumi's profile banner on this server",
+    "opt_bio": "Wumi's profile bio on this server",
+    "opt_reset_bot": "Restore the original name, avatar, banner and bio",
+    "sous_fond": "Premium: a background for every member's cards (rank, profile, level up)",
+    "opt_image": "The background image (PNG, JPEG or WebP, 8 MB max)",
+    "opt_retirer": "Remove the server's card background",
+    "exclusif_titre": "Premium exclusives",
+    "ex_themes": "4 exclusive card themes",
+    "ex_themes_detail": "Free for every member of the server, in /theme.",
+    "ex_fond": "A card background for the whole server",
+    "ex_fond_detail": "Rank, profile and level-up cards, for every member without their own background.",
+    "ex_bot": "Wumi in your server's style",
+    "ex_bot_detail": "Its name, avatar, banner and bio, on your server only.",
+    "plafonds_titre": "Higher limits",
+    "permission": "You need the “Manage Server” permission.",
+    "requis_titre": "Premium only",
+    "requis": "This option is part of **Wumi Premium**. Everything else in Wumi stays free: `/premium info` shows what premium adds.",
+    "image_format": "Unsupported format. Send a PNG, JPEG, WebP or GIF image.",
+    "image_taille": "Image too large: 8 MB max.",
+    "image_illisible": "Couldn't read this image.",
+    "bot_rien": "Nothing to change: pick at least one option (name, avatar, banner, bio or reset).",
+    "bot_echec": "Discord refused the change: {erreur}",
+    "bot_titre": "Wumi has a new look here",
+    "bot_nom": "Name: **{nom}**",
+    "bot_avatar": "New avatar",
+    "bot_banniere": "New banner",
+    "bot_bio": "New bio",
+    "bot_reinitialise": "Name, avatar, banner and bio restored.",
+    "bot_pied": "These changes only apply to this server. Discord may take a few minutes to show them everywhere.",
+    "fond_retire": "The server's card background has been removed.",
+    "fond_actuel": "This server has a card background. Send a new image to replace it, or use the remove option.",
+    "fond_aucun": "This server has no card background yet: attach an image to the command.",
+    "fond_ok_titre": "Card background saved",
+    "fond_ok": "It applies to the rank, profile and level-up cards of every member without their own background. Themes without scenery (Midnight, Gold, premium themes) keep their gradient.",
+    "sous_essai": "Try Wumi Premium free for 7 days (once per server)",
+    "essai": {
+      "bouton": "7-day free trial",
+      "bouton_site": "See Premium",
+      "ligne": "**Free trial** · 7 days of Premium on us, once per server, no card needed.",
+      "permission": "Only someone who can manage the server can start the trial.",
+      "deja": "This server has already used its free trial. You can subscribe from `/premium info`.",
+      "deja_premium": "This server already has Wumi Premium.",
+      "lance_titre": "Premium trial started!",
+      "lance": "**{serveur}** has Wumi Premium until {fin}. Everything is unlocked:\n{E_palette} 4 exclusive card themes in `/theme`\n{E_dossier} a card background for the whole server: `/premium card-background`\n{E_robot} Wumi in your server's style: `/premium bot`\n{E_xp} higher limits everywhere\n\n-# You'll get a DM the day before it ends. Nothing is charged: the trial simply stops.",
+      "en_cours": "Free trial running, ends {fin}.",
+      "veille_titre": "Your Premium trial ends tomorrow",
+      "veille": "The Wumi Premium trial on **{serveur}** ends {fin}. To keep the exclusive themes, the card background and your custom bot, you can subscribe in one click below.",
+      "fin_titre": "Your Premium trial has ended",
+      "fin": "The Wumi Premium trial on **{serveur}** has ended. Everything free keeps working, and Wumi's profile is back to the original. Thanks for trying it! If you liked it, you can subscribe below."
+    }
   },
   "aide": {
     "description_commande": "Show the bot's command list",
@@ -904,7 +1025,7 @@
     "btn_boutique": "Shop",
     "solde_achats_titre": "Recent purchases",
     "monnaie_emoji_invalide": "I can't find the emoji **{emoji}**. Pick it from the emoji picker (it must be on this server) or use a standard emoji like 💰.",
-    "monnaie_defaut": "Wumi Run coin (default)",
+    "monnaie_defaut": "coins",
     "config_section_monnaie": "Currency",
     "config_section_gains": "Earnings",
     "config_section_stats": "Numbers",
@@ -1046,6 +1167,63 @@
       "delai": "The appeal window has closed ({duree}).",
       "en_attente": "You already have a pending appeal for this sanction.",
       "deja_examinee": "This sanction has already been reviewed on appeal."
+    },
+    "u": {
+      "contester": "Dispute this sanction",
+      "modal_titre": "Dispute sanction #{id}",
+      "modal_label": "Explain your side",
+      "modal_ph": "What happened, and why you think the sanction isn't fair...",
+      "accepter": "Accept the appeal",
+      "refuser": "Reject the appeal",
+      "aucun_antecedent": "no prior record",
+      "titre": "Appeal #{id}",
+      "membre_inconnu": "Unknown member",
+      "membre": "Member",
+      "sanction_contestee": "Disputed sanction",
+      "duree": "Duration: {duree}",
+      "moderateur": "Moderator",
+      "raison": "Reason for the sanction",
+      "aucune": "None",
+      "dit_membre": "What the member says",
+      "historique": "History ({n} sanction) || History ({n} sanctions)",
+      "pied": "Accepting lifts the sanction · Rejecting keeps it",
+      "salon_inaccessible": "The appeals channel can't be reached anymore. Contact a server admin.",
+      "transmis": "Your appeal **#{id}** has been sent to the **{serveur}** team.\nYou'll get the answer right here, by DM. No need to follow up.",
+      "effet_ban_leve": "ban lifted",
+      "effet_ban_deja": "ban already lifted",
+      "effet_absent": "member is no longer on the server",
+      "effet_mute_leve": "mute lifted",
+      "effet_mute_non": "mute couldn't be lifted",
+      "effet_warn": "warning cancelled",
+      "effet_kick": "no automatic action (kick)",
+      "effet_maintenue": "sanction kept",
+      "effet_impossible": "couldn't lift it (permissions?)",
+      "message_membre": "Message sent to the member",
+      "ph_accepter": "Your sanction has been lifted, please be careful about...",
+      "ph_refuser": "After review, the sanction stands because...",
+      "deja_traite": "This appeal has already been handled.",
+      "deja_traite_par": "This appeal has already been handled by {staff}.",
+      "mp_accepte": "Your appeal was accepted",
+      "mp_refuse": "Your appeal was rejected",
+      "mp_accepte_texte": "The **{serveur}** team reviewed your sanction **#{id}**: it has been lifted.",
+      "mp_refuse_texte": "The **{serveur}** team reviewed your sanction **#{id}** and is keeping it.",
+      "message_equipe": "Message from the team",
+      "accepte": "Appeal accepted",
+      "refuse": "Appeal rejected",
+      "par": "By {staff} {quand}",
+      "effet": "Effect: {effet}",
+      "reponse": "Answer: {texte}",
+      "non_prevenu": "The member couldn't be notified (DMs closed).",
+      "log_auteur": "Appeal #{id} {decision}",
+      "log_accepte": "accepted",
+      "log_refuse": "rejected",
+      "log_membre": "**Member:** {membre}",
+      "log_sanction": "**Sanction:** #{id}",
+      "log_decision": "**Decision:** {decision} — {effet}",
+      "log_par": "**By:** {staff}",
+      "reserve": "Moderation team only.",
+      "introuvable": "Appeal not found.",
+      "erreur": "Something went wrong."
     }
   },
   "blocklist": {
@@ -1187,7 +1365,7 @@
     "sous_raison": "Fix the reason of a sanction",
     "opt_type": "Only show one type of sanction",
     "opt_texte": "The new reason",
-    "vide_filtre": "**{membre}** has no « {type} » sanction.",
+    "vide_filtre": "**{membre}** has no “{type}” sanction.",
     "filtre_actif": "Filter: **{type}**",
     "pied_page": "ID: {id} · /sanctions view for a sanction's details",
     "date": "Date",
@@ -1332,7 +1510,10 @@
       "liens": "Links",
       "mots": "Forbidden words",
       "mentions": "Mass mentions",
-      "majuscules": "Caps lock"
+      "majuscules": "Caps lock",
+      "arnaques": "Scams",
+      "ia": "AI · toxic messages",
+      "images": "AI · NSFW images"
     },
     "opt_module_actif": "Enable or disable this module",
     "grp_mots": "Manages the forbidden word list",
@@ -1378,7 +1559,35 @@
     "etat_sanction_titre": "Automatic sanction",
     "etat_sanction_valeur": "**{n}** warnings within **{minutes}** minutes trigger a **{mute}**-minute timeout",
     "etat_mots_titre": "Forbidden words",
-    "etat_mots_valeur": "**{n}** word(s) on the list"
+    "etat_mots_valeur": "**{n}** word(s) on the list",
+    "u": {
+      "invitation": "Discord invite",
+      "invitation_d": "Invites to other servers aren't allowed.",
+      "lien": "Link not allowed",
+      "lien_d": "Links aren't allowed here.",
+      "mot": "Banned word",
+      "mot_d": "Your message contains a word that's banned on this server.",
+      "mentions": "Mass mentions",
+      "mentions_d": "Maximum {n} mentions per message.",
+      "majuscules": "Too many capitals",
+      "majuscules_d": "Please don't write in all caps.",
+      "spam": "Spam",
+      "spam_d": "No more than {n} messages in {s} seconds.",
+      "repetition": "Repetition",
+      "repetition_d": "Stop repeating the same message.",
+      "declenchements": "{n} triggers",
+      "arnaque": "Scam",
+      "arnaque_d": "This message looks like a scam (fake Nitro, fake gift, fake report…). Don't click any link.",
+      "toxique": "Toxic message",
+      "toxique_d": "The AI found this message insulting or hateful.",
+      "image": "Inappropriate image",
+      "image_d": "NSFW images belong in channels marked NSFW.",
+      "certitude": "AI confidence"
+    },
+    "ia_chargement": "The AI model is getting ready (downloads the first time, about a minute). Everything runs on Wumi's server: no message is sent anywhere else.",
+    "ia_indisponible": "AI isn't installed on this bot yet: the module is saved and will start as soon as it is.",
+    "ia_indisponible_court": "AI unavailable",
+    "ia_automod_eteint": "Automod is off: turn it on with /automod enable for this module to work."
   },
   "boost": {
     "description_commande": "What the server offers to its boosters",
@@ -1414,7 +1623,18 @@
     "config_recompense": "Reward",
     "config_message": "Thank-you message",
     "config_boosts": "Current boosts",
-    "config_boosts_valeur": "**{n}** · level **{niveau}**"
+    "config_boosts_valeur": "**{n}** · level **{niveau}**",
+    "message_defaut": "Thanks for the boost, {mention}! {emoji}\n**{serveur}** now has **{boosts}** boost(s), level **{niveau}**.",
+    "carte": {
+      "titre": "SERVER BOOST",
+      "boosts": "BOOSTS",
+      "barre": "{a} / {b} boosts to tier {n}",
+      "max": "Max tier reached",
+      "badge": "TIER {n}",
+      "role": "Unlocked: {r}"
+    },
+    "sous_test": "Preview the boost announcement (with the card)",
+    "test_echec": "The card couldn't be generated. Try again in a moment."
   },
   "demarrer": {
     "description_commande": "Guided setup assistant, to get started in a few clicks",
@@ -1425,7 +1645,7 @@
     "fin_titre": "Setup complete!",
     "non_regle": "not set",
     "suite_titre": "What's next?",
-    "suite_valeur": "`/config` opens the full settings panel, setting by setting.\n`/aide` lists every command.",
+    "suite_valeur": "`/config` opens the full settings panel, setting by setting.\n`/help` lists every command.",
     "permissions_valeur": "**{liste}**\nFeatures that depend on them won't work until the bot's role has them.",
     "permission_requise": "You need the Manage Server permission to use this assistant.",
     "etape": {
@@ -1448,8 +1668,27 @@
       "automod": {
         "titre": "Automatic moderation",
         "explication": "Filters spam, invites, links and mass mentions automatically. Fine-tune it with `/automod`."
+      },
+      "langue": {
+        "titre": "Bot language",
+        "explication": "Which language Wumi speaks on this server: messages, cards and replies."
+      },
+      "role": {
+        "titre": "Auto role",
+        "explication": "The role given to every new member as soon as they join. Skip this step if you use verification."
+      },
+      "antiraid": {
+        "titre": "Anti-raid",
+        "explication": "Watches join waves and brand-new accounts, and alerts your staff during a raid. Fine-tune it with `/antiraid`."
+      },
+      "levelup": {
+        "titre": "Level-up channel",
+        "explication": "Where to announce level-ups with their card. Skip this step to announce them in the channel where the member is chatting."
       }
-    }
+    },
+    "choisir_role": "Pick a role",
+    "role_impossible": "I can't give this role: it's managed by Discord or above mine. Move Wumi's role up in the role list, or pick another one.",
+    "bouton_dashboard": "Dashboard"
   },
   "serveur": {
     "description_commande": "Entry verification and stat channels",
@@ -1506,7 +1745,17 @@
     "stats_modele_invalide": "Your template doesn't contain any variable. Use one of these:\n{variables}\n\nExample: {exemple}",
     "stats_lie": "{salon} will display **{rendu}**.",
     "stats_creation_impossible": "Creation failed: {erreur}",
-    "stats_cree": "Channel created: **{nom}**\nNobody can connect to it, it's for display only.\nUpdated every {minutes} minutes."
+    "stats_cree": "Channel created: **{nom}**\nNobody can connect to it, it's for display only.\nUpdated every {minutes} minutes.",
+    "sous_pack": "Create a pack of stylish stats channels, in their own category",
+    "opt_style": "The channels' style",
+    "opt_lien": "An extra fixed channel: invite, website… (e.g. .gg/myserver)",
+    "style_elegant": "Elegant (🧭 Members: 9555)",
+    "style_minimal": "Minimal (👥 9555)",
+    "style_points": "Dots (・Members・9555)",
+    "stats_pack_categorie": "Statistics",
+    "stats_mot_enligne": "online",
+    "stats_mot_boosts": "boosts",
+    "stats_pack_ok": "Channels created: {liste}\nThe numbers update every {minutes} min."
   },
   "structure": {
     "description_commande": "Snapshots the server's roles, channels and permissions, and restores them",
@@ -1615,19 +1864,42 @@
     "import_fait": "📥 Snapshot #{n} imported: **{roles}** roles, **{salons}** channels. Nothing has been changed on the server yet.",
     "import_differences": "**{n}** difference(s) with this server: check with `/structure compare` then apply with `/structure repair`.",
     "import_identique": "This server already matches this snapshot.",
-    "import_membres_retires": "{n} permission(s) given to specific members were skipped: those members aren't on this server."
+    "import_membres_retires": "{n} permission(s) given to specific members were skipped: those members aren't on this server.",
+    "u": {
+      "absent": "I'm not on this server.",
+      "manque_roles": "I'm missing the **Manage Roles** permission",
+      "manque_salons": "I'm missing the **Manage Channels** permission",
+      "manque_serveur": "I'm missing **Manage Server**: I won't be able to restore the name, verification level or AFK channel",
+      "hors_portee": "{n} role(s) are above mine and I can't touch them: {liste}. Move my role above them in the server settings so I can fix them.",
+      "geres": "{n} role(s) belong to bots or boosting: Discord doesn't allow recreating them.",
+      "creation_role": "creating role {nom}",
+      "role": "role {nom}",
+      "role_hors_portee": "role {nom} (above mine)",
+      "creation_salon": "creating channel {nom}",
+      "salon": "channel {nom}",
+      "permissions_de": "permissions for {nom}"
+    },
+    "type": {
+      "textuel": "text",
+      "vocal": "voice",
+      "categorie": "category",
+      "annonces": "announcements",
+      "conference": "stage",
+      "forum": "forum",
+      "galerie": "media"
+    }
   },
   "veille": {
-    "description_commande": "Automatically announces new Instagram, YouTube, Twitch, TikTok or RSS posts",
+    "description_commande": "Automatically announces new Instagram, YouTube, Twitch or RSS posts",
     "sous_ajouter": "Watches an account or a feed",
     "opt_type": "What you want to watch",
     "type_twitch": "🔴 Twitch (announces live streams)",
     "type_tiktok": "🎶 TikTok (via a gateway, fragile)",
-    "type_instagram": "📸 Instagram (your account, token required)",
+    "type_instagram": "📸 Instagram (pro account, by @username)",
     "type_youtube": "▶️ YouTube (a channel)",
     "type_rss": "📰 RSS feed (a website)",
     "opt_salon": "Channel for the announcements",
-    "opt_source": "Twitch handle, YouTube channel (@handle or UC...), or feed address. Not needed for Instagram.",
+    "opt_source": "Twitch or Instagram username, YouTube channel (@handle or UC...), or RSS feed address.",
     "opt_role": "Role mentioned on every announcement",
     "opt_nom": "Name shown in the announcement",
     "opt_message": "Text added above",
@@ -1643,7 +1915,7 @@
     "ajouter_plafond": "This server is already watching **{deja}** sources, that is the maximum.\nRemove one with `/watch remove` to add another.",
     "ajouter_plafond_premium": "-# Premium raises this cap to **{n}** — `/premium`.",
     "ajouter_lecture_impossible": "Can't read this source:\n```{erreur}```",
-    "ajouter_guide_instagram": "\nFollow the steps in **GUIDE-INSTAGRAM.txt** to get a token.",
+    "ajouter_guide_instagram": "\nMake sure the account is **public** and set to **Creator** or **Business** (Instagram → Settings → Account type and tools).",
     "ajouter_guide_twitch": "\nFollow the steps in **GUIDE-TWITCH.txt** to create the Twitch application.",
     "cadence": "Checked every **{n} minutes**.",
     "etat_twitch_direct": "**{nom}** is live right now — that stream won't be announced, the bot starts from now.",
@@ -1669,7 +1941,22 @@
     "test_lecture_impossible": "Reading failed:\n```{erreur}```",
     "test_ignoree": "Source skipped: {motif}.",
     "test_rien": "Source readable, but nothing new to announce.",
-    "test_reussi": "Test successful: {n} announcement(s) sent to {salon}."
+    "test_reussi": "Test successful: {n} announcement(s) sent to {salon}.",
+    "u": {
+      "en_direct": "{nom} is live",
+      "en_direct_auteur": "{nom} is live!",
+      "spectateurs": "{n} viewer || {n} viewers",
+      "insta_video": "New Instagram video",
+      "insta_post": "New Instagram post",
+      "tiktok_video": "New TikTok video",
+      "nouveaute": "New post",
+      "pastille_direct": "LIVE",
+      "pastille_video": "NEW VIDEO",
+      "pastille_post": "NEW POST",
+      "pastille_nouveau": "NEW"
+    },
+    "ajouter_source_manquante_instagram": "Give the **@username** of the Instagram account to follow (or its profile link). It must be a public **Creator** or **Business** account.",
+    "ajouter_instagram_indisponible": "Instagram following isn't enabled on Wumi yet. It's coming soon!"
   },
   "badges": {
     "description_commande": "The badges you've unlocked, and the ones still to come",
@@ -1680,7 +1967,8 @@
     "aucun": "None yet. They show up on their own — just being active on the server does it.",
     "section_a_debloquer": "To unlock ({n})",
     "obtenu": "unlocked {quand}",
-    "pied": "{n} badge out of {total} || {n} badges out of {total}"
+    "pied": "{n} badge out of {total} || {n} badges out of {total}",
+    "annonce_debloque": "{membre} unlocked {badges}!"
   },
   "carte": {
     "description_commande": "Pick your own background image for your rank card",
@@ -1874,7 +2162,7 @@
     "verif_reset": "Cancel a member's verification",
     "verif_voir": "Verification settings and statistics",
     "opt_role_verifie": "The role to give",
-    "opt_role_non_verifie": "An « unverified » role to remove (optional)",
+    "opt_role_non_verifie": "An “unverified” role to remove (optional)",
     "opt_age_jours": "In days (0 = no minimum)",
     "opt_membre": "The member",
     "verif_role_invalide": "This role can't be given (managed role or @everyone).",
@@ -2178,7 +2466,11 @@
     "voir_prochaine_recompense_label": "Next reward",
     "voir_prochaine_recompense": "{role} at **{palier}** invites — **{reste}** to go.",
     "voir_dernieres_label": "Latest arrivals",
-    "voir_pied_desactive": "Invite tracking is off: these numbers no longer move."
+    "voir_pied_desactive": "Invite tracking is off: these numbers no longer move.",
+    "u": {
+      "parti": "{nom} left",
+      "parti_detail": "Invited by {inviteur}, joined {quand}.\nThey now have **{n}** invite. || Invited by {inviteur}, joined {quand}.\nThey now have **{n}** invites."
+    }
   },
   "prestige": {
     "description_commande": "Your prestige, and the next one",
@@ -2203,7 +2495,11 @@
     "succes_recompense": "Plus {somme} as a reward.",
     "succes_pied": "The counter starts over. The stars stay.",
     "consultation": "**{pseudo}** has {etoiles} prestige star.\n{badges}\nXP bonus: **+{bonus}%** || **{pseudo}** has {etoiles} prestige stars.\n{badges}\nXP bonus: **+{bonus}%**",
-    "consultation_vide": "**{pseudo}** doesn't have a prestige star yet."
+    "consultation_vide": "**{pseudo}** doesn't have a prestige star yet.",
+    "raison_desactive": "Prestige is turned off on this server.",
+    "raison_sans_xp": "You don't have any XP yet.",
+    "raison_maximum": "You've reached the maximum prestige ({n} stars).",
+    "raison_niveau": "You need to be **level {requis}** to prestige (you're level {niveau})."
   },
   "profil": {
     "description_commande": "Your full profile, as an image",
@@ -2259,7 +2555,10 @@
     "equipe_public": "**{nom}** is now on your card.",
     "liste_pilotee": "This list isn't yours. Run `/theme list` to get your own.",
     "essai_possede": "**{nom}** — you already own it.",
-    "essai_a_acheter": "**{nom}** — {somme} to unlock it."
+    "essai_a_acheter": "**{nom}** — {somme} to unlock it.",
+    "premium_requis": "The **{nom}** theme is for **Wumi Premium** servers. See `/premium info`.",
+    "etat_premium": "Premium",
+    "bouton_premium": "Premium"
   },
   "xp": {
     "description_commande": "Manage XP, rewards and bonuses",
@@ -2381,7 +2680,8 @@
     "jour_demain": "tomorrow",
     "jour_dans": "in {n} day || in {n} days",
     "liste_titre": "Upcoming birthdays",
-    "liste_pied": "{n} date saved · the year is never shown || {n} dates saved · the year is never shown"
+    "liste_pied": "{n} date saved · the year is never shown || {n} dates saved · the year is never shown",
+    "message_defaut": "Happy birthday {mention}! The whole team wishes you a wonderful day."
   },
   "confidentialite": {
     "description_commande": "View or erase the data the bot keeps about you",
@@ -2432,7 +2732,7 @@
     "annule": "Cancelled. Nothing was erased.",
     "succes_titre": "Erased",
     "succes_corps": "**{n}** row erased. I no longer know anything about you on this server, apart from any sanctions, which belong to moderation. || **{n}** rows erased. I no longer know anything about you on this server, apart from any sanctions, which belong to moderation.",
-    "succes_suite": "If you keep posting here, I'll start counting your XP again — ask an admin to exclude you from the system with `/xp exclure` if you don't want that."
+    "succes_suite": "If you keep posting here, I'll start counting your XP again — if you don't want that, ask an admin for a role that's excluded from XP (`/config` → Levels)."
   },
   "faq": {
     "description_commande": "Frequently asked questions for the server",
@@ -2477,7 +2777,16 @@
     "liste_titre": "Frequently asked questions ({n})",
     "liste_ligne_consultations": "{n} view || {n} views",
     "liste_pied": "/faq show <number> to read a card",
-    "chercher_pas_trouve": "I couldn't find a matching card.\nCheck `/faq list`, or ask your question in the help channel."
+    "chercher_pas_trouve": "I couldn't find a matching card.\nCheck `/faq list`, or ask your question in the help channel.",
+    "u": {
+      "pied_auto": "Automatic answer · entry #{id} · /faq to browse them all",
+      "pied": "Entry #{id} · viewed {n} time(s)",
+      "pas_ma_question": "That wasn't my question",
+      "seul_auteur": "Only the person who asked can remove this answer.",
+      "retiree": "Answer removed. A team member will get back to you."
+    },
+    "tester_detail": "Keywords: {mots} · Meaning (AI): {sens}",
+    "tester_sens_absent": "unavailable"
   },
   "giveaway": {
     "description_commande": "Runs a giveaway",
@@ -2644,7 +2953,7 @@
     "rapport_titre": "Weekly recap · {serveur}",
     "rapport_periode": "From {du} to {au}, compared with the week before.",
     "rapport_mouvements": "{a} joins, {d} leaves",
-    "rapport_vocal": "{h} h",
+    "rapport_vocal": "{h}h",
     "rapport_temps_forts": "Highlights",
     "rapport_meilleur_jour": "📅 Busiest day: {date} ({n} messages)",
     "rapport_pic": "🕒 Peak hour: **{h}:00 – {h2}:00**",
@@ -2840,7 +3149,36 @@
     "statut_attente": "Pending",
     "statut_encours": "In progress",
     "statut_acceptee": "Accepted",
-    "statut_refusee": "Rejected"
+    "statut_refusee": "Rejected",
+    "u": {
+      "aucun_vote": "no votes",
+      "barre_pour": "**{p}%** in favor · {n} vote || **{p}%** in favor · {n} votes",
+      "membre_inconnu": "Unknown member",
+      "titre": "Suggestion #{n} · {statut}",
+      "votes": "Votes",
+      "proposee_par": "Suggested by {auteur}",
+      "reponse_equipe": "Team response",
+      "sans_raison": "*No reason given*",
+      "par": "by {staff}",
+      "pour": "For · {n}",
+      "contre": "Against · {n}",
+      "detail": "Vote details",
+      "n_existe_plus": "This suggestion no longer exists.",
+      "votes_clos": "Voting is closed on this suggestion.",
+      "vote_retire": "Vote removed.",
+      "vote_change_pour": "Vote changed: **for**.",
+      "vote_change_contre": "Vote changed: **against**.",
+      "vote_pour": "Vote recorded: **for**.",
+      "vote_contre": "Vote recorded: **against**.",
+      "votes_de": "Votes on suggestion #{n}",
+      "liste_pour": "For ({n})",
+      "liste_contre": "Against ({n})",
+      "personne": "*nobody*",
+      "introuvable": "No suggestion #{n} on this server.",
+      "ta_suggestion": "Your suggestion #{n}: {statut}",
+      "marquee": "Suggestion **#{n}** marked **{statut}**. The author has been notified.",
+      "erreur": "Something went wrong with this suggestion."
+    }
   },
   "ticket": {
     "description_commande": "Manages the server's support tickets",
@@ -2930,7 +3268,7 @@
       "panneau_message": "Click below to open a ticket. A private channel is created, visible only to you and the team.",
       "panneau_bouton": "Open a ticket",
       "deja_ouvert": "You already have an open ticket: {salons}. Close it before opening another one. || You already have {n} open tickets: {salons}. Close one before opening another.",
-      "permission_bot": "I'm missing the « Manage Channels » permission to create the ticket.",
+      "permission_bot": "I'm missing the “Manage Channels” permission to create the ticket.",
       "formulaire_titre": "Open a ticket",
       "formulaire_sujet": "Subject",
       "formulaire_sujet_aide": "In a few words",
@@ -2999,7 +3337,7 @@
       "relance": "{membre}, this ticket has been quiet for a while. Without a new message, it will close automatically {delai}.",
       "garde": "Ticket kept open by {membre}.",
       "ferme_inactif": "Automatic closing: this ticket went unanswered.",
-      "raison_inactif": "Inactive for more than {n} h",
+      "raison_inactif": "Inactive for more than {n}h",
       "erreur": "Something went wrong with this ticket.",
       "sous_banniere": "Show or hide the illustrated ticket banners",
       "sous_inactivite": "Automatically close inactive tickets",
@@ -3008,8 +3346,8 @@
       "banniere_desactivee": "Ticket banners off.",
       "banniere_label": "Banners",
       "inactivite_label": "Inactive tickets",
-      "inactivite_valeur": "reminder after {n} h, then closing",
-      "inactivite_ok": "A ticket without messages for **{n} h** will get a reminder, then close if it stays unanswered.",
+      "inactivite_valeur": "reminder after {n}h, then closing",
+      "inactivite_ok": "A ticket without messages for **{n}h** will get a reminder, then close if it stays unanswered.",
       "inactivite_off": "Inactive tickets will no longer close automatically.",
       "bouton_liberer": "Release",
       "libere_annonce": "{membre} released this ticket: someone on the team can take it over.",
@@ -3159,8 +3497,8 @@
   "massban": {
     "description_commande": "Ban a list of accounts at once (raids)",
     "opt_ids": "The IDs, separated by spaces, commas or new lines",
-    "opt_raison": "The reason (« Raid » by default)",
-    "opt_purger": "Delete their messages from the last 24 h (yes by default)",
+    "opt_raison": "The reason (“Raid” by default)",
+    "opt_purger": "Delete their messages from the last 24h (yes by default)",
     "raison_defaut": "Raid",
     "aucun_id": "No valid ID found (17 to 20 digits).",
     "trop": "No more than {max} accounts at once.",
@@ -3287,12 +3625,12 @@
       "panneau_intro": "A question, a bug, a premium issue? Pick a reason below: a short form opens, then a private channel is created with the team.",
       "panneau_motifs": "Reasons",
       "panneau_regles": "**Before opening a ticket**\n• One ticket = one topic. Be precise, add screenshots if you can.\n• **Never** share your password or token.\n• The team will never DM you first.",
-      "panneau_pied": "We usually answer within 24 h · Thanks for your patience 💙",
+      "panneau_pied": "We usually answer within 24h · Thanks for your patience 💙",
       "bouton_site": "Website",
       "bouton_inviter": "Invite Wumi",
       "motif_inconnu": "This reason doesn't exist.",
       "deja_ouvert": "You already have an open ticket: {salons}. Finish it before opening another one.",
-      "permission_bot": "I'm missing the « Manage Channels » permission to create your ticket.",
+      "permission_bot": "I'm missing the “Manage Channels” permission to create your ticket.",
       "creation_impossible": "Couldn't create the channel: {erreur}",
       "ouvert": "Your ticket is open: {salon}",
       "aller": "Go to ticket",
@@ -3525,7 +3863,7 @@
       "etape3": "Tap the requested emoji: done, you get access.",
       "role_donne": "Role you'll get: {role}",
       "role_absent": "The verification role isn't set up (`/admin verification role`).",
-      "role_trop_haut": "I can't give this role: it's above mine, or I'm missing « Manage Roles ».",
+      "role_trop_haut": "I can't give this role: it's above mine, or I'm missing “Manage Roles”.",
       "bouton": "Verify",
       "bouton_secours": "Doesn't open?",
       "pied_activite": "Verification runs as a Discord Activity · Nothing is stored except your verification date.",
@@ -3541,7 +3879,7 @@
       "secours_faux": "Wrong code. Click the button again to retry.",
       "trop_essais": "Too many attempts. Wait a bit before trying again.",
       "reussi": "Verified! You got {role}. Welcome 💙",
-      "reussi_activite": "You got the « {role} » role. Welcome 💙",
+      "reussi_activite": "You got the “{role}” role. Welcome 💙",
       "session_expiree": "Your session expired. Start the verification again.",
       "regles_requises": "You must accept the rules.",
       "defi_rate": "Missed! A new challenge is waiting for you.",
@@ -3624,7 +3962,7 @@
     "deja_actif": "Raid mode is already on. `/raid status` for details.",
     "active": "Raid mode on",
     "resume_verification": "Verification level set to maximum",
-    "resume_verification_ko": "Verification level unchanged (I'm missing « Manage Server »)",
+    "resume_verification_ko": "Verification level unchanged (I'm missing “Manage Server”)",
     "resume_slowmode": "10 s slowmode on {n} channel || 10 s slowmode on {n} channels",
     "resume_arrivees": "Newcomers are kicked with a message (configurable in /config)",
     "fin_auto": "Everything goes back to normal in **{duree}**, or with `/raid off`.",
@@ -3752,7 +4090,7 @@
     "sous_voir": "Show the settings",
     "sous_desactiver": "Turn the welcome message off",
     "opt_salon": "The channel",
-    "opt_message": "The message ({mention}, {pseudo}, {serveur}, {membres}…). « default » to restore the base text",
+    "opt_message": "The message ({mention}, {pseudo}, {serveur}, {membres}…). “default” to restore the base text",
     "opt_actif": "Enable?",
     "opt_mp": "The DM text (empty = no more DM)",
     "opt_salon_aurevoir": "The channel (empty = no more goodbye message)",
@@ -3879,7 +4217,7 @@
     "bouton_mettre_a_jour": "Update",
     "bouton_annuler": "Cancel",
     "lien_titre": "Add a link button",
-    "expire": "This draft expired (24 h). Run `/embed` again.",
+    "expire": "This draft expired (24h). Run `/embed` again.",
     "couleur_invalide": "Invalid color: write it like #58a6ff.",
     "image_invalide": "The image must be a link starting with https://",
     "url_invalide": "The address must start with https://",
@@ -3988,7 +4326,7 @@
     "seul_auteur": "Only the person who started the game can give up.",
     "fenetre_titre": "Guess the word",
     "fenetre_label": "Your guess",
-    "mauvais_mot": "{joueur} guessed « {mot} »… wrong!",
+    "mauvais_mot": "{joueur} guessed “{mot}”… wrong!",
     "bonne": "{joueur} found **{lettre}**! || {joueur} found **{lettre}** ({n} times)!",
     "mauvaise": "No **{lettre}** in the word ({joueur})."
   },
@@ -4233,7 +4571,8 @@
     "pl_supprimee": "Playlist **{nom}** deleted.",
     "pl_introuvable": "No playlist named \"{nom}\".",
     "pl_max": "25 playlists max per server.",
-    "pl_sauvee": "Playlist **{nom}** saved ({n} tracks)."
+    "pl_sauvee": "Playlist **{nom}** saved ({n} tracks).",
+    "lecteur_web": "Web player"
   },
   "blindtest": {
     "description_commande": "Music blind test in voice: find the title before everyone else",
@@ -4381,7 +4720,7 @@
     "t_niveau": "Level",
     "t_badges": "Badges",
     "minutes": "{n} min",
-    "heures": "{n} h",
+    "heures": "{n}h",
     "salons": "Your favorite channels",
     "pas_de_salon": "No favorite channel yet.",
     "perso_hibou": "🦉 Night owl",
@@ -4456,7 +4795,7 @@
     "opt_jeu": "The game (e.g. Valorant, Minecraft…)",
     "opt_joueurs": "Number of players including you",
     "opt_details": "Mode, rank, vibe… (optional)",
-    "opt_expire": "The post expires after… (2 h by default)",
+    "opt_expire": "The post expires after… (2h by default)",
     "etat_ouvert": "🔎 {n} player(s) needed",
     "etat_complet": "Group full!",
     "etat_ferme": "Post closed",
@@ -4717,7 +5056,15 @@
     "erreur_deja": "You already have an open conversation: just DM Wumi.",
     "erreur_bloque": "You can't contact the team.",
     "erreur_trop_vite": "Please wait a few minutes before opening a new conversation.",
-    "erreur_mp": "I can't DM you: open your direct messages (Settings › Privacy) and try again."
+    "erreur_mp": "I can't DM you: open your direct messages (Settings › Privacy) and try again.",
+    "renvoi_titre": "Modmail has its own bot",
+    "renvoi_texte": "To talk to the team, send a direct message to {bot}. It forwards everything to the team and replies right there.",
+    "bouton_prendre": "Claim",
+    "bouton_pris": "Claimed by {nom}",
+    "pris_staff": "✋ {membre} claimed this conversation.",
+    "libere": "🔓 {membre} released this conversation: someone else can claim it.",
+    "pris_deja": "This conversation is already claimed by {membre}.",
+    "pris_membre": "**{nom}** from the Wumi team is handling your request. Just reply here."
   },
   "journal": {
     "profil": "Profile",
@@ -4832,7 +5179,7 @@
       "unmute": "Remove timeout",
       "kick": "Kick",
       "ban": "Ban",
-      "ban_purge": "Ban + delete their messages (24 h)"
+      "ban_purge": "Ban + delete their messages (24h)"
     },
     "raison": {
       "spam": "Spam",
@@ -4889,6 +5236,443 @@
     "annonce_record": "Server record! {membre} clears level {niveau} · {nom}",
     "annonce_fini": "{membre} clears level {niveau} · {nom} for the first time",
     "annonce_pied": "Wumi Run · /wumirun play to beat it",
-    "portail": "Wumi Run isn't open yet: Activities aren't enabled in Wumi's Developer Portal (Activities › Settings › Enable Activities)."
+    "portail": "Wumi Run isn't open yet: Activities aren't enabled in Wumi's Developer Portal (Activities › Settings › Enable Activities).",
+    "sous_defi": "This week's challenge: level, leaderboard and rewards",
+    "sous_convertir": "Convert your Wumi Run coins into server currency",
+    "opt_montant": "How many coins to convert (all by default)",
+    "opt_salon_defi": "Channel for the weekly challenge (live leaderboard, results every Monday)",
+    "opt_sans_defi": "Stop posting the weekly challenge",
+    "opt_taux": "Server currency per Wumi Run coin (0 = conversion disabled)",
+    "config_defi": "Weekly challenge",
+    "config_taux": "Coin conversion",
+    "config_taux_valeur": "1 {piece} = {gain}",
+    "config_taux_off": "disabled",
+    "defi_titre": "Wumi Run · Weekly challenge",
+    "defi_niveau": "Level {niveau} · {nom}",
+    "defi_regle": "Set the fastest time on this level this week. Every run counts, not just your personal best. Ends {fin}.",
+    "defi_vide": "No time yet this week. Be the first!",
+    "defi_moi": "You: #{rang} · {temps} · {essais} run || You: #{rang} · {temps} · {essais} runs",
+    "defi_moi_aucun": "You haven't finished this level this week yet.",
+    "defi_gains": "Rewards",
+    "defi_pied": "{n} player this week · Launch the game from this server for your time to count || {n} players this week · Launch the game from this server for your time to count",
+    "defi_resultats": "Weekly challenge results · Level {niveau} · {nom}",
+    "defi_participation": "{n} other player gets {gain} for taking part || {n} other players get {gain} each for taking part",
+    "convertir_titre": "Coins converted",
+    "convertir_ok": "**{montant}** {piece} → **{gain}** on this server. You have **{reste}** {piece} left in Wumi Run.",
+    "convertir_pied": "If the game is open, your new coin total shows the next time you launch it.",
+    "convertir_economie": "The economy isn't enabled on this server.",
+    "convertir_coupee": "Coin conversion is disabled on this server.",
+    "convertir_vide": "You have no Wumi Run coins to convert. Collect some in the game!",
+    "convertir_pas_assez": "You only have **{dispo}** {piece}."
+  },
+  "niveaux_carte": {
+    "carte_titre": "LEVEL UP",
+    "carte_niveau": "LEVEL",
+    "carte_xp": "{a} / {b} XP to level {n}",
+    "carte_total": "{n} XP total",
+    "carte_bonus": "Bonus ×{n}",
+    "carte_rang": "#{n} on the server",
+    "carte_role": "Unlocked: {r}",
+    "annonce_vocal": "{mention} reaches **level {niveau}** in voice! {emoji}",
+    "roles_debloques": "You unlock {roles}!"
+  },
+  "donnees": {
+    "themes": {
+      "Wumi": {
+        "nom": "Wumi",
+        "description": "The server blueprint. Free for everyone."
+      },
+      "ocean": {
+        "nom": "Ocean",
+        "description": "The same scene, in deep blue."
+      },
+      "braise": {
+        "nom": "Ember",
+        "description": "Warm orange, like a campfire."
+      },
+      "lavande": {
+        "nom": "Lavender",
+        "description": "Soft purple on a light background."
+      },
+      "nuit": {
+        "nom": "Night",
+        "description": "The scene goes dark, with light text."
+      },
+      "minuit": {
+        "nom": "Midnight",
+        "description": "No scenery, just a starry sky."
+      },
+      "or": {
+        "nom": "Gold",
+        "description": "Black and gold. The priciest theme on the server."
+      },
+      "aurore": {
+        "nom": "Aurora",
+        "description": "Starry purple and pink sky. Premium."
+      },
+      "neon": {
+        "nom": "Neon",
+        "description": "Cyan and magenta on an electric night. Premium."
+      },
+      "sakura": {
+        "nom": "Sakura",
+        "description": "Cherry-blossom pink on deep plum. Premium."
+      },
+      "emeraude": {
+        "nom": "Emerald",
+        "description": "Emerald green and mint. Premium."
+      }
+    },
+    "objets": {
+      "potion_xp": {
+        "nom": "XP Potion",
+        "description": "Doubles your XP for 1 hour."
+      },
+      "elixir_xp": {
+        "nom": "XP Elixir",
+        "description": "Triples your XP for 30 minutes."
+      },
+      "couleur": {
+        "nom": "Name Color",
+        "description": "Pick your name color for 7 days."
+      },
+      "coupe_file": {
+        "nom": "Fast Pass",
+        "description": "Your next ticket is flagged as priority."
+      },
+      "coffre_fort": {
+        "nom": "Safe",
+        "description": "Protects you from robberies for 24 hours."
+      }
+    },
+    "badges": {
+      "bavard_1": {
+        "nom": "Chatty",
+        "description": "100 messages sent"
+      },
+      "bavard_2": {
+        "nom": "Chat Pillar",
+        "description": "1,000 messages sent"
+      },
+      "bavard_3": {
+        "nom": "Typewriter",
+        "description": "10,000 messages sent"
+      },
+      "voix_1": {
+        "nom": "Familiar Voice",
+        "description": "10 hours in voice"
+      },
+      "voix_2": {
+        "nom": "Voice Regular",
+        "description": "100 hours in voice"
+      },
+      "niveau_1": {
+        "nom": "Experienced",
+        "description": "Reached level 10"
+      },
+      "niveau_2": {
+        "nom": "Veteran",
+        "description": "Reached level 30"
+      },
+      "niveau_3": {
+        "nom": "Legend",
+        "description": "Reached level 50"
+      },
+      "recruteur_1": {
+        "nom": "Recruiter",
+        "description": "5 members invited"
+      },
+      "recruteur_2": {
+        "nom": "Ambassador",
+        "description": "25 members invited"
+      },
+      "fidele_1": {
+        "nom": "Loyal",
+        "description": "6 months on the server"
+      },
+      "fidele_2": {
+        "nom": "Pioneer",
+        "description": "1 year on the server"
+      },
+      "etoile": {
+        "nom": "Starred",
+        "description": "First prestige reached"
+      }
+    },
+    "niveaux_run": {
+      "1": "First Steps",
+      "2": "Scorching Dunes",
+      "3": "Icy Peaks",
+      "4": "Mushroom Forest",
+      "5": "The Citadel"
+    }
+  },
+  "graphique": {
+    "activite_de": "{serveur} activity",
+    "periode": "Last {n} days · {debut} to {fin}",
+    "vs_precedente": "{p}% vs previous period",
+    "messages": "Messages",
+    "par_jour_moyenne": "{n} per day on average",
+    "membres": "Members",
+    "arrivees_departs": "{a} joins · {d} leaves",
+    "vocal": "Voice",
+    "vocal_cumule": "total time in voice",
+    "jour_actif": "Most active day",
+    "n_messages": "{n} messages",
+    "aucune_donnee": "no data",
+    "messages_par_jour": "Messages per day",
+    "moyenne_messages": "average of {n} messages per day",
+    "mouvements": "Joins and leaves",
+    "mouvements_sous": "above the line: joins · below: leaves",
+    "legende_arrivees": "Joins ({n})",
+    "legende_departs": "Leaves ({n})",
+    "salons_actifs": "Most active channels",
+    "sur_jours": "over {n} days",
+    "aucune_donnee_encore": "No data yet",
+    "heures_pointe": "Peak hours",
+    "pic": "peak at {h}:00 · {p}% of messages · Paris time",
+    "heure_paris": "Paris time",
+    "m_quand": "When this member talks",
+    "m_quand_sous": "messages by hour of the day (Paris time)",
+    "m_ou": "Where this member talks",
+    "m_ou_sous": "most used channels",
+    "m_aucun": "No messages recorded yet.",
+    "m_sur": "on {serveur}",
+    "m_niveau": "level {n}",
+    "m_vocal": "Time in voice",
+    "m_jamais": "never joined",
+    "m_heures": "Favorite hours",
+    "m_part": "{p}% of their messages",
+    "m_pas_donnees": "no data yet",
+    "m_salon": "Favorite channel",
+    "m_note": "{n} messages placed in the day · hourly tracking started after total counting"
+  },
+  "carte_profil": {
+    "badges": "{n} badge || {n} badges",
+    "niveau": "LEVEL",
+    "rang": "RANK",
+    "xp_total": "{n} XP total",
+    "progression": "{p}% to level {n}",
+    "messages": "Messages",
+    "en_vocal": "{v} in voice",
+    "solde": "Balance",
+    "rang_solde": "#{n} by balance",
+    "invitations": "Invites",
+    "amenes": "members invited",
+    "personne": "nobody yet",
+    "sur_serveur": "On the server",
+    "avertissements": "{n} warning || {n} warnings",
+    "aucun_avertissement": "no warnings",
+    "missions": "DAILY MISSIONS",
+    "toutes": "all done",
+    "sur": "{a} of {b}",
+    "n_messages": "{v} message || {v} messages"
+  },
+  "fond": {
+    "aucune": "No image provided.",
+    "trop_lourde": "Image too large ({n} MB). Maximum 8 MB.",
+    "format": "Unsupported format. Send a PNG, JPEG or WebP image.",
+    "illisible": "Couldn't read the image: {erreur}",
+    "echec": "Couldn't save the image."
+  },
+  "transcription": {
+    "ouvert_par": "Opened by",
+    "ouvert_le": "Opened on",
+    "ferme_par": "Closed by",
+    "ferme_le": "Closed on",
+    "messages": "Messages",
+    "raison": "Closing reason",
+    "aucune": "None",
+    "sujet": "Subject",
+    "detail": "Request details",
+    "vide": "No messages in this ticket.",
+    "pied": "Transcript generated automatically"
+  },
+  "traduction": {
+    "vide": "This message has no text to translate.",
+    "indisponible": "Translation isn't available on this bot yet.",
+    "trop_vite": "Easy! Wait a few seconds before translating another message.",
+    "langue_inconnue": "I couldn't recognize this message's language (French, English, Spanish, German, Portuguese and Italian only).",
+    "deja": "This message is already in {langue}.",
+    "echec": "Translation failed. Try again in a moment.",
+    "titre": "Translation",
+    "voir_message": "View message",
+    "pied": "Translated by an AI running on Wumi's server: it can make mistakes. Only you can see this translation."
+  },
+  "ticket_faq": {
+    "titre": "The FAQ may already have the answer",
+    "intro": "While you wait for the team, here's an answer that matches your request.",
+    "bouton_ok": "Solved, thanks",
+    "bouton_non": "I'll wait for the team",
+    "attente": "Got it, the team is on its way.",
+    "resolu": "Solved by the FAQ.",
+    "raison": "Solved by the FAQ",
+    "plus_ouvert": "This ticket is no longer open.",
+    "seul_auteur": "Only the ticket author or the team can answer."
+  },
+  "cartes": {
+    "description_commande": "Wumi's collectible cards: boosters, binder, deck",
+    "sous_ouvrir": "Open a 5-card booster",
+    "sous_classeur": "Browse a card binder, family by family",
+    "sous_voir": "Show one of your cards in full size",
+    "sous_deck": "Show a member's 5-card showcase",
+    "sous_vitrine": "Pick the 5 cards of your showcase",
+    "sous_acheter": "Buy boosters with the server's currency",
+    "sous_quotidien": "Claim your free daily booster",
+    "sous_recycler": "Recycle duplicates into dust (100 = one booster)",
+    "sous_info": "A member's boosters, progress and collection",
+    "sous_classement": "The server's best collectors",
+    "opt_membre": "The member (you by default)",
+    "opt_famille": "The family to open",
+    "opt_carte": "A card from your collection",
+    "opt_nombre": "How many boosters (1 by default)",
+    "famille": {
+      "pixel": "Pixel",
+      "nuage": "Cloud",
+      "glitch": "Glitch",
+      "neon": "Neon",
+      "nuit": "Night",
+      "cosmos": "Cosmos",
+      "volcans": "Volcanoes",
+      "eaux": "Lakes & waterfalls",
+      "monuments": "Monuments",
+      "terroir": "Local food",
+      "nature": "Nature",
+      "aventure": "Adventure"
+    },
+    "rarete": {
+      "commune": "Common",
+      "peu_commune": "Uncommon",
+      "rare": "Rare",
+      "epique": "Epic",
+      "legendaire": "Legendary",
+      "mythique": "Mythic"
+    },
+    "serie": "Series {n}",
+    "stat_puissance": "Power",
+    "stat_eclat": "Shine",
+    "brillante": "Shiny",
+    "nouvelle": "New!",
+    "voir_tout": "See the summary",
+    "suivante": "Next card ({i}/{n})",
+    "carte_x": "Card {i}/{n}",
+    "recap_titre": "{membre}'s booster",
+    "recap_pied": "Collection: {n}/{total} · boosters left: {boosters}",
+    "aucun_booster": "You have no booster. The next one comes in **{reste}** messages, and `/cards daily` gives one a day.",
+    "booster_titre": "Creatures",
+    "booster_sous": "Series {n} · 5 cards",
+    "ouverture_titre": "{membre} is opening a booster!",
+    "ouverture_restants": "Boosters left: {n}",
+    "dechirer": "Open the booster",
+    "classeur_titre": "{membre}'s binder",
+    "classeur_resume": "**{n}/{total}** cards ({pourcent}%) · ✨ {brillantes} shiny",
+    "desactive": "Collectible cards are turned off on this server.",
+    "pas_a_toi": "You don't have this card in your collection.",
+    "voir_pied": "Copies: {n} · first obtained on {date}",
+    "deck_vide_moi": "Your showcase is empty. Pick your 5 favourite cards with `/cards showcase`.",
+    "deck_vide": "{membre} has no showcase yet.",
+    "deck_titre": "{membre}'s showcase",
+    "vitrine_ok": "Showcase saved: {cartes}",
+    "economie_off": "The economy is turned off on this server: boosters can't be bought here.",
+    "stock_plein": "You already have the maximum of boosters ({max}). Open them with `/cards open`!",
+    "pas_assez": "You need {cout}, you have {solde}.",
+    "achat_ok": "Bought {n} booster(s) for {cout}. You now have **{boosters}**. Open them with `/cards open`!",
+    "quotidien_off": "The daily booster is turned off on this server.",
+    "quotidien_attente": "You already claimed today's booster. Next one: {quand}.",
+    "quotidien_ok": "Daily booster claimed! You have **{boosters}**. Open it with `/cards open`.",
+    "recycler_rien": "You have no duplicates to recycle.",
+    "recycler_titre": "Recycle duplicates",
+    "recycler_detail": "You have **{n}** duplicate(s). Recycling them gives **{poussiere}** dust ({par} = one booster). One copy of each card is always kept.",
+    "recycler_bouton": "Recycle",
+    "recycler_fait": "Recycled {n} duplicate(s): +{poussiere} dust, {boosters} booster(s) earned. Dust left: {reste}/{par}.",
+    "info_titre": "{membre}'s cards",
+    "info_collection": "Collection: **{n}/{total}** ({pourcent}%) · ✨ {brillantes} shiny",
+    "info_boosters": "Boosters to open: **{n}** (max {max})",
+    "info_prochain": "Next booster: {n}/{total} messages",
+    "info_quotidien": "Daily booster: {quand}",
+    "maintenant": "available",
+    "info_prix": "Booster price: {prix}",
+    "info_poussiere": "Dust: {n}/{par}",
+    "info_ouverts": "Boosters opened: {n}",
+    "classement_vide": "Nobody has a card on this server yet.",
+    "classement_titre": "Top collectors",
+    "classement_ligne": "**{n}/{total}** cards · ✨ {brillantes}",
+    "session_finie": "This booster has already been opened.",
+    "pas_ton_booster": "That's not your booster!",
+    "membre_absent": "This member is no longer on the server.",
+    "erreur": "Something went wrong with the cards. Try again in a moment."
+  },
+  "jeuxmusicaux": {
+    "description_commande": "Music games in voice: quiz, who picked it, vibe check",
+    "sous_quiz": "Music quiz: find the title among 4, the faster the more points",
+    "sous_qui": "Who picked it? Everyone adds tracks, guess who added what",
+    "sous_vibe": "Vibe check: rate each track 1 to 10, aim for the average",
+    "sous_arreter": "Stop the current music game",
+    "opt_theme": "The music theme",
+    "opt_manches": "Number of rounds",
+    "nom_quiz": "Music quiz",
+    "nom_qui": "Who picked it?",
+    "nom_vibe": "Vibe check",
+    "lance": "{jeu} started in {vocal}! Check the messages below.",
+    "en_cours": "A music game or blind test is already running on this server.",
+    "aucune": "No music game is running.",
+    "arret_reserve": "Only the person who started the game, the DJ role or an admin can stop it.",
+    "arrete": "Music game stopped.",
+    "manche": "Round {n}/{total}",
+    "deja_repondu": "You already answered this round.",
+    "reponse_notee": "Answer saved! Results come at the end of the round.",
+    "vote_note": "Vote saved!",
+    "personne": "Nobody got it!",
+    "regles_quiz": "**{n} rounds.** Wumi plays a clip: click the right title among the 4. One answer per round: **the faster you are, the more you score** (1000 to 300 points), and each correct answer in a row adds a 🔥 bonus.",
+    "quiz_question": "🎧 What's this song?",
+    "cetait": "It was **{lettre} · {titre}** · {artiste}",
+    "regles_qui": "Click **Add my tracks** and add up to **{max} tracks** (a name or a link), in secret. Then each track plays for 30 seconds and everyone guesses **who picked it**. Right guess: +1. If nobody finds out, whoever picked it gets +2. You need at least **{min} players**.",
+    "qui_bouton": "Add my tracks",
+    "qui_demarrer": "Start",
+    "qui_inscrits": "**Players joined: {n}**",
+    "qui_fin": "Sign-ups close {quand}, or when the host clicks Start.",
+    "qui_seul_lanceur": "Only the person who started the game can launch it.",
+    "qui_pas_assez": "You need at least {min} players to start.",
+    "qui_modal_titre": "Your tracks (secret)",
+    "qui_modal_champ": "Track {n}",
+    "qui_modal_exemple": "E.g. Daft Punk One More Time, or a link",
+    "qui_merci": "Got it! {n} track(s) saved. You can change them until the game starts.",
+    "qui_annulee": "Game cancelled: at least {min} players were needed.",
+    "qui_cest_parti": "Here we go! **{n} players**, tracks are coming to voice…",
+    "qui_menu": "Who picked it?",
+    "qui_question": "🕵️ Who added this track?",
+    "qui_pas_joueur": "Only players who joined can vote.",
+    "qui_ton_titre": "That's your track: keep a straight face 🤫",
+    "qui_revele": "It was {membre}'s pick!",
+    "qui_trouve": "Nice one: {membres} (+1)",
+    "qui_personne": "Nobody guessed: {membre} gets +2 🦊",
+    "regles_vibe": "**{n} rounds.** Rate each track from 1 to 10, in secret. **The closer you are to the voice channel's average, the more you score** (10 points max). Works solo too.",
+    "vibe_menu": "Your rating out of 10",
+    "vibe_question": "🌡️ Rate this track from 1 to 10!",
+    "vibe_notee": "Rating saved: {note}/10.",
+    "vibe_moyenne": "Voice channel average: {moyenne}/10",
+    "vibe_personne": "Nobody rated this track.",
+    "vibe_hot_take": "Hot take of the round: {membre} with {note}/10!",
+    "virgule": ".",
+    "fin": "{jeu} is over!",
+    "gagnant": "Well done {membre}, champion with **{pts}** points! 🎉",
+    "aucun_point": "Nobody scored this time.",
+    "rejouer": "Play again: /musicgame",
+    "qui_complet": "The game is full (25 players max)."
+  },
+  "avis": {
+    "description_commande": "⭐ Leave a review of Wumi (it may appear on wumi.fr)",
+    "sous_ecrire": "Write or replace your review",
+    "sous_voir": "See your review and whether it is published",
+    "sous_supprimer": "Delete your review",
+    "opt_note": "Your rating",
+    "opt_texte": "Your review in a few words (10 to 300 characters)",
+    "merci": "Thanks for your review! {etoiles}\nIt will be read before it appears on **wumi.fr**, with your name and avatar. You can remove it any time with `/review delete`.",
+    "aucun": "You haven't left a review yet. Write one with `/review write`!",
+    "supprime": "Your review is deleted. It no longer appears anywhere.",
+    "le_tien": "**Your review** · {etoiles}\n>>> {texte}\n\n-# {statut}",
+    "statut_attente": "Waiting for review",
+    "statut_publie": "Published on wumi.fr",
+    "statut_masque": "Not published"
   }
 }

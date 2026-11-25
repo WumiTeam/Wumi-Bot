@@ -44,8 +44,22 @@ const QUESTIONS_DEFAUT_EN = [
   { label: 'What experience do you have?', long: true },
 ];
 
+// 2.31 : les questions par defaut dans les autres langues.
+const QUESTIONS_DEFAUT_AUTRES = {
+  es: ['Tu edad y tu zona horaria', '¿Por qué quieres este puesto?', '¿Qué experiencia tienes?'],
+  de: ['Dein Alter und deine Zeitzone', 'Warum willst du diesen Posten?', 'Welche Erfahrung hast du?'],
+  pt: ['Sua idade e seu fuso horário', 'Por que você quer esta vaga?', 'Que experiência você tem?'],
+  it: ['La tua età e il tuo fuso orario', 'Perché vuoi questo ruolo?', 'Che esperienza hai?'],
+};
+function questionsDefaut(langue) {
+  if (langue === 'fr') return QUESTIONS_DEFAUT;
+  const autres = QUESTIONS_DEFAUT_AUTRES[langue];
+  if (!autres) return QUESTIONS_DEFAUT_EN;
+  return QUESTIONS_DEFAUT_EN.map((q, i) => ({ ...q, label: autres[i] }));
+}
+
 function lireQuestions(type, langue = 'fr') {
-  const defaut = langue === 'fr' ? QUESTIONS_DEFAUT : QUESTIONS_DEFAUT_EN;
+  const defaut = questionsDefaut(langue);
   try {
     const q = JSON.parse(type.questions || '[]');
     return Array.isArray(q) && q.length ? q.slice(0, 5) : defaut;

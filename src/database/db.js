@@ -21,6 +21,10 @@ const cheminDb = path.resolve(process.env.DATABASE_PATH || './data/zhaak.db');
 fs.mkdirSync(path.dirname(cheminDb), { recursive: true });
 
 const db = new DatabaseSync(cheminDb);
+// Chiffrement au repos des textes ecrits par les membres et le staff (2.18) :
+// branche AVANT toute requete preparee, pour que tout le code en profite.
+const chiffrement = require('./chiffrement');
+chiffrement.brancher(db);
 db.exec('PRAGMA journal_mode = WAL');
 db.exec('PRAGMA foreign_keys = ON');
 
@@ -296,6 +300,20 @@ CREATE TABLE IF NOT EXISTS reglages (
 -- Les votes top.gg. GLOBALE : un vote vaut pour LE BOT, pas pour un serveur.
 -- Sans ca, quelqu'un present sur dix serveurs reclamerait dix recompenses
 -- pour un seul vote.
+-- 2.40 : les avis laisses avec /avis. UN avis par personne (le dernier
+-- remplace le precedent). Rien n'est affiche sur wumi.fr avant d'avoir ete
+-- publie a la main depuis le serveur support : statut attente -> publie.
+CREATE TABLE IF NOT EXISTS avis (
+  user_id   TEXT PRIMARY KEY,
+  nom       TEXT NOT NULL,
+  avatar    TEXT,
+  note      INTEGER NOT NULL,
+  texte     TEXT NOT NULL,
+  langue    TEXT NOT NULL DEFAULT 'fr',
+  date      INTEGER NOT NULL,
+  statut    TEXT NOT NULL DEFAULT 'attente'
+);
+
 CREATE TABLE IF NOT EXISTS votes (
   user_id        TEXT PRIMARY KEY,
   dernier_vote   INTEGER NOT NULL,   -- quand la recompense a ete reclamee
@@ -708,6 +726,10 @@ const colonnesConfig = assurerColonnes('config', {
   prestige_actif: 'INTEGER NOT NULL DEFAULT 1',
   badges_actif: 'INTEGER NOT NULL DEFAULT 1',
   fond_perso_actif: 'INTEGER NOT NULL DEFAULT 0',
+  // 2.24 (premium) : le theme de carte par defaut des membres qui n'en ont choisi aucun.
+  theme_defaut: 'TEXT',
+  // 3.0.2 (premium) : la bio donnee au bot sur ce serveur (Discord ne la renvoie pas).
+  profil_bio: 'TEXT',
   carte_animee_actif: 'INTEGER NOT NULL DEFAULT 1',
   double_xp_jusqu_a: 'INTEGER NOT NULL DEFAULT 0',
 
@@ -831,6 +853,8 @@ const colonnesConfig = assurerColonnes('config', {
   bienvenue_carte_fixe: 'INTEGER',                    // design impose (sinon tirage au hasard)
   astro_salon: 'TEXT',                                // Astro Run : salon des records
   astro_recompenses: 'INTEGER NOT NULL DEFAULT 1',    // Astro Run : XP et monnaie a la premiere victoire
+  astro_defi: 'TEXT',                                  // Wumi Run 2.21 : salon du defi de la semaine
+  astro_taux: 'INTEGER NOT NULL DEFAULT 1',            // Wumi Run 2.21 : monnaie du serveur par piece du jeu (0 = conversion coupee)
   paliers_avert: 'TEXT',                               // JSON des paliers d'avertissements (null = defaut)
   raid_kick_arrivees: 'INTEGER NOT NULL DEFAULT 1',    // en mode raid : expulser les nouveaux venus
   ticket_max: 'INTEGER NOT NULL DEFAULT 1',
@@ -872,6 +896,20 @@ const colonnesConfig = assurerColonnes('config', {
   // Wumi 2.9 : la radio permanente (voir src/musique/radioPermanente.js).
   radio_salon: 'TEXT',
   radio_station: 'TEXT',
+
+  // Wumi 2.32 : modules d'automod. Arnaques = regles (actif par defaut, comme
+  // les autres modules : rien ne tourne tant que l'automod est eteint). IA =
+  // modeles locaux, ETEINTS par defaut (choix explicite du serveur).
+  automod_arnaques: 'INTEGER NOT NULL DEFAULT 1',
+  automod_ia: 'INTEGER NOT NULL DEFAULT 0',
+  automod_images: 'INTEGER NOT NULL DEFAULT 0',
+  ticket_faq: 'INTEGER NOT NULL DEFAULT 1',
+  cartes_actif: 'INTEGER NOT NULL DEFAULT 1',
+  cartes_prix: 'INTEGER NOT NULL DEFAULT 500',
+  cartes_messages: 'INTEGER NOT NULL DEFAULT 100',
+  cartes_quotidien: 'INTEGER NOT NULL DEFAULT 1',
+  // Wumi 2.36 : apparaitre dans la banderole de wumi.fr (eteint par defaut).
+  vitrine_site: 'INTEGER NOT NULL DEFAULT 0',
 });
 
 // LES SERVEURS DEJA LA RESTENT EN FRANCAIS.
@@ -899,6 +937,14 @@ try {
 }
 
 // ------------------------------------------------------------------ REQUETES
+// Les textes encore en clair (anciennes versions) sont chiffres une fois.
+try {
+  const n = chiffrement.migrer(db);
+  if (n) console.log(`[chiffrement] ${n} texte(s) existant(s) chiffre(s) au repos.`);
+} catch (e) {
+  console.error('[chiffrement] Migration impossible :', e.message);
+}
+
 const req = {
   getConfig: db.prepare('SELECT * FROM config WHERE guild_id = ?'),
   insertConfig: db.prepare('INSERT OR IGNORE INTO config (guild_id) VALUES (?)'),
@@ -1478,6 +1524,15 @@ const req = {
 
   // ---------------------------------------------------------------- VOTES
   lireVote: db.prepare('SELECT * FROM votes WHERE user_id = ?'),
+  ecrireAvis: db.prepare(`INSERT INTO avis (user_id, nom, avatar, note, texte, langue, date, statut)
+    VALUES (@user_id, @nom, @avatar, @note, @texte, @langue, @date, 'attente')
+    ON CONFLICT(user_id) DO UPDATE SET nom = excluded.nom, avatar = excluded.avatar, note = excluded.note,
+      texte = excluded.texte, langue = excluded.langue, date = excluded.date, statut = 'attente'`),
+  lireAvis: db.prepare('SELECT * FROM avis WHERE user_id = ?'),
+  statutAvis: db.prepare('UPDATE avis SET statut = ? WHERE user_id = ?'),
+  supprimerAvis: db.prepare('DELETE FROM avis WHERE user_id = ?'),
+  avisPublies: db.prepare("SELECT nom, avatar, note, texte, langue, date FROM avis WHERE statut = 'publie' ORDER BY date DESC LIMIT 60"),
+  moyenneAvis: db.prepare("SELECT COUNT(*) AS n, AVG(note) AS moyenne FROM avis WHERE statut = 'publie'"),
   noterVote: db.prepare(`
     INSERT INTO votes (user_id, dernier_vote, dernier_guild, total)
     VALUES (@user_id, @date, @guild_id, 1)

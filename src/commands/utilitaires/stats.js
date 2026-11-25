@@ -114,7 +114,7 @@ module.exports = {
     const options = {};
 
     try {
-      const png = await genererGraphique({ serveur: guild.name, serie: donnees, salons, heures: parHeure, avant: avant.messages || avant.vocal ? avant : null });
+      const png = await genererGraphique({ langue: require('../../utils/langues').langueDe(guild.id), serveur: guild.name, serie: donnees, salons, heures: parHeure, avant: avant.messages || avant.vocal ? avant : null });
       options.files = [new AttachmentBuilder(png, { name: 'activite.png' })];
       elements.push(C.image('attachment://activite.png'));
     } catch (e) {

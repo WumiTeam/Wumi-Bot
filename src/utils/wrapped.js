@@ -148,10 +148,10 @@ function donnees(guildId, userId, periode = 'mois') {
 const L = 1080;
 const H = 1350;
 const P = 'Poppins';
-const BLEU = '#62b8ff';
+const BLEU = '#ff9d1b';
 
 function nombre(n, langue) {
-  return new Intl.NumberFormat(langue === 'en' ? 'en-US' : 'fr-FR').format(n ?? 0);
+  return new Intl.NumberFormat(require('./langues').intl(langue)).format(n ?? 0);
 }
 
 function dureeVocal(min, t) {
@@ -173,17 +173,17 @@ async function image(d, o) {
   const ctx = c.getContext('2d');
 
   // Fond : nuit bleutee + halos.
-  ctx.fillStyle = '#0a0b18';
+  ctx.fillStyle = '#110c07';
   ctx.fillRect(0, 0, L, H);
   const halo = (x, y, r, couleur) => {
     const g = ctx.createRadialGradient(x, y, 0, x, y, r);
     g.addColorStop(0, couleur);
-    g.addColorStop(1, 'rgba(10,11,24,0)');
+    g.addColorStop(1, 'rgba(18,13,8,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, L, H);
   };
-  halo(120, 60, 620, 'rgba(74,140,220,0.45)');
-  halo(1000, 760, 640, 'rgba(139,124,246,0.32)');
+  halo(120, 60, 620, 'rgba(220,120,20,0.45)');
+  halo(1000, 760, 640, 'rgba(230,140,40,0.32)');
   halo(300, 1350, 520, 'rgba(228,107,216,0.22)');
   ctx.strokeStyle = 'rgba(255,255,255,0.035)';
   ctx.lineWidth = 1;
@@ -197,7 +197,7 @@ async function image(d, o) {
   ctx.fillStyle = '#cfe6ff';
   ctx.font = `22px "${P} Medium", sans-serif`;
   const periode = d.periode === 'mois'
-    ? new Intl.DateTimeFormat(langue === 'en' ? 'en-US' : 'fr-FR', { month: 'long', year: 'numeric', timeZone: 'Europe/Paris' }).format(new Date())
+    ? new Intl.DateTimeFormat(require('./langues').intl(langue), { month: 'long', year: 'numeric', timeZone: 'Europe/Paris' }).format(new Date())
     : t('wrapped.depuis_debut');
   ctx.fillText(`WUMI WRAPPED · ${periode.toUpperCase()}`, 96, 99);
 
@@ -205,15 +205,15 @@ async function image(d, o) {
   try {
     const avatar = await loadImage(o.avatarUrl);
     ctx.save();
-    ctx.shadowColor = 'rgba(98,184,255,0.6)';
+    ctx.shadowColor = 'rgba(255,157,27,0.6)';
     ctx.shadowBlur = 40;
     cercleImage(ctx, avatar, 70, 160, 170);
     ctx.restore();
   } catch { /* avatar indisponible : on continue sans */ }
-  ctx.fillStyle = '#eef0fc';
+  ctx.fillStyle = '#f7f1e8';
   ctx.font = `68px "${P} Bold", sans-serif`;
   ctx.fillText(tronquerTexte(ctx, o.pseudo, 760), 270, 238);
-  ctx.fillStyle = '#aeb4d6';
+  ctx.fillStyle = '#c9b9a2';
   ctx.font = `28px "${P}", sans-serif`;
   ctx.fillText(tronquerTexte(ctx, o.serveur, 760), 272, 284);
 
@@ -241,7 +241,7 @@ async function image(d, o) {
     ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.1)';
     ctx.stroke();
-    ctx.fillStyle = '#aeb4d6';
+    ctx.fillStyle = '#c9b9a2';
     ctx.font = `24px "${P} Medium", sans-serif`;
     ctx.fillText(titre.toUpperCase(), x + 34, y + 54);
     ctx.fillStyle = '#ffffff';
@@ -257,7 +257,7 @@ async function image(d, o) {
 
   // Salons preferes.
   const y0 = 930;
-  ctx.fillStyle = '#eef0fc';
+  ctx.fillStyle = '#f7f1e8';
   ctx.font = `30px "${P} Bold", sans-serif`;
   ctx.fillText(t('wrapped.salons'), 70, y0);
   const max = Math.max(1, ...d.salons.map((s) => s.messages));
@@ -268,8 +268,8 @@ async function image(d, o) {
     rectArrondi(ctx, 70, y, 940, 48, 14);
     ctx.fill();
     const g = ctx.createLinearGradient(70, 0, 1010, 0);
-    g.addColorStop(0, 'rgba(74,168,255,0.55)');
-    g.addColorStop(1, 'rgba(169,180,242,0.35)');
+    g.addColorStop(0, 'rgba(255,157,27,0.55)');
+    g.addColorStop(1, 'rgba(255,190,92,0.35)');
     ctx.fillStyle = g;
     rectArrondi(ctx, 70, y, Math.max(60, 940 * (s.messages / max)), 48, 14);
     ctx.fill();
@@ -281,27 +281,27 @@ async function image(d, o) {
     ctx.fillText(n, 990 - ctx.measureText(n).width, y + 32);
   });
   if (!d.salons.length) {
-    ctx.fillStyle = '#8d93b8';
+    ctx.fillStyle = '#a8977f';
     ctx.font = `24px "${P}", sans-serif`;
     ctx.fillText(t('wrapped.pas_de_salon'), 70, y0 + 60);
   }
 
   // Personnalite.
   const yp = 1170;
-  ctx.fillStyle = 'rgba(98,184,255,0.12)';
+  ctx.fillStyle = 'rgba(255,157,27,0.12)';
   rectArrondi(ctx, 70, yp, 940, 100, 26);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(98,184,255,0.35)';
+  ctx.strokeStyle = 'rgba(255,157,27,0.35)';
   ctx.stroke();
   ctx.fillStyle = '#ffffff';
   ctx.font = `34px "${P} Bold", sans-serif`;
   ctx.fillText(t(`wrapped.perso_${d.personnalite}`), 104, yp + 46);
-  ctx.fillStyle = '#aeb4d6';
+  ctx.fillStyle = '#c9b9a2';
   ctx.font = `22px "${P}", sans-serif`;
   ctx.fillText(d.heurePic != null ? t('wrapped.heure_pic', { h: d.heurePic }) : t('wrapped.heure_inconnue'), 106, yp + 80);
 
   // Pied.
-  ctx.fillStyle = '#8d93b8';
+  ctx.fillStyle = '#a8977f';
   ctx.font = `22px "${P} Medium", sans-serif`;
   ctx.fillText('wumi.fr', 70, 1318);
   const sig = '/wrapped';

@@ -64,6 +64,7 @@ function ligne(guildId) {
  * menage : la comparaison suffit, et la ligne sera nettoyee plus tard.
  */
 function estPremium(guildId) {
+  if (require('../edition').profil?.premium) return true;
   if (!guildId) return false;
   const cle = String(guildId);
 
@@ -216,7 +217,11 @@ function ecouter(client) {
     if (e.skuId !== sku() || !e.guildId) return;
     const l = ligne(e.guildId);
     // Un premium offert a la main survit a la fin d'un abonnement Discord.
-    if (l?.source === 'discord') retirer(e.guildId);
+    if (l?.source === 'discord') {
+      retirer(e.guildId);
+      // 2.24 : le profil du bot sur ce serveur revient a celui de Wumi.
+      require('./essaiPremium').rendreProfil(client, e.guildId).catch(() => null);
+    }
     journaliser('💔 Abonnement premium terminé', e, 0xff2860);
   });
 }

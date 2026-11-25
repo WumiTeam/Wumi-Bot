@@ -23,13 +23,8 @@ module.exports = {
     const jours = Math.floor(ageCompte / 86_400_000);
     logger.action('arrivée', membre.user.username, null, `compte créé il y a ${jours} jour(s)`);
 
-    // ------------------------------------------------- BLOCKLIST COMMUNAUTAIRE
-    // Une alerte au staff, si ce serveur l'a demandee. Le bot ne sanctionne
-    // pas : une fiche approuvee a tort ferait sinon bannir quelqu'un partout
-    // a la fois, sans recours.
-    require('../utils/blocklist')
-      .alerterArrivee(membre)
-      .catch((e) => logger.debug('Alerte blocklist :', e.message));
+    // 2.29 : la blocklist communautaire est retiree (personne ne s'en
+    // servait). Ses donnees restent en base, intactes.
 
     // ------------------------------------------------------------ MODE RAID
     // Active a la main avec /raid activer : les nouveaux venus sont expulses

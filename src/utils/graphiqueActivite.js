@@ -35,8 +35,12 @@ function borneHaute(valeur) {
   return 10 * magnitude;
 }
 
-const nb = (n) => Number(n).toLocaleString('fr-FR').replace(/ | /g, ' ');
-const jourCourt = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+// 2.24 : la langue de l'image en cours (le dessin est synchrone, une image a la fois).
+let langue = 'fr';
+const definirLangue = (l) => { langue = require('./langues').LANGUES[l] ? l : 'fr'; };
+const g = (cle, v) => require('./langues').t(`graphique.${cle}`, langue, v);
+const nb = (n) => Number(n).toLocaleString(require('./langues').intl(langue)).replace(/ | /g, ' ');
+const jourCourt = (iso) => (langue === 'en' ? `${iso.slice(5, 7)}/${iso.slice(8, 10)}` : `${iso.slice(8, 10)}/${iso.slice(5, 7)}`);
 
 /** Rectangle dont seule l'extremite « donnee » est arrondie. */
 function barre(ctx, x, y, l, h, rayon, sens) {
@@ -122,6 +126,7 @@ function tuile(ctx, x, y, l, h, libelle, valeur, detail, couleurDetail) {
  */
 async function genererGraphique(d) {
   chargerPolices();
+  definirLangue(d.langue);
 
   const L = 1200;
   const avecHeures = Array.isArray(d.heures) && d.heures.some((v) => v > 0);
@@ -140,12 +145,11 @@ async function genererGraphique(d) {
   ctx.textAlign = 'left';
   ctx.fillStyle = C.texte;
   ctx.font = `28px "${P} Bold", sans-serif`;
-  ctx.fillText(`Activité de ${d.serveur}`, marge, 52);
+  ctx.fillText(g('activite_de', { serveur: d.serveur }), marge, 52);
 
   ctx.fillStyle = C.texteSecondaire;
   ctx.font = `15px "${P}", sans-serif`;
-  const periode = serie.length ? `du ${jourCourt(serie[0].jour)} au ${jourCourt(serie.at(-1).jour)}` : '';
-  ctx.fillText(`${serie.length} derniers jours · ${periode}`, marge, 76);
+  if (serie.length) ctx.fillText(g('periode', { n: serie.length, debut: jourCourt(serie[0].jour), fin: jourCourt(serie.at(-1).jour) }), marge, 76);
 
   // --------------------------------------------------------- CHIFFRES CLES
   const totalMessages = serie.reduce((s, j) => s + j.messages, 0);
@@ -162,20 +166,20 @@ async function genererGraphique(d) {
   const evo = (actuel, avant) => {
     if (!d.avant || !avant) return null;
     const p = Math.round(((actuel - avant) / avant) * 100);
-    return { texte: `${p >= 0 ? '+' : ''}${p} % vs période précédente`, couleur: p >= 0 ? C.positif : C.negatif };
+    return { texte: g('vs_precedente', { p: `${p >= 0 ? '+' : ''}${p}` }), couleur: p >= 0 ? C.positif : C.negatif };
   };
   const evoMessages = evo(totalMessages, d.avant?.messages);
   const evoVocal = evo(totalVocal, d.avant?.vocal);
-  tuile(ctx, marge, yTuile, lTuile, 100, 'Messages', nb(totalMessages), evoMessages?.texte ?? `${nb(moyenne)} par jour en moyenne`, evoMessages?.couleur);
+  tuile(ctx, marge, yTuile, lTuile, 100, g('messages'), nb(totalMessages), evoMessages?.texte ?? g('par_jour_moyenne', { n: nb(moyenne) }), evoMessages?.couleur);
   tuile(
     ctx,
     marge + (lTuile + 16),
     yTuile,
     lTuile,
     100,
-    'Membres',
+    g('membres'),
     `${net >= 0 ? '+' : ''}${nb(net)}`,
-    `${nb(totalArrivees)} arrivées · ${nb(totalDeparts)} départs`,
+    g('arrivees_departs', { a: nb(totalArrivees), d: nb(totalDeparts) }),
     net >= 0 ? C.texteDiscret : C.negatif
   );
   tuile(
@@ -184,9 +188,9 @@ async function genererGraphique(d) {
     yTuile,
     lTuile,
     100,
-    'Vocal',
+    g('vocal'),
     `${nb(Math.round(totalVocal / 60))} h`,
-    evoVocal?.texte ?? 'temps cumulé en vocal',
+    evoVocal?.texte ?? g('vocal_cumule'),
     evoVocal?.couleur
   );
   tuile(
@@ -195,15 +199,15 @@ async function genererGraphique(d) {
     yTuile,
     lTuile,
     100,
-    'Jour le plus actif',
+    g('jour_actif'),
     meilleur && meilleur.messages ? jourCourt(meilleur.jour) : '—',
-    meilleur && meilleur.messages ? `${nb(meilleur.messages)} messages` : 'aucune donnée'
+    meilleur && meilleur.messages ? g('n_messages', { n: nb(meilleur.messages) }) : g('aucune_donnee')
   );
 
   // ================================================ MESSAGES PAR JOUR (aire)
   const yBloc = 220;
   const hBloc = 280;
-  bloc(ctx, marge, yBloc, largeur, hBloc, 'Messages par jour', `moyenne de ${nb(moyenne)} messages par jour`);
+  bloc(ctx, marge, yBloc, largeur, hBloc, g('messages_par_jour'), g('moyenne_messages', { n: nb(moyenne) }));
 
   const gx = marge + 60;
   const gy = yBloc + 74;
@@ -288,7 +292,7 @@ async function genererGraphique(d) {
   const yBas = yBloc + hBloc + 20;
   const hBas = (avecHeures ? 900 : H) - yBas - 40;
   const lGauche = largeur * 0.56;
-  bloc(ctx, marge, yBas, lGauche, hBas, 'Arrivées et départs', 'au-dessus de la ligne : arrivées · en dessous : départs');
+  bloc(ctx, marge, yBas, lGauche, hBas, g('mouvements'), g('mouvements_sous'));
 
   const dx = marge + 50;
   const dy = yBas + 78;
@@ -344,8 +348,8 @@ async function genererGraphique(d) {
   ctx.font = `13px "${P} Medium", sans-serif`;
   let xL = dx;
   for (const [couleur, libelle] of [
-    [C.positif, `Arrivées (${nb(totalArrivees)})`],
-    [C.negatif, `Départs (${nb(totalDeparts)})`],
+    [C.positif, g('legende_arrivees', { n: nb(totalArrivees) })],
+    [C.negatif, g('legende_departs', { n: nb(totalDeparts) })],
   ]) {
     ctx.fillStyle = couleur;
     rectArrondi(ctx, xL, yLegende - 9, 12, 12, 3);
@@ -358,14 +362,14 @@ async function genererGraphique(d) {
   // ================================================= SALONS LES PLUS ACTIFS
   const xDroite = marge + lGauche + 16;
   const lDroite = largeur - lGauche - 16;
-  bloc(ctx, xDroite, yBas, lDroite, hBas, 'Salons les plus actifs', `sur ${serie.length} jours`);
+  bloc(ctx, xDroite, yBas, lDroite, hBas, g('salons_actifs'), g('sur_jours', { n: serie.length }));
 
   const salons = (d.salons ?? []).slice(0, 5);
   if (!salons.length) {
     ctx.textAlign = 'center';
     ctx.font = `14px "${P}", sans-serif`;
     ctx.fillStyle = C.texteDiscret;
-    ctx.fillText('Aucune donnée pour le moment', xDroite + lDroite / 2, yBas + hBas / 2);
+    ctx.fillText(g('aucune_donnee_encore'), xDroite + lDroite / 2, yBas + hBas / 2);
   } else {
     const maxSalon = Math.max(...salons.map((s) => s.total));
     const yDepart = yBas + 86;
@@ -405,8 +409,8 @@ async function genererGraphique(d) {
 function dessinerHeures(ctx, x, y, l, h, heures) {
   const total = heures.reduce((a, b) => a + b, 0);
   const top = heures.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]).slice(0, 3).filter(([v]) => v > 0).map(([, i]) => i);
-  const sous = top.length ? `pic à ${top[0]} h · ${Math.round((heures[top[0]] / Math.max(1, total)) * 100)} % des messages · heure de Paris` : 'heure de Paris';
-  bloc(ctx, x, y, l, h, 'Heures de pointe', sous);
+  const sous = top.length ? g('pic', { h: top[0], p: Math.round((heures[top[0]] / Math.max(1, total)) * 100) }) : g('heure_paris');
+  bloc(ctx, x, y, l, h, g('heures_pointe'), sous);
 
   const gx = x + 60;
   const gy = y + 74;
@@ -449,4 +453,4 @@ function dessinerHeures(ctx, x, y, l, h, heures) {
 // `barre`, `bloc`, `tuile`, `borneHaute` et `nb` sont partages avec le
 // graphique par membre (/messtats) : meme grammaire visuelle, un seul endroit
 // a corriger si la charte bouge.
-module.exports = { genererGraphique, C, P, barre, bloc, tuile, borneHaute, nb };
+module.exports = { genererGraphique, C, P, barre, bloc, tuile, borneHaute, nb, g, definirLangue };

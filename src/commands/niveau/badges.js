@@ -53,7 +53,7 @@ module.exports = {
     .setContexts(InteractionContextType.Guild),
 
   async execute(interaction) {
-    const { t, nombre } = traducteur(interaction);
+    const { t, nombre, langue } = traducteur(interaction);
     const guildId = interaction.guild.id;
     if (!config(guildId).badges_actif) {
       return interaction.reply(C.avertissement(t('badges.desactives')));
@@ -68,8 +68,8 @@ module.exports = {
 
     const obtenus = progression.badgesDe(guildId, cible.id);
     const cles = new Set(obtenus.map((b) => b.cle));
-    const totalBadges = progression.listeBadges().length;
-    const restants = progression.listeBadges().filter((b) => !cles.has(b.cle));
+    const totalBadges = progression.listeBadges(langue).length;
+    const restants = progression.listeBadges(langue).filter((b) => !cles.has(b.cle));
 
     // b.nom / b.description / b.emoji viennent de config.js (progression.badges) :
     // ce sont des donnees, pas de l'interface. On ne les traduit pas, comme les

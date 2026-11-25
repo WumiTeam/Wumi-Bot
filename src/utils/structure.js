@@ -28,17 +28,20 @@ const TYPES = new Set([
   ChannelType.GuildMedia,
 ]);
 
+// 2.24 : cle de traduction (structure.type.*) de chaque type de salon.
 const NOM_TYPE = {
   [ChannelType.GuildText]: 'textuel',
   [ChannelType.GuildVoice]: 'vocal',
-  [ChannelType.GuildCategory]: 'catégorie',
+  [ChannelType.GuildCategory]: 'categorie',
   [ChannelType.GuildAnnouncement]: 'annonces',
-  [ChannelType.GuildStageVoice]: 'conférence',
+  [ChannelType.GuildStageVoice]: 'conference',
   [ChannelType.GuildForum]: 'forum',
   [ChannelType.GuildMedia]: 'galerie',
 };
 
-const nomType = (t) => NOM_TYPE[t] ?? `type ${t}`;
+/** La cle de traduction d'un type de salon (structure.type.*), ou null. */
+const cleType = (type) => (NOM_TYPE[type] ? `structure.type.${NOM_TYPE[type]}` : null);
+const nomType = (type, langue = 'fr') => (NOM_TYPE[type] ? require('./langues').t(`structure.type.${NOM_TYPE[type]}`, langue) : `type ${type}`);
 
 /**
  * Un champ de permissions en chaine de caracteres.
@@ -388,6 +391,7 @@ module.exports = {
   VERSION,
   TYPES,
   nomType,
+  cleType,
   capturer,
   enregistrer,
   purger,

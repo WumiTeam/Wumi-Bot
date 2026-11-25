@@ -234,15 +234,17 @@ module.exports = {
     if (sous === 'test') {
       if (!equipe) return refus();
       const phrase = interaction.options.getString('text');
-      const resultat = faq.chercher(guildId, phrase);
+      // 2.33 : la recherche par le sens peut charger le modele (quelques secondes).
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      const resultat = await faq.chercherIntelligent(guildId, phrase);
       const cfg = config(guildId);
 
       if (!resultat) {
-        return interaction.reply(C.infoPrivee(t('faq.tester_aucune_fiche')));
+        return interaction.editReply(C.info(t('faq.tester_aucune_fiche')));
       }
 
       const reussi = resultat.score >= cfg.faq_seuil;
-      return interaction.reply(C.envoiPrive([
+      return interaction.editReply(C.envoi([
         C.conteneur([
           C.texte(`## ${E('loupe')} ${t('faq.tester_titre')}`),
           C.texte(
@@ -250,6 +252,7 @@ module.exports = {
               t('faq.tester_phrase', { phrase: tronquer(phrase, 200) }),
               t('faq.tester_meilleure', { n: resultat.fiche.id, question: tronquer(resultat.fiche.question, 100) }),
               t('faq.tester_score', { score: nombre(resultat.score), seuil: nombre(cfg.faq_seuil) }),
+              `-# ${t('faq.tester_detail', { mots: nombre(resultat.mots), sens: resultat.sens === null ? t('faq.tester_sens_absent') : nombre(resultat.sens) })}`,
             ].join('\n')
           ),
           C.separateur(),
@@ -293,13 +296,14 @@ module.exports = {
 
     // ========================================================= CHERCHER
     const question = interaction.options.getString('question');
-    const resultat = faq.chercher(guildId, question);
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    const resultat = await faq.chercherIntelligent(guildId, question);
 
     if (!resultat || resultat.score < 25) {
-      return interaction.reply(C.infoPrivee(t('faq.chercher_pas_trouve')));
+      return interaction.editReply(C.info(t('faq.chercher_pas_trouve')));
     }
 
     req.incrementerFaq.run(resultat.fiche.id);
-    return interaction.reply({ embeds: [faq.construireEmbed(resultat.fiche)], flags: MessageFlags.Ephemeral });
+    return interaction.editReply({ embeds: [faq.construireEmbed(resultat.fiche)] });
   },
 };

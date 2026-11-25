@@ -100,7 +100,7 @@ function bandeau() {
   const enCours = a.filter((i) => i.type === 'maintenance' && i.statut === 'en_cours');
   const pire = incidents.sort((x, y) => IMPACTS.indexOf(y.impact) - IMPACTS.indexOf(x.impact))[0];
   if (pire) return { niveau: pire.impact, couleur: COULEUR_IMPACT[pire.impact], liste: a };
-  if (enCours.length) return { niveau: 'maintenance', couleur: 0x58a6ff, liste: a };
+  if (enCours.length) return { niveau: 'maintenance', couleur: 0xffb547, liste: a };
   return { niveau: 'prevue', couleur: null, liste: a };
 }
 
@@ -131,7 +131,7 @@ function ligneEtat(i, t) {
 function annonce(i, t) {
   const C = require('./composants');
   const fini = FINIS.includes(i.statut);
-  const couleur = fini ? 0x2fbf71 : i.type === 'maintenance' ? 0x58a6ff : COULEUR_IMPACT[i.impact];
+  const couleur = fini ? 0x2fbf71 : i.type === 'maintenance' ? 0xffb547 : COULEUR_IMPACT[i.impact];
   const historique = i.majs.slice(1, 4).map((m) => `-# ${EMOJI[m.statut]} ${t(`incident.etat_${m.statut}`)} · <t:${Math.floor(m.le / 1000)}:R> — ${m.message.slice(0, 150)}`).join('\n');
   return C.envoi([C.conteneur([
     C.texte(`## ${fini ? '✅' : i.type === 'maintenance' ? '🛠️' : '⚠️'} ${i.titre}`),

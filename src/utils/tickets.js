@@ -316,6 +316,10 @@ async function ouvrirTicket(interaction, cleType = null, champs = {}) {
   const accueil = construireAccueil(ticket, interaction.member);
   const pings = [`<@${interaction.user.id}>`, cfg.ticket_role_staff ? `<@&${cfg.ticket_role_staff}>` : null].filter(Boolean).join(' ');
   await salon.send(C.envoi([C.texte(pings), accueil.conteneur], { files: accueil.fichiers })).catch((e) => logger.avertissement('Accueil du ticket :', e.message));
+  // 2.33 : une fiche de la FAQ repond peut-etre deja a la question.
+  if (sujet || description) {
+    require('./ticketFaq').suggerer({ guild, salon, texte: [sujet, description].filter(Boolean).join('\n'), systeme: 'p' });
+  }
 
   await envoyerLog(guild, 'moderation', {
     color: conf.couleurs.succes,
@@ -457,8 +461,12 @@ async function transcription(interaction, ticket) {
 }
 
 // ------------------------------------------------------------------ FERMETURE
-function demanderRaison(interaction, ticket) {
+async function demanderRaison(interaction, ticket) {
   const { t } = traducteur(interaction);
+  // La fenetre doit s'ouvrir dans les 3 secondes du clic, sans « defer »
+  // possible avant. Si le bot etait occupe (ou en cas de double clic), Discord
+  // a deja jete l'interaction (10062) : il n'y a plus personne a qui
+  // repondre, le membre n'a qu'a recliquer. On ne le compte pas comme erreur.
   return interaction.showModal(new ModalBuilder()
     .setCustomId('ticket_modal_fermeture')
     .setTitle(t('ticket.v2.fermer_titre', { numero: pad(ticket.numero) }).slice(0, 45))
@@ -468,7 +476,10 @@ function demanderRaison(interaction, ticket) {
       .setPlaceholder(t('ticket.v2.fermer_aide').slice(0, 100))
       .setStyle(TextInputStyle.Short)
       .setMaxLength(200)
-      .setRequired(false))));
+      .setRequired(false)))).catch((e) => {
+    if (e?.code === 10062 || e?.code === 40060) return logger.debug('Ticket : fenetre de fermeture trop tard', e.code);
+    throw e;
+  });
 }
 
 /**
@@ -628,7 +639,7 @@ async function gererInteraction(interaction) {
     }
     if (interaction.isButton() && interaction.customId === 'ticket_fermer') {
       if (!staff && interaction.user.id !== ticket.user_id) return interaction.reply(C.erreurPrivee(t('ticket.v2.fermer_refuse')));
-      return demanderRaison(interaction, ticket);
+      return await demanderRaison(interaction, ticket);
     }
     if (interaction.isModalSubmit() && interaction.customId === 'ticket_modal_fermeture') {
       return await fermerTicket(interaction, interaction.fields.getTextInputValue('raison')?.trim() || null);

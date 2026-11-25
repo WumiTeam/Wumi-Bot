@@ -9,6 +9,8 @@ const { E } = require('./emojis');
 const capacites = require('./capacites');
 const antiPhishing = require('./antiPhishing');
 const { traducteur } = require('./langues');
+const arnaques = require('./arnaques');
+const ia = require('./ia');
 
 const REGEX_INVITATION = /(discord\.(gg|io|me|li)|discord(app)?\.com\/invite)\/[a-z0-9-_]+/i;
 const REGEX_LIEN = /https?:\/\/[^\s]+|www\.[^\s]+/i;
@@ -54,15 +56,18 @@ function normaliser(texte) {
  */
 function analyser(message, cfg, client) {
   const contenu = message.content ?? '';
+  // 2.24 : motif et explication dans la langue du serveur.
+  const t = traducteur(message.guild?.id).t;
+  const M = (cle, v) => ({ motif: t(`automod.u.${cle}`), detail: t(`automod.u.${cle}_d`, v) });
 
   // --- Invitations Discord
   if (cfg.automod_invitations && REGEX_INVITATION.test(contenu)) {
-    return { motif: 'Invitation Discord', detail: 'Les invitations vers d\'autres serveurs sont interdites.' };
+    return M('invitation');
   }
 
   // --- Liens
   if (cfg.automod_liens && REGEX_LIEN.test(contenu)) {
-    return { motif: 'Lien interdit', detail: 'Les liens ne sont pas autorises ici.' };
+    return M('lien');
   }
 
   // --- Mots interdits
@@ -75,7 +80,7 @@ function analyser(message, cfg, client) {
         if (!m) return false;
         return new RegExp(`(^|\\s)${m.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`, 'i').test(normalise) || normalise.includes(m);
       });
-      if (trouve) return { motif: 'Mot interdit', detail: 'Ton message contient un terme interdit sur ce serveur.' };
+      if (trouve) return M('mot');
     }
   }
 
@@ -83,7 +88,7 @@ function analyser(message, cfg, client) {
   if (cfg.automod_mentions) {
     const total = message.mentions.users.size + message.mentions.roles.size;
     if (total > conf.automod.mentionsMax) {
-      return { motif: 'Mentions massives', detail: `Maximum ${conf.automod.mentionsMax} mentions par message.` };
+      return M('mentions', { n: conf.automod.mentionsMax });
     }
   }
 
@@ -93,9 +98,15 @@ function analyser(message, cfg, client) {
     if (lettres.length > 8) {
       const majuscules = lettres.replace(/[^A-ZÀ-Þ]/g, '').length;
       if ((majuscules / lettres.length) * 100 > conf.automod.majusculesPourcentMax) {
-        return { motif: 'Abus de majuscules', detail: 'Evite d\'ecrire tout en majuscules.' };
+        return M('majuscules');
       }
     }
+  }
+
+  // --- Arnaques (2.32) : faux Nitro, « signale par erreur », crypto...
+  if (cfg.automod_arnaques) {
+    const r = arnaques.analyser(contenu, { mentionTous: message.mentions?.everyone });
+    if (r.arnaque) return M('arnaque');
   }
 
   // --- Spam / flood
@@ -109,16 +120,50 @@ function analyser(message, cfg, client) {
 
     if (historique.length > conf.automod.spamMessages) {
       client.antiSpam.set(cle, []);
-      return { motif: 'Spam', detail: `Pas plus de ${conf.automod.spamMessages} messages en ${conf.automod.spamFenetreSecondes} secondes.` };
+      return M('spam', { n: conf.automod.spamMessages, s: conf.automod.spamFenetreSecondes });
     }
 
     const identiques = historique.filter((m) => m.contenu && m.contenu === contenu).length;
     if (contenu && identiques > conf.automod.repetitionMax) {
       client.antiSpam.set(cle, []);
-      return { motif: 'Repetition', detail: 'Arrete de repeter le meme message.' };
+      return M('repetition');
     }
   }
 
+  return null;
+}
+
+/** Les images jointes a un message, en petite taille (proxy Discord). */
+function imagesDe(message) {
+  return [...(message.attachments?.values() ?? [])]
+    .filter((a) => /^image\/(png|jpe?g|webp|gif)/i.test(a.contentType ?? '') && (a.size ?? 0) <= 15 * 1024 * 1024)
+    .slice(0, 4)
+    .map((a) => `${a.proxyURL}${a.proxyURL.includes('?') ? '&' : '?'}format=png&width=448&height=448`);
+}
+
+/**
+ * Les verifications par IA (2.32), asynchrones : toxicite du texte et images
+ * NSFW. Executees seulement si les verifications rapides n'ont rien trouve.
+ * Renvoie le motif comme analyser(), ou null.
+ */
+async function analyserIA(message, cfg) {
+  if (!cfg.automod_ia && !cfg.automod_images) return null;
+  if (!(await ia.pret())) return null;
+  const t = traducteur(message.guild?.id).t;
+  const M = (cle, v) => ({ motif: t(`automod.u.${cle}`), detail: t(`automod.u.${cle}_d`, v), ia: true });
+
+  if (cfg.automod_images && !message.channel?.nsfw) {
+    for (const url of imagesDe(message)) {
+      const score = await ia.nsfw(url);
+      if (score != null && score >= conf.automod.imagesSeuil) return { ...M('image'), image: true, score };
+    }
+  }
+
+  const contenu = (message.content ?? '').trim();
+  if (cfg.automod_ia && contenu.replace(/<a?:\w+:\d+>|<[@#&!]+\d+>|https?:\/\/\S+/g, '').trim().length >= conf.automod.iaLongueurMin) {
+    const score = await ia.toxicite(contenu);
+    if (score != null && score >= conf.automod.iaSeuil) return { ...M('toxique'), score };
+  }
   return null;
 }
 
@@ -230,7 +275,7 @@ async function traiter(message, cfg, client) {
 
   if (!cfg.automod_actif) return false;
 
-  const resultat = analyser(message, cfg, client);
+  const resultat = analyser(message, cfg, client) ?? await analyserIA(message, cfg);
   if (!resultat) return false;
 
   await message.delete().catch(() => null);
@@ -260,7 +305,9 @@ async function traiter(message, cfg, client) {
       .addFields(
         { name: traducteur(message.guild.id).t('journal.membre'), value: `${message.author} \`${message.author.id}\``, inline: true },
         { name: traducteur(message.guild.id).t('journal.salon'), value: `${message.channel}`, inline: true },
-        { name: traducteur(message.guild.id).t('journal.contenu'), value: tronquer(message.content || traducteur(message.guild.id).t('journal.vide')) }
+        { name: traducteur(message.guild.id).t('journal.contenu'), value: tronquer(message.content || traducteur(message.guild.id).t('journal.vide')) },
+        // 2.32 : la certitude du modele IA. L'image NSFW n'est JAMAIS recopiee dans le journal.
+        ...(resultat.ia ? [{ name: traducteur(message.guild.id).t('automod.u.certitude'), value: `${Math.round(resultat.score * 100)} %`, inline: true }] : [])
       )
       .setTimestamp()
   );
@@ -284,7 +331,7 @@ async function traiter(message, cfg, client) {
           cible: message.author,
           moderateur: client.user,
           type: 'mute',
-          raison: `Automod — ${resultat.motif} (${strikes.length} declenchements)`,
+          raison: `Automod — ${resultat.motif} (${traducteur(message.guild.id).t('automod.u.declenchements', { n: strikes.length })})`,
           duree,
         });
       }
@@ -296,4 +343,4 @@ async function traiter(message, cfg, client) {
   return true;
 }
 
-module.exports = { traiter, analyser, exempte, detecterPhishing, agirAntiPhishing };
+module.exports = { traiter, analyser, analyserIA, imagesDe, exempte, detecterPhishing, agirAntiPhishing };

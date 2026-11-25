@@ -26,12 +26,17 @@ const eco = require('../../utils/economie');
 const { ts } = require('../../utils/outils');
 const { E } = require('../../utils/emojis');
 const C = require('../../utils/composants');
-const { traducteur, localisations, t: tr, DEFAUT } = require('../../utils/langues');
+const { traducteur, localisations, t: tr, DEFAUT, langueDe } = require('../../utils/langues');
 
+// Le nom de chaque objet dans les deux langues (utils/donnees.js).
 const CHOIX = objets
   .liste()
   .slice(0, 25)
-  .map((o) => ({ name: `${o.emoji ?? ''} ${o.nom} — ${o.prix}`.trim(), value: o.cle }));
+  .map((o) => {
+    const noms = require('../../utils/donnees').nomsChoix('objets', o.cle, o, `${o.emoji ?? ''} `);
+    const prix = (n) => `${n} — ${o.prix}`.slice(0, 100);
+    return { name: prix(noms.name), name_localizations: { 'en-US': prix(noms.name_localizations['en-US']), 'en-GB': prix(noms.name_localizations['en-US']) }, value: o.cle };
+  });
 
 /** Cree (ou reutilise) un role de couleur, et l'applique au membre. */
 async function appliquerCouleur(interaction, hex) {
@@ -63,7 +68,7 @@ function acheterObjet(interaction, cle, quantite = 1) {
   const { t } = traducteur(interaction);
   const guildId = interaction.guild.id;
   const userId = interaction.user.id;
-  const objet = objets.parCle(cle);
+  const objet = objets.parCle(cle, langueDe(interaction.guild?.id));
   if (!objet) return { ok: false, message: t('objet.inexistant') };
   if (!config(guildId).eco_actif) return { ok: false, message: t('objet.eco_desactivee') };
 
@@ -96,7 +101,7 @@ async function utiliserObjet(interaction, cle, couleur = null) {
   const { t } = traducteur(interaction);
   const guildId = interaction.guild.id;
   const userId = interaction.user.id;
-  const objet = objets.parCle(cle);
+  const objet = objets.parCle(cle, langueDe(interaction.guild?.id));
   if (!objet) return { ok: false, message: t('objet.inexistant') };
 
   if (objet.effet === 'couleur' && (!couleur || !/^#?[0-9a-f]{6}$/i.test(couleur))) {
@@ -142,7 +147,7 @@ function vueListe(interaction) {
     C.separateur(),
   ];
 
-  for (const o of objets.liste().slice(0, 10)) {
+  for (const o of objets.liste(langueDe(interaction.guild?.id)).slice(0, 10)) {
     elements.push(
       C.sectionBouton(
         `${o.emoji ?? E('colis')} **${o.nom}** — ${m.emoji} ${nombre(o.prix)}\n-# ${o.description}`,
@@ -300,12 +305,12 @@ module.exports = {
       const cle = interaction.options.getString('item');
       const quantite = interaction.options.getInteger('quantity') ?? 1;
       objets.donner(guildId, cible.id, cle, quantite);
-      const o = objets.parCle(cle);
+      const o = objets.parCle(cle, langueDe(interaction.guild?.id));
       return interaction.reply(C.succes(t('objet.offert', { emoji: o.emoji, nom: o.nom, n: quantite, membre: cible.id })));
     }
 
     const cle = interaction.options.getString('item');
-    const objet = objets.parCle(cle);
+    const objet = objets.parCle(cle, langueDe(interaction.guild?.id));
     if (!objet) return interaction.reply(C.erreurPrivee(t('objet.inexistant')));
 
     // ------------------------------------------------------------ BUY
@@ -337,7 +342,7 @@ module.exports = {
 
     // ---- Utiliser ----------------------------------------------------
     if (action === 'use') {
-      const objet = objets.parCle(cle);
+      const objet = objets.parCle(cle, langueDe(interaction.guild?.id));
       // La couleur a besoin d'un code hexadecimal : on ouvre une fenetre
       // plutot que de renvoyer le membre vers la commande.
       if (objet?.effet === 'couleur') {

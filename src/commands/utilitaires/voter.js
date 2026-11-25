@@ -25,6 +25,7 @@ const topgg = require('../../utils/topgg');
 const { banniere } = require('../../utils/bannieres');
 const { traducteur, localisations, t: tr, DEFAUT } = require('../../utils/langues');
 const logger = require('../../utils/logger');
+const rappels = require('../../utils/rappelsVote');
 
 const DOUZE_HEURES = 12 * 3_600_000;
 
@@ -70,6 +71,8 @@ function vueVote(interaction, client) {
   } else {
     statut.push(`${E('succes')} ${t('vote.v3.pret')}`);
   }
+  const serie = rappels.serieDe(interaction.user.id);
+  if (serie > 1) statut.push(`${E('feu')} ${t('vote.rappel.serie_statut', { n: serie, bonus: rappels.bonusSerie(serie + 1) })}`);
   if (ligne?.total) {
     const rang = req.rangVote.get(ligne.total)?.rang ?? 1;
     statut.push(`${E('classement')} ${t('vote.v3.tes_votes', { n: ligne.total, rang })}`);
@@ -87,6 +90,7 @@ function vueVote(interaction, client) {
       .setStyle(ButtonStyle.Success)
       .setEmoji(E('succes')));
   }
+  boutons.addComponents(rappels.bouton(interaction.user.id, langue));
 
   const conteneur = C.conteneur([
     b ? C.image(b.url, t('vote.v2.titre', { bot })) : null,
@@ -122,17 +126,20 @@ async function recompenser(interaction) {
   const guildId = interaction.guild.id;
   const cfg = config(guildId);
 
+  const avant = req.lireVote.get(String(interaction.user.id))?.dernier_vote || null;
   req.noterVote.run({ user_id: interaction.user.id, date: Date.now(), guild_id: guildId });
+  const serie = rappels.avancerSerie(interaction.user.id, avant);
   topgg.oublier(interaction.user.id);
+  const ligneSerie = serie > 1 ? `\n${E('feu')} ${t('vote.rappel.serie_merci', { n: serie, bonus: rappels.bonusSerie(serie) })}` : '';
 
-  if (!cfg.vote_actif || cfg.vote_recompense !== 'xp') return t('vote.v2.merci');
+  if (!cfg.vote_actif || cfg.vote_recompense !== 'xp') return t('vote.v2.merci') + ligneSerie;
 
   // On se branche sur le systeme d'effets existant : le multiplicateur d'XP
-  // sait deja lire un effet `xp_multi`.
-  const heures = Math.max(1, Math.min(48, cfg.vote_heures ?? 12));
+  // sait deja lire un effet `xp_multi`. La serie ajoute des heures (2.23).
+  const heures = Math.max(1, Math.min(48, cfg.vote_heures ?? 12)) + rappels.bonusSerie(serie);
   const multi = Math.max(1, Math.min(5, cfg.vote_multi ?? 2));
   req.poserEffet.run(guildId, interaction.user.id, 'xp_multi', String(multi), Date.now() + heures * 3_600_000);
-  return t('vote.v2.merci_recompense', { multi, heures });
+  return t('vote.v2.merci_recompense', { multi, heures }) + ligneSerie;
 }
 
 module.exports = {
@@ -154,9 +161,20 @@ module.exports = {
 
   /** Le bouton « J'ai vote ». Route depuis interactionCreate via « vote_ ». */
   async gererInteraction(interaction, client) {
-    const { t, duree } = traducteur(interaction);
+    const { t, duree, langue } = traducteur(interaction);
     const auteurId = interaction.customId.split('_').pop();
     if (interaction.user.id !== auteurId) return interaction.reply(C.erreurPrivee(t('vote.v2.pas_ton_bouton')));
+
+    // Rappel de vote (2.23) : bouton de /vote, ou « Arreter » depuis le MP.
+    if (interaction.customId.startsWith('vote_stop_')) {
+      if (rappels.rappelActif(interaction.user.id)) rappels.basculer(interaction.user.id, langue);
+      return interaction.reply(C.succesPrive(t('vote.rappel.coupe')));
+    }
+    if (interaction.customId.startsWith('vote_rappel_')) {
+      const actif = rappels.basculer(interaction.user.id, langue);
+      await interaction.update(vueVote(interaction, client));
+      return interaction.followUp(C.succesPrive(t(actif ? 'vote.rappel.active' : 'vote.rappel.coupe')));
+    }
 
     // Le deja-reclame se verifie AVANT d'appeler top.gg.
     const reste = attenteRestante(interaction.user.id);

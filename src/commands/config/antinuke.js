@@ -25,9 +25,9 @@ module.exports = {
     .addSubcommand((s) => d(s.setName('enable').setNameLocalizations({ fr: 'activer' }), 'antinuke.sous_activer')
       .addChannelOption((o) => d(o.setName('alerts').setNameLocalizations({ fr: 'alertes' }), 'antinuke.opt_salon').addChannelTypes(ChannelType.GuildText))
       .addStringOption((o) => d(o.setName('sanction'), 'antinuke.opt_sanction').addChoices(
-        { name: 'Retirer ses rôles / Remove roles', value: 'roles' },
-        { name: 'Expulser / Kick', value: 'kick' },
-        { name: 'Bannir / Ban', value: 'ban' },
+        { name: 'Retirer ses rôles', name_localizations: { 'en-US': 'Remove roles', 'en-GB': 'Remove roles' }, value: 'roles' },
+        { name: 'Expulser', name_localizations: { 'en-US': 'Kick', 'en-GB': 'Kick' }, value: 'kick' },
+        { name: 'Bannir', name_localizations: { 'en-US': 'Ban', 'en-GB': 'Ban' }, value: 'ban' },
       ))
       .addIntegerOption((o) => d(o.setName('threshold').setNameLocalizations({ fr: 'seuil' }), 'antinuke.opt_seuil').setMinValue(2).setMaxValue(20))
       .addIntegerOption((o) => d(o.setName('window').setNameLocalizations({ fr: 'fenetre' }), 'antinuke.opt_fenetre').setMinValue(5).setMaxValue(120)))

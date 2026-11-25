@@ -29,7 +29,19 @@
  * signe qu'il faut sortir la base du processus (PostgreSQL), pas ajouter des
  * shards.
  */
-require('dotenv').config();
+// Une variable laissee VIDE dans l'environnement de pm2 (ancien demarrage)
+// bloque celle du .env : dotenv n'ecrase jamais l'existant. On complete
+// donc les vides avec les valeurs du .env (2.24.1, cas des cles Twitch).
+{
+  // 2.35 : une edition (WUMI_EDITION) lit son propre fichier, ex. WUMI_ENV=.env.auvergne
+  const lu = require('dotenv').config({ path: process.env.WUMI_ENV || undefined, quiet: true });
+  for (const [cle, valeur] of Object.entries(lu.parsed ?? {})) {
+    // 2.30.2 : le .env fait foi. pm2 garde une copie de l'environnement du
+    // premier lancement : sans ca, un salon de logs change dans le .env
+    // restait l'ancien (cas de LOG_DEMARRAGE apres le serveur staff).
+    if (valeur) process.env[cle] = valeur;
+  }
+}
 
 const path = require('node:path');
 const { ShardingManager } = require('discord.js');

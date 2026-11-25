@@ -8,6 +8,7 @@
  * Les textes arrivent deja traduits (champ `l` = libelles) : ce fichier ne
  * fait que dessiner.
  */
+const { filigrane, nomMarque } = require('./mascotte');
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const { chargerPolices } = require('./polices');
 const { rectArrondi, cercleImage, tronquerTexte } = require('./canvasOutils');
@@ -15,14 +16,14 @@ const { rectArrondi, cercleImage, tronquerTexte } = require('./canvasOutils');
 const L = 1200;
 const P = 'Poppins';
 const COUL = {
-  fond: '#0b0e1c',
+  fond: '#120d08',
   carte: 'rgba(255, 255, 255, 0.055)',
   bordure: 'rgba(255, 255, 255, 0.09)',
-  texte: '#eef0fb',
-  doux: '#a3a9c9',
-  discret: '#6f7598',
-  bleu: '#58a6ff',
-  violet: '#a78bfa',
+  texte: '#f7f1e8',
+  doux: '#bcae9a',
+  discret: '#8a7a66',
+  bleu: '#ff9d1b',
+  violet: '#ffbe5c',
   vert: '#4ade80',
   rouge: '#f87171',
 };
@@ -47,19 +48,19 @@ function decor(ctx, H, banniere, accent) {
     ctx.drawImage(banniere, (L - lb) / 2, (hautDecor - hb) / 2, lb, hb);
     ctx.restore();
     const g = ctx.createLinearGradient(0, 0, 0, hautDecor + 40);
-    g.addColorStop(0, 'rgba(11,14,28,0.25)');
-    g.addColorStop(1, 'rgba(11,14,28,1)');
+    g.addColorStop(0, 'rgba(20,14,8,0.25)');
+    g.addColorStop(1, 'rgba(20,14,8,1)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, L, hautDecor + 40);
   } else {
     let g = ctx.createRadialGradient(180, 60, 10, 180, 60, 620);
-    g.addColorStop(0, accent ? `${accent}cc` : 'rgba(58,120,182,0.9)');
-    g.addColorStop(1, 'rgba(11,14,28,0)');
+    g.addColorStop(0, accent ? `${accent}cc` : 'rgba(196,106,0,0.9)');
+    g.addColorStop(1, 'rgba(20,14,8,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, L, H);
     g = ctx.createRadialGradient(L - 60, H, 10, L - 60, H, 700);
-    g.addColorStop(0, 'rgba(88,86,140,0.45)');
-    g.addColorStop(1, 'rgba(11,14,28,0)');
+    g.addColorStop(0, 'rgba(140,90,40,0.45)');
+    g.addColorStop(1, 'rgba(20,14,8,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, L, H);
   }
@@ -148,7 +149,7 @@ function signature(ctx, H) {
   ctx.fillText('.', L - 52, H - 26);
   const point = ctx.measureText('.').width;
   ctx.fillStyle = COUL.discret;
-  ctx.fillText('wumi', L - 52 - point - 1, H - 26);
+  ctx.fillText(nomMarque(), L - 52 - point - 1, H - 26);
   ctx.textAlign = 'left';
 }
 
@@ -207,7 +208,7 @@ async function genererCarteServeur(d) {
     ctx.beginPath(); ctx.moveTo(px(0), gy + gh);
     serie.forEach((v, i) => ctx.lineTo(px(i), py(v)));
     ctx.lineTo(px(serie.length - 1), gy + gh); ctx.closePath();
-    ctx.fillStyle = 'rgba(88,166,255,0.18)'; ctx.fill();
+    ctx.fillStyle = 'rgba(255,157,27,0.18)'; ctx.fill();
     ctx.beginPath();
     serie.forEach((v, i) => (i ? ctx.lineTo(px(i), py(v)) : ctx.moveTo(px(i), py(v))));
     ctx.strokeStyle = COUL.bleu; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();

@@ -66,64 +66,93 @@ function permissionsManquantes(guild, t = null) {
 }
 
 /**
- * L'embed de presentation poste a l'arrivee.
- *
- * Il part dans la langue par defaut du bot — le serveur n'a encore rien
- * configure, et ne peut pas avoir choisi sa langue. D'ou le petit encart
- * « Langue » : c'est la seule chose que le bot sait ne pas savoir.
+ * Le message d'arrivee (2.24, Components V2) : ce que fait Wumi, un bouton
+ * qui lance /demarrer, l'essai Premium gratuit, et les liens utiles.
+ * `enServeur` : false pour la version envoyee en prive au proprietaire,
+ * ou le bouton de configuration ne marcherait pas (il faut un serveur).
  */
-function embedBienvenue(guild, client) {
-  const { t } = traducteur(guild);
+function messageBienvenue(guild, client, { enServeur = true } = {}) {
+  const C = require('./composants');
+  const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
+  const { t, langue } = traducteur(guild);
   const manque = permissionsManquantes(guild, t);
+  const liens = require('./liens');
+  const avatar = client.user?.displayAvatarURL({ size: 256 }) ?? null;
 
-  const embed = new EmbedBuilder()
-    .setColor(conf.couleurs.principale)
-    .setTitle(`${E('salut')} ${t('accueil.titre')}`)
-    .setDescription(t('accueil.presentation', { bot: client.user?.username ?? 'Blueprint' }))
-    .addFields(
-      { name: `${E('config')} ${t('accueil.demarrer_titre')}`, value: t('accueil.demarrer_valeur') },
-      { name: `${E('info')} ${t('accueil.savoir_titre')}`, value: t('accueil.savoir_valeur') },
-      { name: `${E('langue')} ${t('accueil.langue_titre')}`, value: t('accueil.langue_valeur') }
-    )
-    .setFooter({ text: t('accueil.pied', { n: client.commandes?.size ?? 0 }) });
-
+  const blocs = [];
+  const tete = `## ${E('salut')} ${t('accueil.titre')}\n${t('accueil.presentation', { bot: client.user?.username ?? 'Wumi' })}`;
+  blocs.push(avatar ? C.sectionVignette(tete, avatar) : C.texte(tete));
+  blocs.push(C.separateur());
+  blocs.push(C.texte(`### ${E('config')} ${t('accueil.demarrer_titre')}\n${t(enServeur ? 'accueil.demarrer_valeur' : 'accueil.prive_suite')}`));
+  blocs.push(C.texte(`### ${E('info')} ${t('accueil.savoir_titre')}\n${t('accueil.savoir_valeur')}`));
+  blocs.push(C.texte(`### ${E('langue')} ${t('accueil.langue_titre')}\n${t('accueil.langue_valeur')}`));
   if (manque.length) {
-    embed.addFields({
-      name: `${E('avertissement')} ${t('accueil.permissions_titre')}`,
-      value: t('accueil.permissions_valeur', { liste: manque.join('**, **') }),
-    });
+    blocs.push(C.texte(`### ${E('avertissement')} ${t('accueil.permissions_titre')}\n${t('accueil.permissions_valeur', { liste: manque.join('**, **') })}`));
   }
 
-  return embed;
+  let essaiOk = false;
+  try { essaiOk = require('./essaiPremium').disponibilite(guild.id) === 'ok'; } catch { /* sans premium */ }
+  if (essaiOk) blocs.push(C.texte(t('accueil.premium_ligne')));
+
+  const rangee = new ActionRowBuilder();
+  if (enServeur) {
+    rangee.addComponents(new ButtonBuilder().setCustomId('dem_go_0').setLabel(t('accueil.bouton_configurer')).setEmoji('🧭').setStyle(ButtonStyle.Primary));
+    if (essaiOk) rangee.addComponents(require('./essaiPremium').bouton(langue));
+  }
+  rangee.addComponents(new ButtonBuilder().setLabel(t('accueil.bouton_dashboard')).setStyle(ButtonStyle.Link).setURL('https://wumi.fr/dashboard'));
+  if (liens.support()) rangee.addComponents(new ButtonBuilder().setLabel(t('invite.bouton_support')).setStyle(ButtonStyle.Link).setURL(liens.support()));
+  blocs.push(rangee);
+  blocs.push(C.texte(`-# ${t('accueil.pied', { n: client.commandes?.size ?? 0 })}`));
+
+  return C.envoi([C.conteneur(blocs, conf.couleurs.principale)]);
+}
+
+/** Ancienne version (embed), gardee pour ce qui l'importerait encore. */
+function embedBienvenue(guild, client) {
+  const { t } = traducteur(guild);
+  return new EmbedBuilder()
+    .setColor(conf.couleurs.principale)
+    .setTitle(`${E('salut')} ${t('accueil.titre')}`)
+    .setDescription(t('accueil.presentation', { bot: client.user?.username ?? 'Wumi' }));
 }
 
 /**
- * Poste le message d'accueil. Renvoie ou il a ete envoye, ou null.
- * N'echoue jamais bruyamment : un serveur qui refuse le message n'est pas une
- * raison de casser l'arrivee du bot.
+ * 2.24 : un serveur dont la langue Discord est le francais recoit Wumi en
+ * francais d'office. Seulement a l'arrivee, et seulement si personne n'a
+ * encore choisi de langue (valeur par defaut).
  */
-async function souhaiterBienvenue(guild, client) {
-  const embed = embedBienvenue(guild, client);
+function langueAuto(guild) {
+  try {
+    const { config, majConfig } = require('../database/db');
+    // 2.31 : toutes les langues du bot, pas seulement le francais.
+    const langue = require('./langues').depuisDiscord(guild.preferredLocale);
+    if (!langue || langue === 'en') return;
+    if ((config(guild.id).langue ?? 'en') !== 'en') return;
+    majConfig(guild.id, { langue });
+  } catch {
+    /* la langue reste celle par defaut */
+  }
+}
 
+async function souhaiterBienvenue(guild, client) {
+  langueAuto(guild);
   const salon = salonEcrivable(guild);
   if (salon) {
-    const envoye = await salon.send({ embeds: [embed] }).catch(() => null);
+    const envoye = await salon.send(messageBienvenue(guild, client)).catch(() => null);
     if (envoye) return { ou: 'salon', salon };
   }
 
-  // Aucun salon : le proprietaire en prive, faute de mieux.
   const proprio = await guild.fetchOwner().catch(() => null);
   if (proprio) {
-    const envoye = await proprio
-      .send({
-        embeds: [embed],
-        content: traducteur(guild).t('accueil.prive', { serveur: guild.name }),
-      })
-      .catch(() => null);
+    const { t } = traducteur(guild);
+    const msg = messageBienvenue(guild, client, { enServeur: false });
+    // En Components V2, pas de `content` : la phrase d'introduction devient un bloc.
+    msg.components.unshift(require('./composants').texte(t('accueil.prive', { serveur: guild.name })));
+    const envoye = await proprio.send(msg).catch(() => null);
     if (envoye) return { ou: 'prive', proprio };
   }
 
   return null;
 }
 
-module.exports = { souhaiterBienvenue, embedBienvenue, salonEcrivable, permissionsManquantes };
+module.exports = { souhaiterBienvenue, messageBienvenue, embedBienvenue, salonEcrivable, permissionsManquantes, langueAuto };

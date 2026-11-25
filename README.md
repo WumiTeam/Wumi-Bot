@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/banner.png" alt="Wumi, the cutest all-in-one Discord bot" width="100%">
+<img src="docs/assets/v3-hero.en.jpg" alt="Wumi, the cutest all-in-one Discord bot" width="100%">
 
 <br>
 
@@ -8,14 +8,14 @@
 
 <br>
 
-[![Add to Discord](https://img.shields.io/badge/Add%20to%20Discord-62b8ff?style=for-the-badge&logo=discord&logoColor=0c0d1c)](https://discord.com/oauth2/authorize?client_id=1545770920185045084&scope=bot%20applications.commands&permissions=1426362592470)
-[![Website](https://img.shields.io/badge/wumi.fr-161935?style=for-the-badge&logo=googlechrome&logoColor=62b8ff)](https://wumi.fr)
-[![Support](https://img.shields.io/badge/Support%20server-161935?style=for-the-badge&logo=discord&logoColor=a9b4f2)](https://discord.gg/VaGrXgnAHS)
+[![Add to Discord](https://img.shields.io/badge/Add%20to%20Discord-ff9d1b?style=for-the-badge&logo=discord&logoColor=221b10)](https://discord.com/oauth2/authorize?client_id=1545770920185045084&scope=bot%20applications.commands&permissions=1426362592470)
+[![Website](https://img.shields.io/badge/wumi.fr-221b10?style=for-the-badge&logo=googlechrome&logoColor=ff9d1b)](https://wumi.fr)
+[![Support](https://img.shields.io/badge/Support%20server-221b10?style=for-the-badge&logo=discord&logoColor=ffcf8a)](https://discord.gg/VaGrXgnAHS)
 
-![Version](https://img.shields.io/badge/version-2.17-62b8ff?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.0-ff9d1b?style=flat-square)
 ![discord.js](https://img.shields.io/badge/discord.js-v14-5865f2?style=flat-square&logo=discord&logoColor=white)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522.5-3ddc97?style=flat-square&logo=nodedotjs&logoColor=white)
-![Commands](https://img.shields.io/badge/commands-90%2B-a9b4f2?style=flat-square)
+![Commands](https://img.shields.io/badge/commands-90%2B-ffcf8a?style=flat-square)
 ![Languages](https://img.shields.io/badge/languages-EN%20%C2%B7%20FR-f8bd2c?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-eef0fc?style=flat-square)
 
@@ -70,22 +70,36 @@ Right-click a member › **Sanction**, warnings with automatic steps, automod, a
 
 </td>
 </tr>
+<tr>
+<td valign="top">
+
+### 🎵 Music & music games
+Music and 24/7 radios with a **web player** any member can use, plus music games in voice: music quiz, *Who picked it?* and *Vibe check*.
+
+</td>
+<td valign="top">
+
+### 📣 Live alerts
+Twitch, YouTube, TikTok, Instagram and RSS: every new live or video arrives with its own image card.
+
+</td>
+</tr>
 </table>
 
 ## 🖼️ A look inside
 
 <div align="center">
+<img src="docs/assets/v3-niveaux.en.jpg" alt="Level-up cards" width="100%">
+<sub>Level-up and <code>/rank</code> cards, with themes.</sub>
+<br><br>
+<img src="docs/assets/v3-bienvenue.en.jpg" alt="Welcome cards" width="49%"> <img src="docs/assets/v3-classement.en.jpg" alt="Leaderboard" width="49%">
+<sub>Welcome and goodbye cards · <code>/leaderboard</code> with your own rank highlighted.</sub>
+<br><br>
+<img src="docs/assets/v3-alertes.en.jpg" alt="Live alerts" width="49%"> <img src="docs/assets/v3-economie.en.jpg" alt="Economy cards" width="49%">
+<sub>Twitch and YouTube alert cards · <code>/economy balance</code> and <code>/economy daily</code>.</sub>
+<br><br>
 <img src="docs/assets/wumirun.png" alt="Wumi Run" width="100%">
 <sub><b>Wumi Run</b>: the platformer that opens right in your channel.</sub>
-<br><br>
-<img src="docs/assets/leaderboard.png" alt="Image leaderboard" width="100%">
-<sub><code>/leaderboard</code>: two columns, progress bars, your own rank highlighted.</sub>
-<br><br>
-<img src="docs/assets/wallet.png" alt="Wallet card" width="49%"> <img src="docs/assets/daily.png" alt="Daily reward card" width="49%">
-<sub><code>/economy balance</code> and <code>/economy daily</code>, with the Wumi Run gold coin.</sub>
-<br><br>
-<img src="docs/assets/serverinfo.png" alt="Server info card" width="49%"> <img src="docs/assets/welcome.png" alt="Welcome card" width="49%">
-<sub><code>/serverinfo</code> and a welcome card (up to 5 custom designs per server).</sub>
 </div>
 
 ## 📚 Everything Wumi can do
@@ -99,8 +113,8 @@ Right-click a member › **Sanction**, warnings with automatic steps, automod, a
 | 🛡️ **Security** | `/antinuke`, `/raid` panic button, anti-raid, automod, anti-phishing, `/audit` (score out of 100), structure snapshots and repair |
 | 🎫 **Support** | Tickets with panels, claim and transcripts, modmail, suggestions with voting, staff applications |
 | 👋 **Community** | Welcome and goodbye cards, auto roles, reaction roles, starboard, birthdays, giveaways with bonus chances, recurring events |
-| 🎵 **Music** | `/play` (YouTube, Spotify, SoundCloud), radios, filters, DJ role, playlists, 24/7 |
-| 🧰 **Utilities** | `/embed` builder with templates, server and user cards, `/stats` with a Monday report, invites tracking, temporary voice channels, Twitch / YouTube / RSS alerts |
+| 🎵 **Music** | `/play` (YouTube, Spotify, SoundCloud), radios, filters, DJ role, playlists, 24/7, a web player, music games (`/musicgame`: quiz, who picked it, vibe check) |
+| 🧰 **Utilities** | `/embed` builder with templates, server and user cards, `/stats` with a Monday report, invites tracking, temporary voice channels, Twitch / YouTube / TikTok / Instagram / RSS alerts with image cards, `/review` |
 
 > The full, always up-to-date list lives on **[wumi.fr/commandes](https://wumi.fr/commandes/)**: it's generated from the bot itself.
 
@@ -109,8 +123,8 @@ Right-click a member › **Sanction**, warnings with automatic steps, automod, a
 **You need:** Node.js **22.5 or newer** (24 recommended) and a Discord application from the [Developer Portal](https://discord.com/developers/applications).
 
 ```bash
-git clone https://github.com/Zhaak63/Wumi-bot.git
-cd Wumi-bot
+git clone https://github.com/WumiTeam/Wumi-Bot.git
+cd Wumi-Bot
 npm install
 cp .env.example .env      # then fill in DISCORD_TOKEN, CLIENT_ID, OWNER_IDS...
 npm run deploy            # registers the slash commands
@@ -146,7 +160,7 @@ docs/              guides and README pictures
 
 [discord.js v14](https://discord.js.org) with Components V2 · `node:sqlite` · [@napi-rs/canvas](https://github.com/Brooooooklyn/canvas) for every image card · the Discord Embedded App SDK for Wumi Run · [Poppins](https://fonts.google.com/specimen/Poppins) · game art by [Kenney](https://kenney.nl) (CC0).
 
-## 💙 Links
+## 🧡 Links
 
 - 🌐 Website: [wumi.fr](https://wumi.fr) · [What's new](https://wumi.fr/nouveautes/) · [Status](https://wumi.fr/statut/)
 - 💬 Support server: [discord.gg/VaGrXgnAHS](https://discord.gg/VaGrXgnAHS)
@@ -155,5 +169,5 @@ docs/              guides and README pictures
 
 <div align="center">
 <br>
-<sub>Made with 💙 by <b>Zhaak</b> · released under the <a href="LICENSE">MIT license</a></sub>
+<sub>Made with 🧡 by <b>Zhaak</b> · released under the <a href="LICENSE">MIT license</a></sub>
 </div>
