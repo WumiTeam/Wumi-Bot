@@ -1,5 +1,18 @@
 # Wumi — ce qui change
 
+## 3.1.0 · Les cartes de Wumi et ses amis
+
+- **Les 72 cartes redessinées** dans la nouvelle DA : Wumi (avec ses expressions et ses déguisements) et sa bande d'amis — Bloop, le robot, le fantôme, l'oiseau, l'étoile et le bug — tous brun noir aux yeux blancs. Numéros, noms, familles, raretés et stats inchangés : les collections ne bougent pas.
+- **Raretés qui se voient** : cadre de couleur selon la rareté ; les **légendaires** et **mythiques** deviennent des cartes pleine image (cadre doré ou arc-en-ciel, ruban, rayons, reflets holo, nom doré). Cartes brillantes : voile holo et étincelles.
+- **Nouveau booster** orange avec Wumi et deux amis ; classeur et emplacements vides aux couleurs de la DA.
+- **`/cartes ouvrir nombre:`** : ouvre jusqu'à **5 boosters d'un coup**. Bouton **⏩ Tout voir** pour passer directement au récapitulatif (grille de toutes les cartes, les meilleures listées en premier).
+- Les decks d'édition gardent leur propre rendu.
+
+## 3.0.3
+
+- **Nouvelle pièce de Wumi** sur toutes les cartes (portefeuille, gains, banque, profil, classements) : disque doré avec la mascotte, comme l'emoji. L'ancienne pièce hexagonale de Wumi Run disparaît des images.
+- Visuels de présentation v3 (`outils/promo-v3.js`) et image du Premium (`outils/logo-premium.js`).
+
 ## 3.0.2
 
 - **Stickers recadrés** : plus rien n'est coupé (bulles, confettis, larmes, « zz ») — chaque sticker est recadré avec une marge. `outils/stickers-serveur.js --remplacer` repose les stickers Wumi déjà posés par le bot.

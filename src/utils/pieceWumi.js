@@ -40,59 +40,37 @@ function hexagone(ctx, cx, cy, r, arrondi) {
 
 /**
  * Dessine la piece dans le carre (x, y, taille).
+ * 3.0.3 : la piece de la nouvelle DA (comme l'emoji ku_wumicoin) — disque
+ * dore, tranche orange foncee, la mascotte brun noir aux yeux blancs frappee
+ * au centre. L'ancienne piece hexagonale de Wumi Run est retiree des cartes.
  * @param {CanvasRenderingContext2D} ctx
  */
 function dessinerPiece(ctx, x, y, taille) {
-  const cx = x + taille / 2;
-  const cy = y + taille / 2;
-  const R = taille / 2;
+  const { mascotte, hauteur } = require('./mascotte');
+  const T = taille;
+  const cx = x + T / 2;
+  const cy = y + T / 2;
+  const R = T / 2;
   ctx.save();
-  // Le sprite est un hexagone un peu elargi (38 x 40 px) : on etire en largeur.
-  ctx.translate(cx, cy);
-  ctx.scale(1.1, 1);
-  ctx.translate(-cx, -cy);
-
-  // Contour sombre
-  hexagone(ctx, cx, cy, R, R * 0.22);
-  ctx.fillStyle = COUL.contour;
-  ctx.fill();
-
-  // Corps en or, un peu plus clair en haut
-  const rc = R * 0.84;
-  hexagone(ctx, cx, cy, rc, R * 0.14);
-  const g = ctx.createLinearGradient(0, cy - rc, 0, cy + rc);
-  g.addColorStop(0, COUL.orClair);
-  g.addColorStop(0.55, COUL.or);
-  g.addColorStop(1, COUL.orFonce);
+  // tranche
+  ctx.fillStyle = '#c96f00';
+  ctx.beginPath(); ctx.arc(cx, cy + R * 0.05, R * 0.97, 0, Math.PI * 2); ctx.fill();
+  // face
+  const g = ctx.createLinearGradient(x, y, x + T, y + T);
+  g.addColorStop(0, '#ffd36a');
+  g.addColorStop(1, '#ff9d1b');
   ctx.fillStyle = g;
-  ctx.fill();
-
-  // Hexagone en creux, plus fonce en haut (l'ombre du rebord)
-  const ri = R * 0.48;
-  hexagone(ctx, cx, cy + R * 0.02, ri, R * 0.08);
-  const gi = ctx.createLinearGradient(0, cy - ri, 0, cy + ri);
-  gi.addColorStop(0, COUL.creuxFonce);
-  gi.addColorStop(0.5, COUL.creux);
-  gi.addColorStop(1, COUL.orFonce);
-  ctx.fillStyle = gi;
-  ctx.fill();
-
-  // Barre claire au centre
-  const lb = R * 0.17;
-  const hb = R * 0.5;
-  const xb = cx - lb / 2;
-  const yb = cy - hb / 2 + R * 0.03;
-  const rb = lb / 2.4;
-  ctx.beginPath();
-  ctx.moveTo(xb + rb, yb);
-  ctx.arcTo(xb + lb, yb, xb + lb, yb + hb, rb);
-  ctx.arcTo(xb + lb, yb + hb, xb, yb + hb, rb);
-  ctx.arcTo(xb, yb + hb, xb, yb, rb);
-  ctx.arcTo(xb, yb, xb + lb, yb, rb);
-  ctx.closePath();
-  ctx.fillStyle = COUL.barre;
-  ctx.fill();
-
+  ctx.beginPath(); ctx.arc(cx, cy, R * 0.95, 0, Math.PI * 2); ctx.fill();
+  // cercle grave
+  ctx.strokeStyle = 'rgba(160, 80, 0, 0.55)';
+  ctx.lineWidth = Math.max(1, T * 0.035);
+  ctx.beginPath(); ctx.arc(cx, cy, R * 0.76, 0, Math.PI * 2); ctx.stroke();
+  // mascotte
+  const l = T * 0.56;
+  mascotte(ctx, cx - l / 2, cy - hauteur(l) / 2 + T * 0.02, l, '#221b10', '#ffffff');
+  // reflet
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.beginPath(); ctx.ellipse(x + T * 0.3, y + T * 0.23, T * 0.11, T * 0.055, -0.7, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
 

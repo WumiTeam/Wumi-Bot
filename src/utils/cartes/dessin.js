@@ -231,6 +231,11 @@ function barre(ctx, x, y, w, libelle, valeur, couleur) {
  * numero, et des jauges pour les stats.
  */
 async function carte(c, opts = {}) {
+  // 3.1 : la serie 1 de Wumi passe a la DA v3 (Wumi et ses amis). Les decks
+  // d'edition (ex. l'Auvergne) gardent l'ancien rendu.
+  if (!c.scene && !require('../../edition').profil?.cartes && require('./looks')[c.numero]) {
+    return require('./carteV3').carte(c, { ...opts, nomBrillante: opts.nomBrillante });
+  }
   chargerPolices();
   const r = RARETES[c.rarete];
   const e = ELEMENTS[c.element];
@@ -363,6 +368,7 @@ async function carte(c, opts = {}) {
 
 /** Le paquet ferme (booster). */
 async function booster(opts = {}) {
+  if (!opts.vedette && !require('../../edition').profil?.cartes) return require('./carteV3').booster(opts);
   chargerPolices();
   const w = 420, h = 640;
   const canvas = createCanvas(w, h);
@@ -438,7 +444,7 @@ function vide(numero, opts = {}) {
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
   arrondi(ctx, 0, 0, W, H, 44);
-  ctx.fillStyle = '#2a2650';
+  ctx.fillStyle = '#221a12';
   ctx.fill();
   ctx.setLineDash([22, 16]);
   arrondi(ctx, 18, 18, W - 36, H - 36, 32);
@@ -475,8 +481,8 @@ async function page(emplacements, opts = {}) {
   const canvas = createCanvas(cols * w + (cols + 1) * m, entete + lignesN * (h + m) + m);
   const ctx = canvas.getContext('2d');
   const fond = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  fond.addColorStop(0, '#1d1a3f');
-  fond.addColorStop(1, '#2b1f52');
+  fond.addColorStop(0, '#1a130c');
+  fond.addColorStop(1, '#2a1d10');
   ctx.fillStyle = fond;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (opts.element) {
@@ -509,7 +515,7 @@ async function page(emplacements, opts = {}) {
       ctx.font = '24px "Poppins Bold"';
       const lt = ctx.measureText(t).width + 24;
       arrondi(ctx, x + w - lt - 10, y + h - 46, lt, 36, 18);
-      ctx.fillStyle = '#1b1838';
+      ctx.fillStyle = '#221b10';
       ctx.fill();
       ctx.fillStyle = '#ffffff';
       ctx.fillText(t, x + w - lt + 2, y + h - 27);
@@ -522,13 +528,15 @@ async function page(emplacements, opts = {}) {
 async function rangee(cartes, opts = {}) {
   chargerPolices();
   const s = opts.echelle ?? 0.45, w = W * s, h = H * s, m = 20;
-  const n = Math.max(1, cartes.length);
-  const canvas = createCanvas(n * w + (n + 1) * m, h + 2 * m);
+  // 3.1 : plusieurs boosters d'un coup -> une grille (opts.colonnes par ligne).
+  const n = Math.max(1, Math.min(cartes.length, opts.colonnes ?? cartes.length));
+  const lignesN = Math.max(1, Math.ceil(cartes.length / n));
+  const canvas = createCanvas(n * w + (n + 1) * m, lignesN * (h + m) + m);
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (const [i, c] of cartes.entries()) {
     const cv = c ? await carte(c.carte, { ...opts.optsCarte?.(c.carte), brillante: c.brillante }) : vide('?');
-    ctx.drawImage(cv, m + i * (w + m), m, w, h);
+    ctx.drawImage(cv, m + (i % n) * (w + m), m + Math.floor(i / n) * (h + m), w, h);
   }
   return canvas;
 }

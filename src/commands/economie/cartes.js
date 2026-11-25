@@ -31,6 +31,7 @@ function optsCarte(t) {
     nomElement: t(`cartes.famille.${c.element}`),
     nomRarete: t(`cartes.rarete.${c.rarete}`),
     nomSerie: t('cartes.serie', { n: 1 }),
+    nomBrillante: t('cartes.brillante'),
     total: cartes.TOTAL,
     marque: cartes.EDITION ? require('../../edition').profil.marque : undefined,
     libelles: cartes.EDITION?.libelles ?? [t('cartes.stat_puissance').toUpperCase(), t('cartes.stat_eclat').toUpperCase()],
@@ -62,22 +63,33 @@ async function ecranRevelation(t, s) {
   return C.envoi([C.conteneur([
     C.texte(`### ${t('cartes.carte_x', { i: s.i + 1, n: s.cartes.length })}\n${ligneCarte(t, x)}`),
     C.image('attachment://carte.png'),
-    new ActionRowBuilder().addComponents(bouton),
+    new ActionRowBuilder().addComponents(bouton, ...(derniere ? [] : [new ButtonBuilder().setCustomId(`crt_tout:${s.id}`).setStyle(ButtonStyle.Secondary).setEmoji('⏩').setLabel(t('cartes.tout_voir'))])),
   ], RARETE_COULEUR[x.carte.rarete])], { files: [png(image, 'carte.png')] });
 }
 
 async function ecranRecap(t, s, membre) {
-  const image = await dessin.rangee(s.cartes, { optsCarte: optsCarte(t), echelle: 0.4 });
+  const plusieurs = s.cartes.length > 5;
+  const image = await dessin.rangee(s.cartes, { optsCarte: optsCarte(t), echelle: plusieurs ? 0.3 : 0.4, colonnes: 5 });
   const r = cartes.resume(s.guildId, s.userId);
   return C.envoi([C.conteneur([
-    C.texte(`## 🎴 ${t('cartes.recap_titre', { membre: `${membre}` })}\n${s.cartes.map((x) => ligneCarte(t, x)).join('\n')}`),
+    C.texte(`## 🎴 ${t(plusieurs ? 'cartes.recap_titre_n' : 'cartes.recap_titre', { membre: `${membre}`, n: s.ouverts ?? 1 })}\n${resumeCartes(t, s.cartes)}`),
     C.image('attachment://booster.png'),
     C.texte(`-# ${t('cartes.recap_pied', { n: r.differentes, total: r.total, boosters: r.boosters })}`),
   ], COULEUR)], { files: [png(image, 'booster.png')] });
 }
 
+/** La liste du recap : tout pour un booster ; pour plusieurs, le meilleur d'abord. */
+function resumeCartes(t, liste) {
+  if (liste.length <= 5) return liste.map((x) => ligneCarte(t, x)).join('\n');
+  const tries = [...liste].sort((a, b) => cartes.RARETES.indexOf(b.carte.rarete) - cartes.RARETES.indexOf(a.carte.rarete) || b.brillante - a.brillante || b.nouvelle - a.nouvelle);
+  const mises = tries.filter((x) => x.nouvelle || x.brillante || ['rare', 'epique', 'legendaire', 'mythique'].includes(x.carte.rarete));
+  const reste = liste.length - mises.length;
+  return [...mises.slice(0, 20).map((x) => ligneCarte(t, x)), reste + Math.max(0, mises.length - 20) > 0 ? `-# ${t('cartes.recap_autres', { n: reste + Math.max(0, mises.length - 20) })}` : null].filter(Boolean).join('\n');
+}
+
 async function ouvrir(interaction, t) {
-  const res = cartes.ouvrir(interaction.guildId, interaction.user.id);
+  const voulu = interaction.options.getInteger('amount') ?? 1;
+  const res = cartes.ouvrir(interaction.guildId, interaction.user.id, voulu);
   if (!res) {
     const r = cartes.resume(interaction.guildId, interaction.user.id);
     return interaction.reply(C.infoPrivee(t('cartes.aucun_booster', { reste: r.messages - r.compteur })));
@@ -85,14 +97,15 @@ async function ouvrir(interaction, t) {
   await interaction.deferReply();
   nettoyer();
   const id = crypto.randomBytes(5).toString('hex');
-  const s = { id, guildId: interaction.guildId, userId: interaction.user.id, cartes: res.cartes, i: -1, fin: Date.now() + 15 * 60_000 };
+  const s = { id, guildId: interaction.guildId, userId: interaction.user.id, cartes: res.cartes, ouverts: res.ouverts, i: -1, fin: Date.now() + 15 * 60_000 };
   sessions.set(id, s);
-  const image = await dessin.booster(cartes.EDITION ? { ...cartes.EDITION.booster, haut: require('../../edition').profil.marque.toUpperCase() } : { titre: t('cartes.booster_titre').toUpperCase(), sous: t('cartes.booster_sous', { n: 1 }) });
+  const image = await dessin.booster(cartes.EDITION ? { ...cartes.EDITION.booster, haut: require('../../edition').profil.marque.toUpperCase() } : { titre: t('cartes.booster_titre').toUpperCase(), sous: t('cartes.booster_sous', { n: 1 }), nombre: res.ouverts });
   return interaction.editReply(C.envoi([C.conteneur([
-    C.texte(`## 🎴 ${t('cartes.ouverture_titre', { membre: `${interaction.user}` })}\n-# ${t('cartes.ouverture_restants', { n: res.restants })}`),
+    C.texte(`## 🎴 ${t(res.ouverts > 1 ? 'cartes.ouverture_titre_n' : 'cartes.ouverture_titre', { membre: `${interaction.user}`, n: res.ouverts })}\n-# ${t('cartes.ouverture_restants', { n: res.restants })}`),
     C.image('attachment://paquet.png'),
     new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId(`crt_rev:${id}`).setStyle(ButtonStyle.Primary).setEmoji('✨').setLabel(t('cartes.dechirer'))
+      new ButtonBuilder().setCustomId(`crt_rev:${id}`).setStyle(ButtonStyle.Primary).setEmoji('✨').setLabel(t('cartes.dechirer')),
+      new ButtonBuilder().setCustomId(`crt_tout:${id}`).setStyle(ButtonStyle.Success).setEmoji('⏩').setLabel(t('cartes.tout_voir'))
     ),
   ], COULEUR)], { files: [png(image, 'paquet.png')] }));
 }
@@ -129,7 +142,8 @@ module.exports = {
 
   data: d(n(new SlashCommandBuilder(), 'cards', 'cartes'), 'cartes.description_commande')
     .setContexts(InteractionContextType.Guild)
-    .addSubcommand((s) => d(n(s, 'open', 'ouvrir'), 'cartes.sous_ouvrir'))
+    .addSubcommand((s) => d(n(s, 'open', 'ouvrir'), 'cartes.sous_ouvrir')
+      .addIntegerOption((o) => d(n(o, 'amount', 'nombre'), 'cartes.opt_ouvrir').setMinValue(1).setMaxValue(cartes.OUVERTURE_MAX)))
     .addSubcommand((s) => d(n(s, 'binder', 'classeur'), 'cartes.sous_classeur')
       .addUserOption((o) => d(n(o, 'member', 'membre'), 'cartes.opt_membre'))
       .addStringOption((o) => d(n(o, 'family', 'famille'), 'cartes.opt_famille')
@@ -276,12 +290,12 @@ module.exports = {
     const { t } = traducteur(interaction);
     const [action, a, b] = interaction.customId.split(':');
     try {
-      if (action === 'crt_rev') {
+      if (action === 'crt_rev' || action === 'crt_tout') {
         const s = sessions.get(a);
         if (!s) return interaction.reply(C.infoPrivee(t('cartes.session_finie')));
         if (s.userId !== interaction.user.id) return interaction.reply(C.erreurPrivee(t('cartes.pas_ton_booster')));
         await interaction.deferUpdate();
-        s.i++;
+        s.i = action === 'crt_tout' ? s.cartes.length : s.i + 1;
         if (s.i >= s.cartes.length) {
           sessions.delete(s.id);
           return interaction.editReply({ ...(await ecranRecap(t, s, interaction.user)), attachments: [] });

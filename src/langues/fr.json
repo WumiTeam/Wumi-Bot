@@ -5600,7 +5600,12 @@
     "session_finie": "Ce booster a déjà été ouvert.",
     "pas_ton_booster": "Ce n'est pas ton booster !",
     "membre_absent": "Ce membre n'est plus sur le serveur.",
-    "erreur": "Un souci est survenu avec les cartes. Réessaie dans un instant."
+    "erreur": "Un souci est survenu avec les cartes. Réessaie dans un instant.",
+    "opt_ouvrir": "Combien de boosters ouvrir d'un coup (1 à 5)",
+    "tout_voir": "Tout voir",
+    "recap_titre_n": "Les {n} boosters de {membre}",
+    "ouverture_titre_n": "{membre} ouvre {n} boosters !",
+    "recap_autres": "+ {n} autres cartes (communes déjà vues)"
   },
   "jeuxmusicaux": {
     "description_commande": "Jeux musicaux dans le vocal : quiz, qui l'a choisie, vibe check",

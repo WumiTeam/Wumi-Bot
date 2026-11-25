@@ -58,6 +58,7 @@ const ACHAT_MAX = 10;             // boosters par achat
 const QUOTIDIEN_MS = 20 * 3_600_000;
 const CHANCE_BRILLANTE = 1 / 40;
 const POUSSIERE_BOOSTER = 100;
+const OUVERTURE_MAX = 5;           // boosters ouverts d'un coup (3.1)
 const POUSSIERE = { commune: 5, peu_commune: 10, rare: 25, epique: 60, legendaire: 150, mythique: 500 };
 
 // Chances par emplacement du booster (en %, la somme fait 100).
@@ -111,16 +112,19 @@ function tirer(hasard = Math.random) {
 }
 
 /** Ouvre un booster du stock. null s'il n'y en a pas. */
-function ouvrir(guildId, userId) {
+function ouvrir(guildId, userId, nombre = 1) {
   const j = joueur(guildId, userId);
   if (j.boosters <= 0) return null;
+  // 3.1 : jusqu'a OUVERTURE_MAX boosters d'un coup.
+  const n = Math.max(1, Math.min(Math.floor(nombre) || 1, OUVERTURE_MAX, j.boosters));
   const avant = new Set(q.collection.all(guildId, userId).map((l) => l.numero));
-  const tirage = tirer();
+  const tirage = [];
+  for (let i = 0; i < n; i++) tirage.push(...tirer());
   const maintenant = Date.now();
   db.exec('BEGIN');
   try {
-    j.boosters--;
-    j.ouverts++;
+    j.boosters -= n;
+    j.ouverts += n;
     sauver(j);
     for (const t of tirage) q.ajouterCarte.run(guildId, userId, t.carte.numero, t.brillante ? 1 : 0, maintenant);
     db.exec('COMMIT');
@@ -137,7 +141,7 @@ function ouvrir(guildId, userId) {
   });
   // Revelees de la moins rare a la plus rare : le suspense jusqu'au bout.
   cartes.sort((a, b) => RARETES.indexOf(a.carte.rarete) - RARETES.indexOf(b.carte.rarete) || a.brillante - b.brillante);
-  return { cartes, restants: j.boosters };
+  return { cartes, restants: j.boosters, ouverts: n };
 }
 
 // ---------------------------------------------------------------- GAINS
@@ -275,7 +279,7 @@ function classement(guildId, limite = 10) {
   return q.classement.all(guildId, limite);
 }
 
-module.exports = {
+module.exports = { OUVERTURE_MAX,
   EDITION, SERIE1, FAMILLES, RARETES, PAR_NUMERO, TOTAL,
   BOOSTERS_MAX, ACHAT_MAX, POUSSIERE, POUSSIERE_BOOSTER, EMPLACEMENTS, CHANCE_BRILLANTE,
   reglages, joueur, tirer, ouvrir, noterMessage, quotidien, acheter, estimerRecyclage, recycler,

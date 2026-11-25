@@ -12,7 +12,7 @@
 [![Website](https://img.shields.io/badge/wumi.fr-221b10?style=for-the-badge&logo=googlechrome&logoColor=ff9d1b)](https://wumi.fr)
 [![Support](https://img.shields.io/badge/Support%20server-221b10?style=for-the-badge&logo=discord&logoColor=ffcf8a)](https://discord.gg/VaGrXgnAHS)
 
-![Version](https://img.shields.io/badge/version-3.0-ff9d1b?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.1-ff9d1b?style=flat-square)
 ![discord.js](https://img.shields.io/badge/discord.js-v14-5865f2?style=flat-square&logo=discord&logoColor=white)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522.5-3ddc97?style=flat-square&logo=nodedotjs&logoColor=white)
 ![Commands](https://img.shields.io/badge/commands-90%2B-ffcf8a?style=flat-square)
@@ -89,6 +89,9 @@ Twitch, YouTube, TikTok, Instagram and RSS: every new live or video arrives with
 ## 🖼️ A look inside
 
 <div align="center">
+<img src="docs/assets/v3-cartes.en.jpg" alt="Wumi TCG cards" width="100%">
+<sub><b>Wumi TCG</b>: 72 cards of Wumi and friends, full-art legendaries and mythics.</sub>
+<br><br>
 <img src="docs/assets/v3-niveaux.en.jpg" alt="Level-up cards" width="100%">
 <sub>Level-up and <code>/rank</code> cards, with themes.</sub>
 <br><br>
@@ -107,7 +110,7 @@ Twitch, YouTube, TikTok, Instagram and RSS: every new live or video arrives with
 | Category | What's inside |
 |---|---|
 | 🎮 **Games** | Wumi Run (Discord Activity), Connect Four, tic-tac-toe, hangman, flag quiz and trivia, blind test, counting channel, `/pet`, `/lfg` |
-| 🪙 **Economy** | Daily reward with streak bonus, work, bank with interest, shop with roles, items, missions, `/pay`, `/rob`, leaderboard |
+| 🪙 **Economy** | Daily reward with streak bonus, work, bank with interest, shop with roles, items, missions, `/pay`, `/rob`, leaderboard, **Wumi TCG** (72 collectible cards, up to 5 boosters at once) |
 | 📈 **Levels** | XP (messages and voice), rank and profile cards, themes, badges, prestige, role rewards, global leaderboard, `/wrapped` |
 | 🔨 **Moderation** | warn, mute, kick, ban, softban, massban, purge, lock, slowmode, history, staff notes, appeals, `/snipe`, right-click sanctions |
 | 🛡️ **Security** | `/antinuke`, `/raid` panic button, anti-raid, automod, anti-phishing, `/audit` (score out of 100), structure snapshots and repair |

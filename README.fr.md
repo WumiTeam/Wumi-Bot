@@ -12,7 +12,7 @@
 [![Site](https://img.shields.io/badge/wumi.fr-221b10?style=for-the-badge&logo=googlechrome&logoColor=ff9d1b)](https://wumi.fr/fr/)
 [![Support](https://img.shields.io/badge/Serveur%20support-221b10?style=for-the-badge&logo=discord&logoColor=ffcf8a)](https://discord.gg/VaGrXgnAHS)
 
-![Version](https://img.shields.io/badge/version-3.0-ff9d1b?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.1-ff9d1b?style=flat-square)
 ![discord.js](https://img.shields.io/badge/discord.js-v14-5865f2?style=flat-square&logo=discord&logoColor=white)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522.5-3ddc97?style=flat-square&logo=nodedotjs&logoColor=white)
 ![Commandes](https://img.shields.io/badge/commandes-90%2B-ffcf8a?style=flat-square)
@@ -89,6 +89,9 @@ Twitch, YouTube, TikTok, Instagram et RSS : chaque live ou nouvelle vidéo arriv
 ## 🖼️ Un aperçu
 
 <div align="center">
+<img src="docs/assets/v3-cartes.fr.jpg" alt="Cartes Wumi TCG" width="100%">
+<sub><b>Wumi TCG</b> : 72 cartes de Wumi et ses amis, légendaires et mythiques en pleine image.</sub>
+<br><br>
 <img src="docs/assets/v3-niveaux.fr.jpg" alt="Cartes de niveau" width="100%">
 <sub>Cartes de montée de niveau et <code>/rank</code>, avec thèmes.</sub>
 <br><br>
@@ -107,7 +110,7 @@ Twitch, YouTube, TikTok, Instagram et RSS : chaque live ou nouvelle vidéo arriv
 | Catégorie | Au programme |
 |---|---|
 | 🎮 **Jeux** | Wumi Run (Activité Discord), puissance 4, morpion, pendu, quiz des drapeaux et culture générale, blind test, salon de comptage, `/pet`, `/lfg` |
-| 🪙 **Économie** | Récompense quotidienne avec bonus de série, travail, banque avec intérêts, boutique avec rôles, objets, missions, `/payer`, `/braquer`, classement |
+| 🪙 **Économie** | Récompense quotidienne avec bonus de série, travail, banque avec intérêts, boutique avec rôles, objets, missions, `/payer`, `/braquer`, classement, **Wumi TCG** (72 cartes à collectionner, jusqu'à 5 boosters d'un coup) |
 | 📈 **Niveaux** | XP (messages et vocal), cartes de rang et de profil, thèmes, badges, prestige, rôles par palier, classement mondial, `/wrapped` |
 | 🔨 **Modération** | avertir, muet, expulser, bannir, softban, massban, purge, verrouillage, mode lent, historique, notes du staff, appels, `/snipe`, sanction au clic droit |
 | 🛡️ **Sécurité** | `/antinuke`, bouton panique `/raid`, anti-raid, automod, anti-phishing, `/audit` (note sur 100), photos de structure et réparation |

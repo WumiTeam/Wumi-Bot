@@ -5600,7 +5600,12 @@
     "session_finie": "This booster has already been opened.",
     "pas_ton_booster": "That's not your booster!",
     "membre_absent": "This member is no longer on the server.",
-    "erreur": "Something went wrong with the cards. Try again in a moment."
+    "erreur": "Something went wrong with the cards. Try again in a moment.",
+    "opt_ouvrir": "How many boosters to open at once (1 to 5)",
+    "tout_voir": "Show all",
+    "recap_titre_n": "{membre}'s {n} boosters",
+    "ouverture_titre_n": "{membre} is opening {n} boosters!",
+    "recap_autres": "+ {n} more cards (commons you already had)"
   },
   "jeuxmusicaux": {
     "description_commande": "Music games in voice: quiz, who picked it, vibe check",
